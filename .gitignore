@@ -1,0 +1,17 @@
+# virtualenv and bytecode
+.venv/
+__pycache__/
+*.pyc
+
+# generated corpus and index — rebuild with scripts/extract_man.py + build_index.py
+data/corpus/*.jsonl
+data/index/
+
+# GGUF weights — fetch with scripts/fetch_models.py
+models/
+
+# server logs and pid files
+.run/
+
+# retrieval cache used to split eval into two stages
+data/eval/results/*-retrieved.json

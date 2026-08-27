@@ -1,0 +1,116 @@
+{
+  "pages_discovered": 4125,
+  "pages_extracted": 4114,
+  "so_aliases": 11,
+  "failures": 0,
+  "failure_ids": [],
+  "sections_total": 38915,
+  "sections_per_page": 9.5,
+  "see_also_edges": 15040,
+  "pages_with_edges": 2954,
+  "name_aliases": 4570,
+  "body_chars": 41194631,
+  "top_headings": [
+    [
+      "NAME",
+      4093
+    ],
+    [
+      "DESCRIPTION",
+      3771
+    ],
+    [
+      "SEE ALSO",
+      3348
+    ],
+    [
+      "SYNOPSIS",
+      2967
+    ],
+    [
+      "OPTIONS",
+      1960
+    ],
+    [
+      "AUTHOR",
+      1119
+    ],
+    [
+      "EXAMPLES",
+      795
+    ],
+    [
+      "COPYRIGHT",
+      742
+    ],
+    [
+      "NOTES",
+      740
+    ],
+    [
+      "BUGS",
+      632
+    ],
+    [
+      "FILES",
+      583
+    ],
+    [
+      "AUTHORS",
+      523
+    ],
+    [
+      "ENVIRONMENT",
+      428
+    ],
+    [
+      "REPORTING BUGS",
+      366
+    ],
+    [
+      "HISTORY",
+      325
+    ],
+    [
+      "EXIT STATUS",
+      322
+    ],
+    [
+      "GIT",
+      189
+    ],
+    [
+      "EXAMPLE",
+      188
+    ],
+    [
+      "AVAILABILITY",
+      160
+    ],
+    [
+      "COMMANDS",
+      147
+    ],
+    [
+      "CONFIGURATION",
+      137
+    ],
+    [
+      "CONFORMING TO",
+      99
+    ],
+    [
+      "Description",
+      88
+    ],
+    [
+      "Synopsis",
+      82
+    ],
+    [
+      "MODULE NAME",
+      77
+    ]
+  ],
+  "elapsed_s": 26.8
+}

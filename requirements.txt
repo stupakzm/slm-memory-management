@@ -1,0 +1,2 @@
+# The only third-party dependency. Everything else is the standard library.
+sqlite-vec==0.1.9
