@@ -32,7 +32,7 @@ Nothing here asks them to.
 |---|---|---|
 | Corpus | Structured extraction from installed man pages | **done** — 4,114 pages, 38,915 sections, 15,040 cross-references |
 | 0 | Evaluation set, before any system exists | **done** — 166 questions, 24% unanswerable, all verified |
-| 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, see `docs/phase1-results.md` |
+| 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, prefix ablation run; see `docs/phase1-results.md` |
 | 2 | Precision layer: BM25 + reranker + abstention gate | next |
 | 3 | Hierarchy, only if phase 2 leaves a gap | |
 | 4 | Gated tool use | |

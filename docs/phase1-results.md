@@ -176,3 +176,53 @@ the specific case where retrieval quietly returned nothing useful.
 3. **BM25 fused with dense.** For the 39 `exact-token` questions and the `no-tool`
    collapse. Needs typo tolerance — dense handled misspellings fine, BM25 will not.
 4. **GBNF-enforced citations.** Fabricated `[3]` markers prove prompting is not enough.
+
+## Ablation: does the document-identity prefix help?
+
+Every chunk in the main index is prefixed with `tar(1) - an archiving utility`, on
+the theory that a window from the middle of a long page otherwise never says which
+command it documents. That was an assumption, so it got its own 39-minute index
+build and its own eval.
+
+| metric | no prefix | prefix | delta |
+|---|---|---|---|
+| recall@1 | 33.3% | 34.9% | +1.6% |
+| recall@3 | 50.0% | 55.6% | +5.6% |
+| **recall@5** | **57.9%** | **63.5%** | **+5.6%** |
+| recall@10 | 64.3% | 75.4% | +11.1% |
+| recall@20 | 78.6% | 83.3% | +4.8% |
+| MRR@10 | 0.432 | 0.471 | +0.039 |
+
+At k=5: **14 questions fixed, 7 broken, net +7.** Not a uniform improvement, which
+is why the comparison is reported per question rather than as a single number.
+
+Per tag, in raw question counts rather than percentages — the distinction matters:
+
+| tag | n | no prefix → prefix | |
+|---|---|---|---|
+| flag lookup | 81 | 40 → 46 | **+6** |
+| exact-token | 39 | 23 → 27 | **+4** |
+| variant-terse | 15 | 9 → 13 | **+4** |
+| config | 27 | 20 → 21 | +1 |
+| variant-typo | 15 | 8 → 8 | 0 |
+| concept | 16 | 12 → 11 | −1 |
+| variant-no-tool | 15 | 6 → 5 | −1 |
+
+**Decision: keep the prefix.** It wins on the core use case (flag lookup, +6) and
+most strongly on terse queries (+4 of 15), which is how these questions actually get
+typed. The mechanism is straightforward: the prefix injects the tool name into every
+chunk, so a query that names the tool matches far more of the page.
+
+A caution about reading this table. As percentages, `concept` (−6.2%) and
+`variant-no-tool` (−6.7%) look like a real trade-off, and there is a tidy story
+available — the prefix should dilute chunks when the query deliberately avoids
+naming the tool. **Both "regressions" are one question.** On subsets of 15 and 16
+that is noise, and the tidy story is not supported. The effect may well be real; this
+experiment cannot show it. If it matters later, it needs more `no-tool` questions,
+not a firmer conclusion from these.
+
+The score gate is a wash: 65.0% abstention recall at ≥90% coverage without the
+prefix, 62.5% with it. Prefixing does not help abstention either way.
+
+Both indexes are kept. `scripts/compare_runs.py` reports fixed/broken by qid, per-tag
+deltas, and the gate operating point for any two runs.
