@@ -31,6 +31,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from smm import fingerprint, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
+from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
 from smm.retrieve import Retriever  # noqa: E402
 
@@ -57,7 +58,22 @@ def main() -> int:
     ap.add_argument("--dense-weight", type=float, default=1.0)
     ap.add_argument("--bm25-weight", type=float, default=1.0)
     ap.add_argument("--topk", type=int, default=max(KS), help="depth the metrics are scored to")
+    ap.add_argument("--rewrites", type=int, default=0,
+                    help="fuse each question with N model rewrites, each retrieved and "
+                         "reranked separately at candidates=20/variant (measured default; "
+                         "see src/smm/retrieve.py:VARIANT_CANDIDATES); 0 reproduces "
+                         "existing runs exactly")
+    ap.add_argument("--gen-url", default="http://127.0.0.1:8080",
+                    help="generator llama-server, used only when --rewrites > 0")
     args = ap.parse_args()
+
+    gen = None
+    if args.rewrites:
+        gen = Generator(args.gen_url)
+        if not gen.health():
+            print(f"no generator at {args.gen_url}: "
+                  f"./scripts/servers.sh start generator", file=sys.stderr)
+            return 2
 
     emb = None
     if args.mode in ("dense", "hybrid"):
@@ -92,14 +108,20 @@ def main() -> int:
                   domain=args.domain)
     config = {"mode": args.mode, "rerank": args.rerank, "candidates": pool,
               "dense_weight": args.dense_weight, "bm25_weight": args.bm25_weight,
-              "domain": args.domain, "domains_in_index": store.domains(db)}
+              "domain": args.domain, "domains_in_index": store.domains(db),
+              "rewrites": args.rewrites}
     print(f"index: {n_chunks} chunks  meta={meta}")
     print(f"pipeline: {config}\n")
 
     rows = [json.loads(l) for l in (ROOT / args.eval).open(encoding="utf-8")]
     per_q, t0 = [], time.time()
     for i, row in enumerate(rows, 1):
-        res = r.retrieve(row["question"], k=args.topk)
+        if args.rewrites:
+            rewrites = gen.rewrites(row["question"], n=args.rewrites)
+            res, _winner, _variants = r.retrieve_fused(row["question"], rewrites=rewrites,
+                                                        k=args.topk)
+        else:
+            res = r.retrieve(row["question"], k=args.topk)
         top = res[0] if res else None
         rec = {
             "qid": row["qid"], "kind": row["kind"], "tags": row["tags"],

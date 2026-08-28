@@ -23,6 +23,33 @@ extracts provided. Follow these rules exactly:
 - Be brief. No preamble."""
 
 
+# Grammar for N alternative search-query rewrites, one per line, no numbering.
+# Same house idiom as smm.grammar.cited_answer: a GBNF template with the one
+# free parameter (here, exactly N lines) filled in by string replacement,
+# because GBNF's own `{m,n}` repetition syntax collides with str.format.
+REWRITE_TEMPLATE = r'''
+root ::= line ("\n" line){REPS}
+line ::= [^\n]+
+'''
+
+
+def _rewrite_grammar(n: int) -> str:
+    """Grammar admitting exactly n non-empty lines, each on its own line."""
+    n = max(1, n)
+    return REWRITE_TEMPLATE.replace("REPS", f"{n - 1},{n - 1}").strip() + "\n"
+
+
+def build_rewrite_prompt(question: str, n: int) -> list[dict]:
+    system = (f"Rewrite the user's request as {n} alternative search queries for a "
+              "Linux manual-page search engine. Each on its own line, no numbering, "
+              "no explanation. Keep them short, name the likely command if you can, "
+              "and vary the wording.")
+    return [
+        {"role": "system", "content": system},
+        {"role": "user", "content": question},
+    ]
+
+
 def build_prompt(question: str, chunks: list[dict]) -> list[dict]:
     parts = []
     for i, c in enumerate(chunks, 1):
@@ -61,6 +88,19 @@ class Generator:
         citation - see smm.grammar for what that does and does not guarantee."""
         g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
         return self.chat(build_prompt(question, chunks), grammar=g, **kw)
+
+    def rewrites(self, question: str, n: int = 1, max_tokens: int = 120) -> list[str]:
+        """N grammar-constrained alternative search queries for `question`, one per
+        line, no numbering. Grammar-constrained rather than filtered afterwards on
+        purpose: the local 4B is sloppy at this (one run produced a 300-token blob
+        of ORs) and rank fusion is what makes the fused-retrieval path robust to a
+        bad variant, not a quality check here - see retrieve.fuse_variants.
+        """
+        if n <= 0:
+            return []
+        text = self.chat(build_rewrite_prompt(question, n), max_tokens=max_tokens,
+                         temperature=0.0, grammar=_rewrite_grammar(n))
+        return [l.strip() for l in text.splitlines() if l.strip()][:n]
 
     def health(self) -> bool:
         try:

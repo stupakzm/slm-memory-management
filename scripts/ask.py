@@ -9,10 +9,27 @@ default because it did not beat this - see docs/phase3-results.md.
   .venv/bin/python scripts/ask.py --retrieve-only -k 10 "watch a log file as it grows"
   .venv/bin/python scripts/ask.py --no-gate "how do I install python packages with pip"   # see it speak
   .venv/bin/python scripts/ask.py --act "delete the build directory and everything in it"
+  .venv/bin/python scripts/ask.py --rewrites 2 "how to list files via size"   # phrasing robustness
 
 The gate is on by default and the threshold is not a taste decision - it is the
 operating point `scripts/sweep_gate.py` picked off the labelled set. Below it the
 generator is never invoked, so there is nothing to speculate with.
+
+`--rewrites N` (default 1) fuses the question with N model-generated rewrites:
+each variant is retrieved and reranked separately and the reranked lists are
+combined by rank fusion (measured; see src/smm/retrieve.py:fuse_variants -
+reranking a single pre-fused pool was tried and barely moved gold). `--rewrites 0`
+reproduces today's single-query path exactly. Under `--retrieve-only` the default
+is 0 instead of 1 - that mode stays generator-free unless `--rewrites` is passed
+explicitly.
+
+Known, accepted tradeoff: with `--rewrites` > 0 the generator has to produce the
+rewrites *before* retrieval can run, so it now starts before the embedder/reranker
+and before the gate decision - on every such ask, including one the gate goes on
+to refuse. That both reorders the embedder -> reranker -> generator lazy-start
+sequence and pays the generator's ~3.7GB VRAM load on a query-only outcome, which
+is exactly what the project's VRAM-budget and lazy-start notes say never happens.
+This was a deliberate choice for this feature, not an oversight.
 """
 
 from __future__ import annotations
@@ -64,8 +81,28 @@ def main() -> int:
                          "is never run by this program under any flag")
     ap.add_argument("--retrieve-only", action="store_true")
     ap.add_argument("--show-context", action="store_true")
+    ap.add_argument("--rewrites", type=int, default=None,
+                    help="fuse the question with N model-generated rewrites, each "
+                         "retrieved and reranked separately (default 1; 0 under "
+                         "--retrieve-only unless passed explicitly). --rewrites 0 "
+                         "reproduces the single-query path exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
+    if args.rewrites is None:
+        args.rewrites = 0 if args.retrieve_only else 1
+
+    rewrite_texts: list[str] = []
+    interpreted_idx = 0
+    gen = None
+    if args.rewrites > 0:
+        # Deliberate reorder (see module docstring): the generator has to run
+        # before retrieval to produce the rewrites, so it starts here - before
+        # the embedder/reranker and before the gate - on every such ask.
+        gen = Generator()
+        if not gen.health():
+            print("generator not running: ./scripts/servers.sh start generator", file=sys.stderr)
+            return 2
+        rewrite_texts = gen.rewrites(question, n=args.rewrites)
 
     emb = Embedder()
     if not emb.health():
@@ -81,12 +118,18 @@ def main() -> int:
     db = store.connect(ROOT / args.db)
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                   candidates=args.candidates, domain=args.domain)
-    hits = r.retrieve(question, k=args.k)
+    if args.rewrites > 0:
+        hits, interpreted_idx, _variants = r.retrieve_fused(question, rewrites=rewrite_texts, k=args.k)
+    else:
+        hits = r.retrieve(question, k=args.k)
     score = gate_score(hits)
     if args.act and args.gate == GATE:
         args.gate = GATE_ACT
     if args.expand:
         hits = expand(db, hits, span=args.expand)
+
+    if interpreted_idx != 0 and rewrite_texts:
+        print(f'interpreted as: "{rewrite_texts[interpreted_idx - 1]}"')
 
     if args.retrieve_only or args.show_context:
         for i, h in enumerate(hits, 1):
@@ -101,10 +144,11 @@ def main() -> int:
               f"below {args.gate:.3f} - the model was not asked)")
         return 0
 
-    gen = Generator()
-    if not gen.health():
-        print("generator not running: ./scripts/servers.sh start generator", file=sys.stderr)
-        return 2
+    if gen is None:
+        gen = Generator()
+        if not gen.health():
+            print("generator not running: ./scripts/servers.sh start generator", file=sys.stderr)
+            return 2
 
     if args.act:
         return act(gen, db, question, hits, args)

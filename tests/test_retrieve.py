@@ -1,0 +1,197 @@
+"""Tests for query-rewrite fusion (tsk_20260828_a47f0496): fuse the original
+question with model-generated rewrites, each retrieved AND reranked separately,
+combined by rrf() - and surface which variant's list won.
+
+Hermetic by design (blk_test_env_constraints): this worktree has no .venv, no
+data/, no models/, and `smm.retrieve` imports `smm.store`, which imports the
+third-party `sqlite_vec` (absent here, and not to be added - it's a real
+extension module, not something worth stubbing meaningfully for a unit test).
+`sqlite_vec` is stubbed in `sys.modules` before the import below so `smm.store`
+loads without it; nothing here ever opens a real sqlite3 connection or calls
+into the stub, so its contents don't matter, only its presence.
+
+`fuse_variants` is exercised directly with a plain `retrieve_fn` callable (no DB,
+no GPU, no third-party imports) exactly as designed for testability. The winner
+scenario in `test_fusion_promotes_low_ranked_original_hit` is modelled on the
+measured numbers from tsk_20260828_a47f0496: the query "how to list files via
+size" reranks `ls.1:4` (the correct chunk) behind four `size.1` /
+`x86_64-linux-gnu-size.1` chunks (0.9967 / 0.9957 / 0.9892 / 0.9848 vs 0.9661) -
+a rewrite that does not surface the `size` pages at all lets rank fusion recover
+the gold chunk to the top.
+"""
+
+from __future__ import annotations
+
+import sys
+import types
+from pathlib import Path
+
+if "sqlite_vec" not in sys.modules:
+    stub = types.ModuleType("sqlite_vec")
+    stub.load = lambda *a, **kw: None  # never called: no real db is opened here
+    sys.modules["sqlite_vec"] = stub
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
+
+from smm.retrieve import KEEP, Retriever, fuse_variants, rrf  # noqa: E402
+
+
+def check(cond, msg):
+    if not cond:
+        raise AssertionError(msg)
+
+
+def c(chunk_id, **kw):
+    return dict(chunk_id=chunk_id, **kw)
+
+
+# --------------------------------------------------------------------------
+# fuse_variants: pure, hermetic, exercised with a plain retrieve_fn callable.
+# --------------------------------------------------------------------------
+
+
+def test_fusion_promotes_low_ranked_original_hit():
+    """Modelled on the measured evidence: the original question's reranked list
+    buries the gold chunk (ls.1:4) behind four size.1 chunks; a rewrite that
+    does not surface `size` pages ranks it first. Fusing the two RERANKED lists
+    by rrf() must recover ls.1:4 to the top - and name the rewrite as the winner.
+    """
+    question = "how to list files via size"
+    rewrite = "command to see the largest files in a directory"
+    variants = [question, rewrite]
+
+    original_reranked = [
+        c("size.1:1", rerank_score=0.9967),
+        c("size.1:2", rerank_score=0.9957),
+        c("x86_64-linux-gnu-size.1:1", rerank_score=0.9892),
+        c("x86_64-linux-gnu-size.1:2", rerank_score=0.9848),
+        c("ls.1:4", rerank_score=0.9661),
+    ]
+    rewrite_reranked = [
+        c("ls.1:4", rerank_score=0.99),
+        c("du.1:2", rerank_score=0.80),
+        c("sort.1:1", rerank_score=0.75),
+    ]
+    lists = {question: original_reranked, rewrite: rewrite_reranked}
+
+    calls = []
+
+    def retrieve_fn(q):
+        calls.append(q)
+        return lists[q]
+
+    fused, winner = fuse_variants(retrieve_fn, variants, k=KEEP)
+
+    check(calls == variants, f"each variant must be retrieved exactly once, in order: {calls}")
+    check(fused, "fusion should not return an empty list")
+    check(fused[0]["chunk_id"] == "ls.1:4",
+          f"gold chunk should win the fused ranking, got {fused[0]['chunk_id']}")
+    check(winner == 1, f"the rewrite (index 1) should be named as the winner, got {winner}")
+    check(variants[winner] == rewrite, "winner index must map back to the rewrite text")
+
+    # Sanity check against a plain, un-fused rrf() call over the same lists:
+    # fusing must genuinely move the chunk, not just relabel the original top.
+    plain = rrf([original_reranked, rewrite_reranked])
+    check(plain[0]["chunk_id"] == "ls.1:4", "cross-check: rrf() over these two lists agrees")
+
+
+def test_fusion_original_wins_when_it_is_actually_better():
+    """The original question is `variants[0]`; when its list ranks the gold hit
+    first (and the rewrite only surfaces it lower, behind an off-target hit of
+    its own), the fused winner must be attributed to the original question
+    (index 0), not the rewrite."""
+    question = "how do I watch a log file as it grows"
+    rewrite = "monitor a file for changes"
+    variants = [question, rewrite]
+
+    original_reranked = [c("tail.1:2", rerank_score=0.98), c("other.1:1", rerank_score=0.4)]
+    rewrite_reranked = [c("watch.1:1", rerank_score=0.6), c("tail.1:2", rerank_score=0.5),
+                        c("inotifywait.1:1", rerank_score=0.3)]
+    lists = {question: original_reranked, rewrite: rewrite_reranked}
+
+    fused, winner = fuse_variants(lambda q: lists[q], variants, k=KEEP)
+
+    check(fused[0]["chunk_id"] == "tail.1:2", f"expected tail.1:2 on top, got {fused[0]}")
+    check(winner == 0, f"the original question should be named winner, got {winner}")
+
+
+def test_fusion_respects_k():
+    """The fused list is truncated to k, same contract as Retriever.retrieve()."""
+    variants = ["q1", "q2"]
+    lists = {
+        "q1": [c(f"a{i}", rerank_score=1.0 - i * 0.01) for i in range(5)],
+        "q2": [c(f"b{i}", rerank_score=1.0 - i * 0.01) for i in range(5)],
+    }
+    fused, _winner = fuse_variants(lambda q: lists[q], variants, k=3)
+    check(len(fused) == 3, f"fused list should be truncated to k=3, got {len(fused)}")
+
+
+def test_fusion_empty_variant_list_is_a_noop():
+    fused, winner = fuse_variants(lambda q: [], [], k=KEEP)
+    check(fused == [], "no variants -> no fused hits")
+    check(winner == 0, "winner defaults to 0 with nothing retrieved")
+
+
+# --------------------------------------------------------------------------
+# Retriever.retrieve_fused: call-count contract at the level ask.py uses.
+# --------------------------------------------------------------------------
+
+
+def test_retrieve_fused_with_no_rewrites_issues_exactly_one_retrieval_call():
+    """rewrites=0 (`ask.py --rewrites 0`, or omitted rewrites here) must retrieve
+    the question and nothing else - one call, not N+1."""
+    r = Retriever(db=None, embedder=None, reranker=None, mode="dense")
+    calls = []
+
+    def fake_candidates_for(question, n=None):
+        calls.append((question, n))
+        return [c("only.1:1", score=0.9)]
+
+    r.candidates_for = fake_candidates_for  # instance override; no real db touched
+
+    fused, winner, variants = r.retrieve_fused("how do I list files", rewrites=None, k=KEEP)
+
+    check(len(calls) == 1, f"expected exactly one retrieval call, got {len(calls)}: {calls}")
+    check(variants == ["how do I list files"], f"variants should be just the question: {variants}")
+    check(winner == 0, "the only variant is the question itself")
+    check(fused and fused[0]["chunk_id"] == "only.1:1", f"unexpected fused result: {fused}")
+
+
+def test_retrieve_fused_issues_one_call_per_variant_at_variant_candidates():
+    """N rewrites -> N+1 retrieval calls, each at variant_candidates (default 20
+    per the measured briefing), independent of the top-level `candidates` the
+    Retriever was constructed with."""
+    r = Retriever(db=None, embedder=None, reranker=None, mode="dense", candidates=50)
+    calls = []
+
+    def fake_candidates_for(question, n=None):
+        calls.append((question, n))
+        return [c(f"{question}-hit", score=0.9)]
+
+    r.candidates_for = fake_candidates_for
+
+    fused, winner, variants = r.retrieve_fused(
+        "how do I list files", rewrites=["show files by size", "ls command sort"], k=KEEP,
+    )
+
+    check(len(calls) == 3, f"expected 3 retrieval calls (question + 2 rewrites), got {len(calls)}")
+    check(all(n == 20 for _, n in calls), f"each variant call should use candidates=20: {calls}")
+    check(variants == ["how do I list files", "show files by size", "ls command sort"], variants)
+    check(fused, "fused result should not be empty")
+
+
+if __name__ == "__main__":
+    tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
+    failed = 0
+    for t in tests:
+        try:
+            t()
+            print(f"  pass  {t.__name__}")
+        except AssertionError as e:
+            failed += 1
+            print(f"  FAIL  {t.__name__}: {e}")
+        except Exception as e:  # noqa: BLE001 - a crashing test is still a failure to report
+            failed += 1
+            print(f"  FAIL  {t.__name__}: {type(e).__name__}: {e}")
+    print(f"\n{len(tests) - failed}/{len(tests)} passed")
+    raise SystemExit(1 if failed else 0)
