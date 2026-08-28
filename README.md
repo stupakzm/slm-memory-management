@@ -36,13 +36,13 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 
 | Phase | What | State |
 |---|---|---|
-| Corpus | Structured extraction from installed man pages | **done** — 4,114 pages, 38,915 sections, 15,040 cross-references |
+| Corpus | Structured extraction from installed man pages | **done** — 4,147 pages; a phase 4 fix recovered cross-reference tags on 1,084 of them |
 | 0 | Evaluation set, before any system exists | **done** — 166 questions, 24% unanswerable, all verified |
 | 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, prefix ablation run; see `docs/phase1-results.md` |
 | 2 | Precision layer: reranker + abstention gate + GBNF citations | **done** — recall@5 71.4%, abstention 92.5%, uncited claims 0%; BM25 measured and rejected; see `docs/phase2-results.md` |
 | 3 | Structure-aware chunking | **done, reverted** — +8 questions, −8 questions, net zero; and cleaner chunks made the abstention gate *worse*; see `docs/phase3-results.md` |
-| 4 | Gated tool use | next |
-| 5 | User-fed knowledge loop | |
+| 4 | Gated tool use | **done** — zero unconfirmed executions across 480 requests; GBNF takes valid calls from 17.5% to 100%; see `docs/phase4-results.md` |
+| 5 | User-fed knowledge loop | next |
 
 ## From a fresh clone
 
@@ -72,7 +72,12 @@ cmake --build ~/opt/llama.cpp/build -j"$(nproc)" \
 .venv/bin/python scripts/build_lexical.py --from data/index/phase1-prefix.db --out data/index/phase2.db
 ./scripts/servers.sh stop && ./scripts/servers.sh start serve
 .venv/bin/python scripts/ask.py "how do I exclude files listed in a text file from a tar archive"
+.venv/bin/python scripts/ask.py --act "make a gzip-compressed archive of the reports folder"
 ```
+
+`--act` is tool mode: the system answers, proposes a command, opens a manual page, or
+refuses. A proposed command is printed with its risk and **never run** — execution is
+opt-in per tool and only a validated, read-only manual page qualifies.
 
 Phase 2 answers a question with three models at once, so `servers.sh start serve`
 runs them with query-sized batches — the indexing profile reserves a 600 MB compute
@@ -123,6 +128,7 @@ C programming reference and are deliberately excluded.
 ```
 src/smm/corpus/manpages.py   discover / render / parse man pages
 src/smm/structure.py         split a section into the entries a reader sees in it
+src/smm/tools.py             tool schemas, GBNF per schema, validate-before-execute
 src/smm/chunk.py             flat windows (default) and the structure-aware chunker
 src/smm/retrieve.py          the pipeline: candidates -> fuse -> rerank -> gate
 src/smm/rerank.py            cross-encoder client
@@ -133,8 +139,12 @@ scripts/build_lexical.py     add the BM25 half to an existing dense index
 scripts/chunk_stats.py       chunking cost and ceiling, before spending GPU time
 scripts/corpus_grep.py       search the extracted corpus
 scripts/resolve_gold.py      eval-set validator: no gold by assertion, no leaked answers
+scripts/resolve_tools.py     the same rule for the tool eval set
+scripts/eval_tools.py        tool-call accuracy, over-action, and the execution gate
 scripts/sweep_gate.py        pick the abstention threshold on the labelled set
 scripts/compare_runs.py      per-question diff between two runs
 data/eval/questions.jsonl    phase 0 evaluation set (version-controlled)
+data/eval/tool_questions.jsonl  phase 4 tool eval set (version-controlled)
+tests/test_tools.py          asserts the execution gate directly
 docs/research-briefing.html  the research this design follows
 ```

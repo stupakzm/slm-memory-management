@@ -179,16 +179,40 @@ def render(path: Path) -> str:
     return col.stdout.decode("utf-8", "replace")
 
 
-def _strip_running_heads(lines: list[str]) -> list[str]:
-    """Drop the repeated `TAR(1) ... TAR(1)` header and footer lines."""
+def _strip_running_heads(lines: list[str], mf: ManFile | None = None) -> list[str]:
+    """Drop the repeated `TAR(1) ... TAR(1)` header and footer lines.
+
+    The test has to separate a running head from a *tagged paragraph whose tag is a
+    cross-reference*, because groff renders both as a line consisting of a
+    `name(section)` token. Index-style pages are made almost entirely of the latter:
+
+        pip3-install(1)
+               Install packages.
+
+    Requiring only "starts and ends with the same token" called that a running head
+    and deleted it, taking the tag and leaving the orphaned description - across
+    1,084 of 4,158 pages, and taking the whole of `git.1`'s subcommand list and
+    `pip.1`'s command list with it. Two conditions separate them:
+
+    - a genuine running head has the token at *both ends with content between*
+      (`TAR(1)   General Commands Manual   TAR(1)`), so the line must be longer than
+      the token it starts with;
+    - a page-break remnant is a lone token naming *this page*, so it is dropped only
+      when it matches the document's own name and section.
+
+    A lone `dircolors(1)` inside `ls.1` satisfies neither and is kept, which is
+    correct: it is a tag, and its description belongs to it.
+    """
+    own = f"{mf.name}({mf.section})".lower() if mf else None
     out = []
     for ln in lines:
         stripped = ln.strip()
-        if stripped and _RUNNING_HEAD_RE.search(stripped) and _XREF_RE.match(stripped):
-            # A running head starts and ends with the same NAME(sec) token.
-            first = _XREF_RE.match(stripped)
-            if stripped.endswith(first.group(0)):
-                continue
+        first = _XREF_RE.match(stripped) if stripped else None
+        if first and _RUNNING_HEAD_RE.search(stripped) and stripped.endswith(first.group(0)):
+            if len(stripped) > len(first.group(0)):
+                continue                                  # token ... token
+            if own and stripped.lower() == own:
+                continue                                  # this page's own head
         out.append(ln)
     return out
 
@@ -202,7 +226,7 @@ def _dedent(block: list[str], amount: int) -> str:
 
 
 def parse(rendered: str, mf: ManFile) -> ManDoc:
-    lines = _strip_running_heads(rendered.splitlines())
+    lines = _strip_running_heads(rendered.splitlines(), mf)
 
     # Title from the running head's centre field, before it was stripped.
     title = ""

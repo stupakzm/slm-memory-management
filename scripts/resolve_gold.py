@@ -76,10 +76,23 @@ def main() -> int:
             if leaked:
                 warnings.append(f"{r['qid']}: question leaks answer token(s) {leaked}")
         else:
-            if r.get("unanswerable_reason") == "tool-not-installed":
-                tool = r["unanswerable_detail"]
-                if tool in names:
-                    errors.append(f"{r['qid']}: {tool!r} IS installed ({names[tool][0]}) - not unanswerable")
+            reason = r.get("unanswerable_reason")
+            detail = r.get("unanswerable_detail") or ""
+            if reason == "tool-not-installed":
+                if detail in names:
+                    errors.append(f"{r['qid']}: {detail!r} IS installed ({names[detail][0]}) - not unanswerable")
+            elif reason == "out-of-corpus":
+                # This check did not exist, and that is how a wrong label survived
+                # three phases: u22 claimed pip was out of corpus while pip.1,
+                # pip-install.1 and pip3-install.1 were all indexed, and every phase
+                # scored the documented answer as a hallucination. An out-of-corpus
+                # question must now name the page it would need, and that page must
+                # genuinely be absent.
+                if not detail:
+                    errors.append(f"{r['qid']}: out-of-corpus but names no needed page")
+                elif detail in docs:
+                    errors.append(f"{r['qid']}: claims {detail!r} is out of corpus, "
+                                  f"but it is indexed")
 
     print(f"questions            : {len(rows)}")
     print(f"  answerable         : {sum(1 for r in rows if r['kind']=='answerable')}")

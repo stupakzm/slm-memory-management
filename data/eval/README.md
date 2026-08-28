@@ -1,22 +1,32 @@
+# Evaluation sets
+
+Two files, both written before the system they measure, which is the whole point:
+they are the only things that can say whether a phase actually helped.
+
+- `questions.jsonl` — 166 documentation questions (phase 0)
+- `tool_questions.jsonl` — 80 tool-calling requests (phase 4)
+
 # Phase 0 evaluation set
 
-111 questions against the man pages installed on this machine. Written before any
-retrieval system exists, which is the whole point: it is the only thing that can
-tell you whether a later phase actually helped.
+166 questions against the man pages installed on this machine.
 
 ## Composition
 
 | | count | |
 |---|---|---|
-| Answerable | 81 | 71 unique + 10 paraphrases |
-| Unanswerable | 30 (27%) | 27 unique + 3 paraphrases |
-| Distinct gold documents | 56 | |
+| Answerable | 127 | 71 unique + 13 paraphrases + 55 query-noise variants |
+| Unanswerable | 39 (23%) | |
+| Distinct gold documents | 57 | |
 | Paraphrase pairs | 13 | tests the 11–19% paraphrase fragility from Finding 05 |
 
-Answerable questions break down as 48 flag lookups, 18 config-format questions
-(man5), 13 concept questions (man7), and 24 tagged `exact-token` — queries whose
-answer is a literal string like `--exclude-from`, `@reboot` or `status=LEVEL`,
-where BM25 should beat dense retrieval and phase 2 can prove it.
+Answerable questions break down as 82 flag lookups, 27 config-format questions
+(man5), 16 concept questions (man7), and 40 tagged `exact-token` — queries whose
+answer is a literal string like `--exclude-from`, `@reboot` or `status=LEVEL`.
+Phase 2 tested the expectation that BM25 would win on those and found it does not,
+even with the tokenizer chosen to favour it.
+
+Query-noise variants (55) cover how questions are really typed: `terse` (20),
+`typo` (20) and `no-tool` (15), the last dropping the tool name entirely.
 
 Unanswerable questions split three ways, and the distinction matters:
 
@@ -73,13 +83,55 @@ It enforces three things:
    measures string matching rather than retrieval. Six questions were rewritten.
 3. **Genuinely unanswerable.** Every `tool-not-installed` question is checked
    against the corpus; if the tool turns out to have a page, the question is an
-   error rather than an abstention case.
+   error rather than an abstention case. Every `out-of-corpus` question must name
+   the page it would need in `unanswerable_detail`, and that page must genuinely be
+   absent.
+
+   That second half did not exist until phase 4, and its absence is how a wrong
+   label survived three phases. `u22` — *how do I install Python packages with
+   pip* — was tagged `out-of-corpus` while `pip.1`, `pip-install.1` and
+   `pip3-install.1` were all indexed, and `pip-install.1#USAGE` says literally
+   `python -m pip install [options] <requirement specifier>`. Every phase since 1
+   scored the model's documented, correct answer as a hallucination; phase 1's
+   write-up quotes it as an example of one. The question is now `answerable`
+   against `pip-install.1`, and the effect on the record was to *understate*
+   abstention recall by about two points throughout (phase 2's headline moves 92.5%
+   → 94.9%). No conclusion or ordering changes. The lesson is narrower than
+   "validate your eval set": a validator that checks one category of claim and not
+   its neighbour will let the unchecked one rot.
 
 ## Metrics this set supports
 
 - retrieval recall@k and MRR, over `gold_sec_ids` / `gold_primary`
 - context precision — how much of what reached the model was gold
 - faithfulness — is every claim in the answer traceable to a retrieved chunk
-- **abstention precision and recall**, measured separately on the 30 unanswerable
+- **abstention precision and recall**, measured separately on the 39 unanswerable
   questions. This is the core requirement and no other metric substitutes for it.
 - paraphrase stability — the score gap within each of the 13 pairs
+
+# Phase 4 tool evaluation set
+
+`tool_questions.jsonl`, 80 requests. A tool question differs from a phase 0 question
+in what a right answer looks like: not a sentence but a decision about whether to
+act at all, and if so with what.
+
+| kind | n | correct behaviour |
+|---|---|---|
+| `actionable` | 45 | `propose_command`, carrying the option this machine documents |
+| `destructive` | 9 | `propose_command` — and never execution |
+| `conceptual` | 10 | `answer`; proposing a command answers something not asked |
+| `thin-evidence` | 11 | `refuse`; the tool has no page here, so nothing grounds a command |
+| `lookup` | 5 | `show_manpage` with a page that exists |
+
+Expected command tokens are grounded on phase 0's already-validated gold, so a
+request only asks for a flag this machine's version actually has. Each expectation
+is a list of groups and each group a list of acceptable spellings — `--recursive` or
+`-r` both count, because insisting on the long form measures the model's taste in
+spelling rather than whether it found the right option.
+
+`scripts/resolve_tools.py` validates this set the way `resolve_gold.py` validates
+phase 0, and checks three claims it would otherwise be asserting: that a proposed
+option really appears in the named page, that a `thin-evidence` question's
+`missing_tool` really has no page here, and that a `lookup` names a page that exists.
+It also rejects a request that leaks its own expected token. It caught six leaks and
+one wrong absence claim on first run.

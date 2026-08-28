@@ -192,3 +192,21 @@ phase 2 already makes it computable.
 `--tagged-ratio 0` entry-packs every section, which is the rule the first two
 indexes used. A later bookkeeping fix in the same function shifts 5 documents of
 4,114 by one chunk each; none of them are in the eval set.
+
+---
+
+## Correction (phase 4)
+
+Two defects found while validating the phase 4 tool eval set affect the numbers
+above. Neither changes a conclusion; both are documented in
+`docs/phase4-results.md`.
+
+1. **`u22` was mislabelled `out-of-corpus`.** `pip.1`, `pip-install.1` and
+   `pip3-install.1` are all indexed, and `pip-install.1#USAGE` reads
+   `python -m pip install [options] <requirement specifier>`. The question is
+   answerable, so abstention recall here was **understated by about two points**:
+   phase 3's 85.0% becomes 87.2% and phase 2's 92.5% becomes 94.9%.
+   The gap that decided the revert is unchanged.
+2. **A corpus extraction bug** deleted tagged-paragraph tags that are
+   cross-references (`pip3-install(1)`), across 1,084 of 4,158 pages. Rebuilding the
+   index on the corrected corpus moved recall@5 by less than one question.
