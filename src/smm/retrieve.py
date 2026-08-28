@@ -25,12 +25,29 @@ RRF_K = 60          # standard constant; damps the influence of any single list'
 CANDIDATES = 50     # what the reranker sees, per the briefing
 KEEP = 5            # what the model sees
 
-# Per-variant candidate depth when fusing the question with rewrites. Measured
-# (see tsk_20260828_a47f0496): 1 rewrite at 20 candidates/variant moved gold
-# 15 -> 2 on the failing query in 2.56s (today's single query at 50 is 2.98s);
-# 3 rewrites at pool 50 cost 11.6s for no further win. This is not CANDIDATES,
-# on purpose - the two pools answer different questions.
-VARIANT_CANDIDATES = 20
+# Two distinct per-variant knobs when fusing the question with rewrites - do not
+# collapse them into one, and do not reuse the caller's output `k` for either.
+# VARIANT_CANDIDATES is the dense/BM25 candidate pool handed to the reranker for
+# each variant (input to the cross-encoder). VARIANT_K is how deep each variant's
+# RERANKED list goes before it reaches rrf() (input to the fusion) - it is NOT
+# the number of hits the caller ultimately wants (`k`/KEEP), which only truncates
+# the fused output at the very end.
+#
+# Measured (tsk_20260828_a47f0496), query "how to list files via size", gold
+# chunk ls.1:4:
+#   per-variant reranked depth  5 (== k, the bug)  -> gold@4, two size.1 chunks
+#                                                       still rank above it
+#   per-variant reranked depth 20, 1 rewrite        -> gold@2
+#   per-variant reranked depth 20, 3 rewrites       -> gold@1
+# Fusing 5-deep lists starves rrf() of exactly the lower-ranked-but-right hits
+# it exists to promote - by the time a list is truncated to 5, the variant that
+# would have surfaced the gold chunk at rank 6-15 has already dropped it. 20 is
+# the same measured depth as VARIANT_CANDIDATES's own justification (1 rewrite
+# at 20 candidates/variant: 2.56s wall, vs 2.98s for today's single query at 50;
+# 3 rewrites at pool 50 cost 11.6s for no further win) - a deeper reranked list
+# needs a deeper candidate pool to draw from, which is why both default to 20.
+VARIANT_CANDIDATES = 20    # candidate pool per variant, fed to the reranker
+VARIANT_K = 20             # reranked-list depth per variant, fed to rrf()
 
 
 def rrf(lists: list[list[dict]], k: int = RRF_K, weights: list[float] | None = None) -> list[dict]:
@@ -130,13 +147,17 @@ class Retriever:
 
     def retrieve_fused(self, question: str, rewrites: list[str] | None = None,
                         k: int = KEEP, variant_candidates: int = VARIANT_CANDIDATES,
+                        variant_k: int = VARIANT_K,
                         ) -> tuple[list[dict], int, list[str]]:
         """`retrieve()`, fused across the question and its rewrites.
 
         Each variant (index 0 is `question`, the rest are `rewrites`) is retrieved
-        at `variant_candidates` and reranked on its own; the reranked lists are then
-        combined with `fuse_variants` (see module docstring there for why per-variant
-        reranking, not a single fused-then-reranked pool). Returns
+        at `variant_candidates` and reranked down to `variant_k` on its own; the
+        reranked lists are then combined with `fuse_variants` (see module docstring
+        there for why per-variant reranking, not a single fused-then-reranked pool)
+        and the fused result is truncated to `k`. `variant_k` is deliberately NOT
+        `k`: rrf() needs the lower-ranked-but-right hits a shallow list would have
+        already dropped - see the measured numbers on VARIANT_K above. Returns
         `(fused hits, winning variant index, variants)` so a caller can report which
         rewrite - or the original question - produced the top hit.
         """
@@ -145,8 +166,8 @@ class Retriever:
         def rerank_variant(q: str) -> list[dict]:
             cands = self.candidates_for(q, n=variant_candidates)
             if self.reranker is None:
-                return cands[:k]
-            return self.reranker.rerank(q, cands, top_k=k)
+                return cands[:variant_k]
+            return self.reranker.rerank(q, cands, top_k=variant_k)
 
         fused, winner = fuse_variants(rerank_variant, variants, k=k)
         return fused, winner, variants

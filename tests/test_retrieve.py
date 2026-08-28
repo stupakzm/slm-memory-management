@@ -33,7 +33,7 @@ if "sqlite_vec" not in sys.modules:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from smm.retrieve import KEEP, Retriever, fuse_variants, rrf  # noqa: E402
+from smm.retrieve import KEEP, VARIANT_K, Retriever, fuse_variants, rrf  # noqa: E402
 
 
 def check(cond, msg):
@@ -178,6 +178,75 @@ def test_retrieve_fused_issues_one_call_per_variant_at_variant_candidates():
     check(all(n == 20 for _, n in calls), f"each variant call should use candidates=20: {calls}")
     check(variants == ["how do I list files", "show files by size", "ls command sort"], variants)
     check(fused, "fused result should not be empty")
+
+
+# --------------------------------------------------------------------------
+# Depth contract: variant_k (the per-variant RERANKED-list depth fed to rrf())
+# must never be confused with k (the caller's final OUTPUT size). Attempt 1
+# passed `k` straight through as each variant's `top_k`, which starved rrf()
+# of exactly the lower-ranked-but-right hits it exists to promote - measured
+# live: gold only reached @4 (still behind two wrong hits) at depth 5, but @2
+# at the intended depth 20. None of the tests above catch this: they all use
+# `reranker=None`, which never exercises `top_k` at all.
+# --------------------------------------------------------------------------
+
+
+class StubReranker:
+    """Records the query and top_k each call was asked for; returns the
+    candidates truncated to top_k, preserving order - just enough behaviour to
+    pin the depth contract without a real cross-encoder."""
+
+    def __init__(self):
+        self.calls: list[tuple[str, int | None]] = []
+
+    def rerank(self, query, chunks, top_k=None, batch=16):
+        self.calls.append((query, top_k))
+        return chunks[:top_k] if top_k else list(chunks)
+
+
+def test_retrieve_fused_reranks_each_variant_to_variant_k_not_k():
+    """The regression this attempt fixes: the caller's output size `k` must
+    never leak into the per-variant reranker's `top_k`. Each variant is
+    reranked to `variant_k` (VARIANT_K by default); only the FUSED result is
+    truncated to `k`."""
+    r = Retriever(db=None, embedder=None, reranker=StubReranker(), mode="dense")
+
+    def fake_candidates_for(question, n=None):
+        return [c(f"{question}-{i}", score=1.0 - i * 0.01) for i in range(25)]
+
+    r.candidates_for = fake_candidates_for
+
+    fused, winner, variants = r.retrieve_fused(
+        "how to list files via size", rewrites=["largest files command"], k=5,
+    )
+
+    calls = r.reranker.calls
+    check(len(calls) == 2, f"expected one rerank call per variant, got {len(calls)}: {calls}")
+    check(all(top_k == VARIANT_K for _, top_k in calls),
+          f"each variant's rerank call must ask for top_k=VARIANT_K (20), not k=5: {calls}")
+    check(all(top_k != 5 for _, top_k in calls),
+          f"k must not leak into the per-variant rerank call: {calls}")
+    check(len(fused) == 5, f"fused OUTPUT must still be truncated to k=5, got {len(fused)}")
+
+
+def test_retrieve_fused_variant_k_is_overridable():
+    """An explicit `variant_k` overrides the VARIANT_K default, independent of
+    `k` - the two knobs stay separately controllable."""
+    r = Retriever(db=None, embedder=None, reranker=StubReranker(), mode="dense")
+
+    def fake_candidates_for(question, n=None):
+        return [c(f"{question}-{i}", score=1.0 - i * 0.01) for i in range(10)]
+
+    r.candidates_for = fake_candidates_for
+
+    fused, winner, variants = r.retrieve_fused(
+        "how to list files via size", rewrites=["largest files command"], k=3, variant_k=7,
+    )
+
+    calls = r.reranker.calls
+    check(all(top_k == 7 for _, top_k in calls),
+          f"explicit variant_k=7 must override the VARIANT_K default: {calls}")
+    check(len(fused) == 3, f"fused output should still respect k=3, got {len(fused)}")
 
 
 if __name__ == "__main__":
