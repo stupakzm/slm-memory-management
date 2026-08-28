@@ -12,11 +12,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
 RESULTS = ROOT / "data" / "eval" / "results"
+
+from sweep_gate import operating_points  # noqa: E402
 KS = (1, 3, 5, 10, 20)
 
 
@@ -94,18 +98,16 @@ def main() -> int:
         print(f"  {t:22} {len(g):3}   {x:7.1%}  {y:8.1%}  {y-x:+7.1%}{flag}")
 
     # Abstention headroom: separation between answerable and unanswerable top scores.
+    # The candidate thresholds come from the observed scores rather than a fixed grid,
+    # because a dense cosine and a reranker probability do not live on the same scale.
     for label, run in ((args.baseline, a), (args.candidate, b)):
-        per = run["per_question"]
-        ansc = sorted(p["top_score"] for p in per if p["kind"] == "answerable")
-        unac = sorted(p["top_score"] for p in per if p["kind"] == "unanswerable")
-        best = (0, 0)
-        for t in [x / 400 for x in range(160, 320)]:
-            kept = sum(1 for s in ansc if s >= t) / len(ansc)
-            rec = sum(1 for s in unac if s < t) / len(unac)
-            if kept >= 0.90 and rec > best[1]:
-                best = (t, rec)
-        print(f"\n{label:24} score gate @>=90% coverage: "
-              f"threshold {best[0]:.3f} -> abstention recall {best[1]:.1%}")
+        pts = [p for p in operating_points(run["per_question"], k)
+               if p["coverage"] >= 0.90]
+        best = max(pts, key=lambda p: p["abstention_recall"], default=None)
+        if best:
+            print(f"\n{label:24} score gate @>=90% coverage: "
+                  f"threshold {best['threshold']:.4f} -> "
+                  f"abstention recall {best['abstention_recall']:.1%}")
     return 0
 
 

@@ -26,6 +26,12 @@ This sidesteps the load-bearing finding in `docs/research-briefing.html`: sub-7B
 models cannot build a knowledge graph, and fail hard rather than gracefully.
 Nothing here asks them to.
 
+The other half of the design is that abstention is architectural. A score gate
+refuses before the generator is invoked, so on thin evidence there is nothing to
+speculate with, and a GBNF grammar makes an uncited claim structurally impossible.
+Phase 1 measured what asking nicely in a prompt buys instead: fabricated citations
+like `NULL [3]`, pointing at an extract that says nothing of the kind.
+
 ## Status
 
 | Phase | What | State |
@@ -33,8 +39,8 @@ Nothing here asks them to.
 | Corpus | Structured extraction from installed man pages | **done** — 4,114 pages, 38,915 sections, 15,040 cross-references |
 | 0 | Evaluation set, before any system exists | **done** — 166 questions, 24% unanswerable, all verified |
 | 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, prefix ablation run; see `docs/phase1-results.md` |
-| 2 | Precision layer: BM25 + reranker + abstention gate | next |
-| 3 | Hierarchy, only if phase 2 leaves a gap | |
+| 2 | Precision layer: reranker + abstention gate + GBNF citations | **done** — recall@5 71.4%, abstention 92.5%, uncited claims 0%; BM25 measured and rejected; see `docs/phase2-results.md` |
+| 3 | Structure-aware chunking — phase 2 left the gap it predicted | next |
 | 4 | Gated tool use | |
 | 5 | User-fed knowledge loop | |
 
@@ -63,24 +69,42 @@ cmake --build ~/opt/llama.cpp/build -j"$(nproc)" \
 .venv/bin/python scripts/build_index.py --out data/index/phase1-prefix.db
 
 # 4. ask it something
-./scripts/ask.py "how do I exclude files listed in a text file from a tar archive"
+.venv/bin/python scripts/build_lexical.py --from data/index/phase1-prefix.db --out data/index/phase2.db
+./scripts/servers.sh stop && ./scripts/servers.sh start serve
+.venv/bin/python scripts/ask.py "how do I exclude files listed in a text file from a tar archive"
 ```
+
+Phase 2 answers a question with three models at once, so `servers.sh start serve`
+runs them with query-sized batches — the indexing profile reserves a 600 MB compute
+buffer and will not fit beside the generator on a 6 GB card.
 
 Only `sqlite-vec` is a third-party Python dependency; everything else is stdlib.
 
-### Reproducing the phase 1 numbers
+### Reproducing the numbers
 
-The embedder and the 4B generator together need ~5.5 GB of VRAM, so answer
-evaluation runs in two stages with one model resident at a time:
+Evaluation runs in two stages with one set of models resident at a time, because the
+embedder, the reranker and the 4B generator do not all fit at eval batch sizes.
 
 ```bash
-./scripts/servers.sh start embedder
-.venv/bin/python scripts/eval_retrieval.py --db data/index/phase1-prefix.db --name phase1-prefix
-.venv/bin/python scripts/eval_answers.py  --db data/index/phase1-prefix.db --name phase1-prefix --stage retrieve
+# retrieval, and the ablations behind every phase 2 claim
+./scripts/servers.sh start embedder && ./scripts/servers.sh start reranker
+.venv/bin/python scripts/eval_retrieval.py --db data/index/phase2.db --mode dense --name phase2-dense
+.venv/bin/python scripts/eval_retrieval.py --db data/index/phase2.db --mode bm25  --name phase2-bm25
+.venv/bin/python scripts/eval_retrieval.py --db data/index/phase2.db --mode dense --rerank --name phase2-dense-rerank
+
+# answers: retrieve once, then replay generation variants against the same cache
+.venv/bin/python scripts/eval_answers.py --stage retrieve --mode dense --rerank --name phase2-full
 ./scripts/servers.sh stop && ./scripts/servers.sh start generator
-.venv/bin/python scripts/eval_answers.py --name phase1-prefix --stage generate
+.venv/bin/python scripts/eval_answers.py --stage generate --name phase2-full --gate 0.65 --grammar
 ./scripts/servers.sh stop
 ```
+
+The gate threshold is not a taste decision. `sweep_gate.py --answers phase2-rerank`
+replays every threshold against one ungated generation run — the gate only chooses
+whether to invoke the model, never what it writes — and reports accuracy, abstention
+recall and unsupported answers at each. 0.65 is the point it picks.
+
+`compare_runs.py` reports fixed/broken by question id for any two retrieval runs.
 
 ## Corpus extraction
 
@@ -98,10 +122,16 @@ C programming reference and are deliberately excluded.
 
 ```
 src/smm/corpus/manpages.py   discover / render / parse man pages
+src/smm/retrieve.py          the pipeline: candidates -> fuse -> rerank -> gate
+src/smm/rerank.py            cross-encoder client
+src/smm/lexical.py           BM25 on FTS5 - measured, and off by default
+src/smm/grammar.py           GBNF citation grammar and the check it enables
 scripts/extract_man.py       corpus extraction driver
-data/corpus/                 extracted JSONL (gitignored)
+scripts/build_lexical.py     add the BM25 half to an existing dense index
 scripts/corpus_grep.py       search the extracted corpus
 scripts/resolve_gold.py      eval-set validator: no gold by assertion, no leaked answers
+scripts/sweep_gate.py        pick the abstention threshold on the labelled set
+scripts/compare_runs.py      per-question diff between two runs
 data/eval/questions.jsonl    phase 0 evaluation set (version-controlled)
 docs/research-briefing.html  the research this design follows
 ```

@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import urllib.request
 
+from . import grammar
+
 DEFAULT_URL = "http://127.0.0.1:8080"
 
 # Phase 1 deliberately asks for abstention in the prompt and nothing else. The
@@ -37,21 +39,28 @@ class Generator:
         self.url = url.rstrip("/")
         self.timeout = timeout
 
-    def chat(self, messages: list[dict], max_tokens: int = 400, temperature: float = 0.0) -> str:
+    def chat(self, messages: list[dict], max_tokens: int = 400, temperature: float = 0.0,
+             grammar: str | None = None) -> str:
+        payload = {
+            "messages": messages, "max_tokens": max_tokens,
+            "temperature": temperature, "stream": False,
+        }
+        if grammar:
+            payload["grammar"] = grammar
         req = urllib.request.Request(
             self.url + "/v1/chat/completions",
-            data=json.dumps({
-                "messages": messages, "max_tokens": max_tokens,
-                "temperature": temperature, "stream": False,
-            }).encode(),
+            data=json.dumps(payload).encode(),
             headers={"Content-Type": "application/json"},
         )
         with urllib.request.urlopen(req, timeout=self.timeout) as r:
             out = json.load(r)
         return out["choices"][0]["message"]["content"].strip()
 
-    def answer(self, question: str, chunks: list[dict], **kw) -> str:
-        return self.chat(build_prompt(question, chunks), **kw)
+    def answer(self, question: str, chunks: list[dict], cite_grammar: bool = False, **kw) -> str:
+        """`cite_grammar` constrains decoding so every claim carries an in-range
+        citation - see smm.grammar for what that does and does not guarantee."""
+        g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
+        return self.chat(build_prompt(question, chunks), grammar=g, **kw)
 
     def health(self) -> bool:
         try:
