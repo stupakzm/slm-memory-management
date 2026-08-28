@@ -18,7 +18,14 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LLAMA="${LLAMA_CPP:-$HOME/opt/llama.cpp/build/bin}"
 MODELS="$ROOT/models"
-RUN="$ROOT/.run"
+# SMM_RUN/SMM_*_PORT let tests (tests/test_cli.py) point this at a scratch
+# directory and scratch ports instead of the real pidfiles/ports this machine
+# may already have servers running on - same idea as LLAMA_CPP above. Unset,
+# behaviour is exactly what it always was.
+RUN="${SMM_RUN:-$ROOT/.run}"
+EMBED_PORT="${SMM_EMBED_PORT:-8081}"
+RERANK_PORT="${SMM_RERANK_PORT:-8082}"
+GEN_PORT="${SMM_GEN_PORT:-8080}"
 mkdir -p "$RUN"
 
 start_embedder() {
@@ -26,7 +33,7 @@ start_embedder() {
     -m "$MODELS/Qwen3-Embedding-0.6B-Q8_0.gguf" \
     --embedding --pooling last -c 8192 -ngl 99 \
     -b 4096 -ub 1024 --parallel 4 \
-    --host 127.0.0.1 --port 8081 \
+    --host 127.0.0.1 --port "$EMBED_PORT" \
     > "$RUN/embedder.log" 2>&1 &
   echo $! > "$RUN/embedder.pid"
   echo "embedder starting (pid $(cat "$RUN/embedder.pid")) -> $RUN/embedder.log"
@@ -40,7 +47,7 @@ start_generator() {
   "$LLAMA/llama-server" \
     -m "$MODELS/Qwen3-4B-Instruct-2507-Q4_K_M.gguf" \
     -c "$ctx" -ngl 99 --temp 0.0 \
-    --host 127.0.0.1 --port 8080 \
+    --host 127.0.0.1 --port "$GEN_PORT" \
     > "$RUN/generator.log" 2>&1 &
   echo $! > "$RUN/generator.pid"
   echo "generator starting (pid $(cat "$RUN/generator.pid")) -> $RUN/generator.log"
@@ -54,7 +61,7 @@ start_reranker() {
     -m "$MODELS/qwen3-reranker-0.6b-q8_0.gguf" \
     --reranking -c "$ctx" -ngl 99 \
     -b "$batch" -ub "$batch" --parallel "$par" \
-    --host 127.0.0.1 --port 8082 \
+    --host 127.0.0.1 --port "$RERANK_PORT" \
     > "$RUN/reranker.log" 2>&1 &
   echo $! > "$RUN/reranker.pid"
   echo "reranker starting (pid $(cat "$RUN/reranker.pid")) -> $RUN/reranker.log"
@@ -67,7 +74,7 @@ start_embedder_lean() {
     -m "$MODELS/Qwen3-Embedding-0.6B-Q8_0.gguf" \
     --embedding --pooling last -c 512 -ngl 99 \
     -b 512 -ub 512 --parallel 1 \
-    --host 127.0.0.1 --port 8081 \
+    --host 127.0.0.1 --port "$EMBED_PORT" \
     > "$RUN/embedder.log" 2>&1 &
   echo $! > "$RUN/embedder.pid"
   echo "embedder starting (pid $(cat "$RUN/embedder.pid")) -> $RUN/embedder.log"
@@ -89,13 +96,20 @@ wait_ready() {
 case "${1:-status}" in
   start)
     case "${2:-embedder}" in
-      embedder)  start_embedder;  wait_ready 8081 embedder ;;
-      generator) start_generator; wait_ready 8080 generator ;;
-      reranker)  start_reranker;  wait_ready 8082 reranker ;;
+      embedder)  start_embedder;  wait_ready "$EMBED_PORT" embedder ;;
+      generator) start_generator; wait_ready "$GEN_PORT" generator ;;
+      reranker)  start_reranker;  wait_ready "$RERANK_PORT" reranker ;;
       serve)
-        start_embedder_lean; wait_ready 8081 embedder
-        start_reranker 1024 768 1; wait_ready 8082 reranker
-        start_generator 4096; wait_ready 8080 generator ;;
+        start_embedder_lean; wait_ready "$EMBED_PORT" embedder
+        start_reranker 1024 768 1; wait_ready "$RERANK_PORT" reranker
+        start_generator 4096; wait_ready "$GEN_PORT" generator ;;
+      # Single-server, serve-sized starts. `bin/smm` (asq) uses these to bring
+      # up exactly the model an invocation needs, at query-sized batches, so
+      # the three fit together the same way `start serve` does — just lazily,
+      # one at a time, instead of all at once.
+      embedder-lean)  start_embedder_lean; wait_ready "$EMBED_PORT" embedder ;;
+      reranker-query) start_reranker 1024 768 1; wait_ready "$RERANK_PORT" reranker ;;
+      generator-query) start_generator 4096; wait_ready "$GEN_PORT" generator ;;
       *) echo "unknown: $2" >&2; exit 1 ;;
     esac ;;
   stop)

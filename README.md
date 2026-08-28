@@ -97,6 +97,30 @@ buffer and will not fit beside the generator on a 6 GB card.
 
 Only `sqlite-vec` is a third-party Python dependency; everything else is stdlib.
 
+## Everyday use: `asq`
+
+The manual `servers.sh start` / `ask.py` / `servers.sh stop` cycle above is what
+`asq` is for — one command, no server bookkeeping:
+
+```bash
+bin/smm install                 # symlinks ~/.local/bin/asq -> bin/smm; --name/--prefix to change either
+asq "how do I exclude files listed in a text file from a tar archive"
+asq ingest --domain notes ~/notes/
+asq status                      # per-model up/down; starts nothing
+asq stop                        # stop everything now instead of waiting
+```
+
+`asq` resolves the repo from its own real path, so the installed symlink works
+from any directory. Servers start lazily and in the order a question
+actually needs them (embedder, then reranker unless `--no-rerank`, then the
+generator unless `--retrieve-only`) and reuse whichever are already up. An
+idle reaper — a detached background process, one at a time — stops everything
+`SMM_IDLE` seconds (default 600) after the last invocation and removes the
+pidfiles, so forgetting `servers.sh stop` no longer leaves the card pinned.
+Renaming needs no code edit: `asq install --name X --prefix DIR` points a new
+symlink at `bin/smm`, which takes its usage text from whatever name it is
+invoked as. Unrecognised flags pass straight through to `ask.py` / `ingest.py`.
+
 ### Reproducing the numbers
 
 Evaluation runs in two stages with one set of models resident at a time, because the
@@ -138,6 +162,8 @@ C programming reference and are deliberately excluded.
 ## Layout
 
 ```
+bin/smm                      the `asq` launcher - ask/ingest/status/stop/install, from any cwd
+src/smm/daemon.py            lazy server start, activity stamp, idle reaper
 src/smm/corpus/manpages.py   discover / render / parse man pages
 src/smm/structure.py         split a section into the entries a reader sees in it
 src/smm/tools.py             tool schemas, GBNF per schema, validate-before-execute
@@ -162,5 +188,6 @@ scripts/compare_runs.py      per-question diff between two runs
 data/eval/questions.jsonl    phase 0 evaluation set (version-controlled)
 data/eval/tool_questions.jsonl  phase 4 tool eval set (version-controlled)
 tests/test_tools.py          asserts the execution gate directly
+tests/test_cli.py            asserts asq's lazy start and idle reaper against a stub
 docs/research-briefing.html  the research this design follows
 ```

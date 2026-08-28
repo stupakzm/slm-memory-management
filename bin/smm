@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# asq / smm - one command for the corpus: no manual server start/stop.
+#
+#   asq "how do I exclude files listed in a text file from a tar archive"
+#   asq ingest --domain notes ~/notes/
+#   asq status                 # per-model up/down, starts nothing
+#   asq stop                   # stop everything now, instead of waiting SMM_IDLE
+#   asq install --name X --prefix DIR
+#
+# Servers start lazily, one at a time, only as an invocation needs them
+# (embedder -> reranker -> generator - see src/smm/daemon.py) and an idle
+# reaper stops them SMM_IDLE seconds (default 600) after the last invocation.
+#
+# Renameable without a code edit: this script resolves its own real path so
+# it works via a symlink from any cwd, and takes its displayed name from
+# argv[0] - `asq install` just points a new symlink at this file.
+set -euo pipefail
+
+SELF="$(readlink -f "${BASH_SOURCE[0]}")"
+ROOT="$(cd "$(dirname "$SELF")/.." && pwd)"
+PYTHON="$ROOT/.venv/bin/python"
+DAEMON="$ROOT/src/smm/daemon.py"
+NAME="$(basename "$0")"
+
+usage() {
+  cat >&2 <<EOF
+usage: $NAME ["question..."]              ask the corpus (default subcommand)
+       $NAME ingest [options] path...     add material to an index
+       $NAME status                       per-model up/down; starts nothing
+       $NAME stop                         stop all servers and the reaper now
+       $NAME install [--name X] [--prefix DIR]
+                                           symlink DIR/X -> this launcher
+                                           (defaults: X=asq, DIR=~/.local/bin)
+
+Flags this wrapper does not recognise pass straight through to the wrapped
+script (scripts/ask.py or scripts/ingest.py).
+EOF
+}
+
+cmd_install() {
+  local name="asq" prefix="$HOME/.local/bin"
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --name)   name="$2"; shift 2 ;;
+      --prefix) prefix="$2"; shift 2 ;;
+      *) echo "$NAME install: unknown option $1" >&2; return 1 ;;
+    esac
+  done
+  mkdir -p "$prefix"
+  ln -sf "$SELF" "$prefix/$name"
+  echo "installed: $prefix/$name -> $SELF"
+  case ":${PATH:-}:" in
+    *":$prefix:"*) ;;
+    *) echo "warning: $prefix is not on \$PATH - add it, e.g. export PATH=\"$prefix:\$PATH\"" >&2 ;;
+  esac
+}
+
+sub="ask"
+if [ $# -gt 0 ]; then
+  case "$1" in
+    ask|ingest|status|stop|install) sub="$1"; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) : ;;  # not a subcommand keyword - falls through to `ask` untouched
+  esac
+fi
+
+if [ "$sub" = "install" ]; then
+  cmd_install "$@"
+  exit $?
+fi
+
+if [ ! -x "$PYTHON" ]; then
+  echo "$NAME: no venv at $PYTHON - see README (python3 -m venv --copies .venv && ...)" >&2
+  exit 1
+fi
+
+case "$sub" in
+  status) exec "$PYTHON" "$DAEMON" status ;;
+  stop)   exec "$PYTHON" "$DAEMON" stop ;;
+  ask)
+    if [ $# -eq 0 ]; then usage; exit 1; fi
+    exec "$PYTHON" "$DAEMON" run "$PYTHON" "$ROOT/scripts/ask.py" -- "$@" ;;
+  ingest)
+    exec "$PYTHON" "$DAEMON" run "$PYTHON" "$ROOT/scripts/ingest.py" -- "$@" ;;
+esac
