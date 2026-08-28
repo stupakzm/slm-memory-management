@@ -79,6 +79,29 @@ class Retriever:
         return self.reranker.rerank(question, cands, top_k=k)
 
 
+def expand(db, hits: list[dict], span: int = 1, budget: int = 6000) -> list[dict]:
+    """Widen each hit to its neighbours in the same section, preserving hit order.
+
+    Ranking is untouched: hit i stays at position i and only its text grows. A chunk
+    already absorbed into an earlier hit's expansion is not repeated, so the model
+    never reads the same paragraph twice under two numbers.
+    """
+    if not hits or not hits[0].get("sec_id"):
+        return hits                      # a flat index has no sections to expand into
+    out, used, total = [], set(), 0
+    for h in hits:
+        block = store.neighbours(db, h["doc_id"], h["sec_id"], h["ord"], span)
+        keep = [c for c in block if c["chunk_id"] not in used] or [h]
+        text = "\n\n".join(c["text"] for c in keep)
+        if total + len(text) > budget and out:
+            text = h["text"]             # out of budget: fall back to the chunk itself
+            keep = [h]
+        used.update(c["chunk_id"] for c in keep)
+        total += len(text)
+        out.append(dict(h, text=text, expanded=len(keep)))
+    return out
+
+
 def gate_score(hits: list[dict]) -> float:
     """The number the gate thresholds: top-1 reranker score, or dense if unreranked."""
     if not hits:

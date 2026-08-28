@@ -40,8 +40,8 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 | 0 | Evaluation set, before any system exists | **done** — 166 questions, 24% unanswerable, all verified |
 | 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, prefix ablation run; see `docs/phase1-results.md` |
 | 2 | Precision layer: reranker + abstention gate + GBNF citations | **done** — recall@5 71.4%, abstention 92.5%, uncited claims 0%; BM25 measured and rejected; see `docs/phase2-results.md` |
-| 3 | Structure-aware chunking — phase 2 left the gap it predicted | next |
-| 4 | Gated tool use | |
+| 3 | Structure-aware chunking | **done, reverted** — +8 questions, −8 questions, net zero; and cleaner chunks made the abstention gate *worse*; see `docs/phase3-results.md` |
+| 4 | Gated tool use | next |
 | 5 | User-fed knowledge loop | |
 
 ## From a fresh clone
@@ -122,12 +122,15 @@ C programming reference and are deliberately excluded.
 
 ```
 src/smm/corpus/manpages.py   discover / render / parse man pages
+src/smm/structure.py         split a section into the entries a reader sees in it
+src/smm/chunk.py             flat windows (default) and the structure-aware chunker
 src/smm/retrieve.py          the pipeline: candidates -> fuse -> rerank -> gate
 src/smm/rerank.py            cross-encoder client
 src/smm/lexical.py           BM25 on FTS5 - measured, and off by default
 src/smm/grammar.py           GBNF citation grammar and the check it enables
 scripts/extract_man.py       corpus extraction driver
 scripts/build_lexical.py     add the BM25 half to an existing dense index
+scripts/chunk_stats.py       chunking cost and ceiling, before spending GPU time
 scripts/corpus_grep.py       search the extracted corpus
 scripts/resolve_gold.py      eval-set validator: no gold by assertion, no leaked answers
 scripts/sweep_gate.py        pick the abstention threshold on the labelled set

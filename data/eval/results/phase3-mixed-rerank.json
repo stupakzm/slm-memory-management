@@ -1,0 +1,2665 @@
+{
+  "name": "phase3-mixed-rerank",
+  "db": "data/index/phase3-mixed.db",
+  "meta": {
+    "dim": "1024",
+    "chunk_chars": "1000",
+    "overlap": "150",
+    "prefix": "True",
+    "corpus": "data/corpus/man.jsonl",
+    "chunker": "structured",
+    "section_path": "True",
+    "max_entry": "1500",
+    "phase": "3-structured"
+  },
+  "config": {
+    "mode": "dense",
+    "rerank": true,
+    "candidates": 50,
+    "dense_weight": 1.0,
+    "bm25_weight": 1.0
+  },
+  "n_chunks": 74764,
+  "elapsed_s": 416.8,
+  "recall": {
+    "@1": 0.3888888888888889,
+    "@3": 0.6349206349206349,
+    "@5": 0.7142857142857143,
+    "@10": 0.8253968253968254,
+    "@20": 0.873015873015873
+  },
+  "mrr@10": 0.5285336356764929,
+  "gold_doc_top5": 0.6746031746031746,
+  "per_question": [
+    {
+      "qid": "a01",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9935210347175598,
+      "top_dense": 0.5905488431453705,
+      "top_doc": "dpkg-source.1",
+      "first_hit_rank": 5,
+      "n_hits": 1,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a02",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9988452196121216,
+      "top_dense": 0.6431612074375153,
+      "top_doc": "gzip.1",
+      "first_hit_rank": 12,
+      "n_hits": 1,
+      "doc_rank": 12
+    },
+    {
+      "qid": "a03",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9872008562088013,
+      "top_dense": 0.6148317456245422,
+      "top_doc": "grep.1",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a04",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9933074712753296,
+      "top_dense": 0.5687787234783173,
+      "top_doc": "find.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a05",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9991371631622314,
+      "top_dense": 0.6520994901657104,
+      "top_doc": "git-grep.1",
+      "first_hit_rank": 1,
+      "n_hits": 4,
+      "doc_rank": 8
+    },
+    {
+      "qid": "a06",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9975340366363525,
+      "top_dense": 0.6361616849899292,
+      "top_doc": "grep.1",
+      "first_hit_rank": 1,
+      "n_hits": 8,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a07",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9946560263633728,
+      "top_dense": 0.6218776404857635,
+      "top_doc": "find.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a08",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9942965507507324,
+      "top_dense": 0.6466822624206543,
+      "top_doc": "git-whatchanged.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a09",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9994584918022156,
+      "top_dense": 0.5697236955165863,
+      "top_doc": "git-filter-branch.1",
+      "first_hit_rank": 3,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "a10",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.99526047706604,
+      "top_dense": 0.6404195427894592,
+      "top_doc": "ls.1",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a11",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.997748076915741,
+      "top_dense": 0.6550793349742889,
+      "top_doc": "od.1",
+      "first_hit_rank": 12,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "a12",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.982721209526062,
+      "top_dense": 0.6100937724113464,
+      "top_doc": "install.1",
+      "first_hit_rank": 1,
+      "n_hits": 6,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a13",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9946902394294739,
+      "top_dense": 0.5831603109836578,
+      "top_doc": "gio.1",
+      "first_hit_rank": 2,
+      "n_hits": 5,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a14",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9925527572631836,
+      "top_dense": 0.6040745675563812,
+      "top_doc": "rmdir.1",
+      "first_hit_rank": 2,
+      "n_hits": 3,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a15",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.944064199924469,
+      "top_dense": 0.5700623393058777,
+      "top_doc": "chmod.1",
+      "first_hit_rank": 8,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a16",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.972781240940094,
+      "top_dense": 0.6191246509552002,
+      "top_doc": "chown.1",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a17",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9848159551620483,
+      "top_dense": 0.6020882427692413,
+      "top_doc": "du.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a18",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9973631501197815,
+      "top_dense": 0.6074762046337128,
+      "top_doc": "proc_sys_fs.5",
+      "first_hit_rank": 11,
+      "n_hits": 2,
+      "doc_rank": 11
+    },
+    {
+      "qid": "a19",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9988841414451599,
+      "top_dense": 0.6536048650741577,
+      "top_doc": "ps.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a20",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9981673955917358,
+      "top_dense": 0.5865820646286011,
+      "top_doc": "kill.1",
+      "first_hit_rank": 8,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a21",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6486528515815735,
+      "top_dense": 0.6133355796337128,
+      "top_doc": "sort.1",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a22",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9720764756202698,
+      "top_dense": 0.6568275094032288,
+      "top_doc": "uniq.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 8
+    },
+    {
+      "qid": "a23",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9709304571151733,
+      "top_dense": 0.6321870386600494,
+      "top_doc": "uniq.1",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a24",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9733913540840149,
+      "top_dense": 0.6293557584285736,
+      "top_doc": "colrm.1",
+      "first_hit_rank": 4,
+      "n_hits": 1,
+      "doc_rank": 4
+    },
+    {
+      "qid": "a25",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9702416062355042,
+      "top_dense": 0.6218833327293396,
+      "top_doc": "busybox.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a26",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9825783371925354,
+      "top_dense": 0.5918654203414917,
+      "top_doc": "nl.1",
+      "first_hit_rank": 4,
+      "n_hits": 4,
+      "doc_rank": 4
+    },
+    {
+      "qid": "a27",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9718238711357117,
+      "top_dense": 0.5602619349956512,
+      "top_doc": "journalctl.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "a28",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9986616373062134,
+      "top_dense": 0.613490104675293,
+      "top_doc": "ssh.1",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a29",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9987000226974487,
+      "top_dense": 0.5904169082641602,
+      "top_doc": "gh-codespace-cp.1",
+      "first_hit_rank": 2,
+      "n_hits": 2,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a30",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9960339665412903,
+      "top_dense": 0.6560740768909454,
+      "top_doc": "curl.1",
+      "first_hit_rank": 1,
+      "n_hits": 9,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a31",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9956195950508118,
+      "top_dense": 0.5643726885318756,
+      "top_doc": "curl.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a32",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9902307391166687,
+      "top_dense": 0.6561580002307892,
+      "top_doc": "wget.1",
+      "first_hit_rank": 1,
+      "n_hits": 7,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a33",
+      "kind": "answerable",
+      "tags": [
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.16900569200515747,
+      "top_dense": 0.6108403205871582,
+      "top_doc": "busybox.1",
+      "first_hit_rank": 7,
+      "n_hits": 1,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a34",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9990407824516296,
+      "top_dense": 0.6649211049079895,
+      "top_doc": "xargs.1",
+      "first_hit_rank": 9,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a35",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9975237250328064,
+      "top_dense": 0.5680344104766846,
+      "top_doc": "boot.7",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a36",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9992693066596985,
+      "top_dense": 0.6521289050579071,
+      "top_doc": "journalctl.1",
+      "first_hit_rank": 1,
+      "n_hits": 4,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a37",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9984550476074219,
+      "top_dense": 0.5943796038627625,
+      "top_doc": "mount.8",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a38",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9986005425453186,
+      "top_dense": 0.6357892751693726,
+      "top_doc": "ntfslabel.8",
+      "first_hit_rank": 5,
+      "n_hits": 4,
+      "doc_rank": 7
+    },
+    {
+      "qid": "a39",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9993687868118286,
+      "top_dense": 0.6616828143596649,
+      "top_doc": "adduser.8",
+      "first_hit_rank": 7,
+      "n_hits": 2,
+      "doc_rank": 4
+    },
+    {
+      "qid": "a40",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.96994948387146,
+      "top_dense": 0.5832609236240387,
+      "top_doc": "aconnect.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a41",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.8722668886184692,
+      "top_dense": 0.6103727221488953,
+      "top_doc": "ln.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a42",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9793928861618042,
+      "top_dense": 0.6102296710014343,
+      "top_doc": "lsof.8",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a43",
+      "kind": "answerable",
+      "tags": [
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.7162889838218689,
+      "top_dense": 0.5945691168308258,
+      "top_doc": "date.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a44",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.999920129776001,
+      "top_dense": 0.7351826727390289,
+      "top_doc": "systemctl.1",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b01",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.7398949265480042,
+      "top_dense": 0.5999619960784912,
+      "top_doc": "fstab.5",
+      "first_hit_rank": 3,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b02",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9976897239685059,
+      "top_dense": 0.5768162906169891,
+      "top_doc": "spufs.7",
+      "first_hit_rank": 2,
+      "n_hits": 4,
+      "doc_rank": 5
+    },
+    {
+      "qid": "b03",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9964148998260498,
+      "top_dense": 0.65211421251297,
+      "top_doc": "crontab.5",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b04",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9777141809463501,
+      "top_dense": 0.642547607421875,
+      "top_doc": "crontab.5",
+      "first_hit_rank": 2,
+      "n_hits": 6,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b05",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9856665730476379,
+      "top_dense": 0.6271405518054962,
+      "top_doc": "sshd_config.5",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b06",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9927743673324585,
+      "top_dense": 0.6283163726329803,
+      "top_doc": "sshd_config.5",
+      "first_hit_rank": 1,
+      "n_hits": 14,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b07",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9964505434036255,
+      "top_dense": 0.6266021728515625,
+      "top_doc": "sshd_config.5",
+      "first_hit_rank": 3,
+      "n_hits": 6,
+      "doc_rank": 3
+    },
+    {
+      "qid": "b08",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9991975426673889,
+      "top_dense": 0.5959652364253998,
+      "top_doc": "passwd.5",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b09",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.998293936252594,
+      "top_dense": 0.5984954833984375,
+      "top_doc": "shadow.5",
+      "first_hit_rank": 2,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b10",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9995357394218445,
+      "top_dense": 0.640190601348877,
+      "top_doc": "hosts.5",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b11",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9731630086898804,
+      "top_dense": 0.5849333107471466,
+      "top_doc": "dnsmasq.8",
+      "first_hit_rank": 2,
+      "n_hits": 7,
+      "doc_rank": null
+    },
+    {
+      "qid": "b12",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9993009567260742,
+      "top_dense": 0.6337026953697205,
+      "top_doc": "systemd.service.5",
+      "first_hit_rank": 1,
+      "n_hits": 9,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b13",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9994769096374512,
+      "top_dense": 0.5665696561336517,
+      "top_doc": "NetworkManager-wait-online.service.8",
+      "first_hit_rank": 6,
+      "n_hits": 1,
+      "doc_rank": 6
+    },
+    {
+      "qid": "b14",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9977216124534607,
+      "top_dense": 0.5991067588329315,
+      "top_doc": "sudoers.5",
+      "first_hit_rank": 1,
+      "n_hits": 4,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b15",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9996940493583679,
+      "top_dense": 0.6027531921863556,
+      "top_doc": "newusers.8",
+      "first_hit_rank": 1,
+      "n_hits": 7,
+      "doc_rank": 3
+    },
+    {
+      "qid": "c01",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.7395639419555664,
+      "top_dense": 0.6353667676448822,
+      "top_doc": "kill.1",
+      "first_hit_rank": 15,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "c02",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9861541390419006,
+      "top_dense": 0.5855511128902435,
+      "top_doc": "signal.7",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "c03",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.8448655009269714,
+      "top_dense": 0.5605336427688599,
+      "top_doc": "egrep.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 2
+    },
+    {
+      "qid": "c04",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9995555281639099,
+      "top_dense": 0.6413754224777222,
+      "top_doc": "re_format.7",
+      "first_hit_rank": 7,
+      "n_hits": 4,
+      "doc_rank": null
+    },
+    {
+      "qid": "c05",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.15918409824371338,
+      "top_dense": 0.5403883457183838,
+      "top_doc": "ssh.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "c06",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6023624539375305,
+      "top_dense": 0.5024444162845612,
+      "top_doc": "python3.13.1",
+      "first_hit_rank": 5,
+      "n_hits": 1,
+      "doc_rank": 5
+    },
+    {
+      "qid": "c07",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9859839677810669,
+      "top_dense": 0.6244373917579651,
+      "top_doc": "symlink.7",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "c08",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9977192282676697,
+      "top_dense": 0.6332806050777435,
+      "top_doc": "path_resolution.7",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "c09",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9972490668296814,
+      "top_dense": 0.5678645372390747,
+      "top_doc": "sulogin.8",
+      "first_hit_rank": 2,
+      "n_hits": 15,
+      "doc_rank": 14
+    },
+    {
+      "qid": "c10",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9988818764686584,
+      "top_dense": 0.6727515161037445,
+      "top_doc": "pipe.7",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "c11",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token",
+        "split-page"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9975733160972595,
+      "top_dense": 0.640459418296814,
+      "top_doc": "uptime.1",
+      "first_hit_rank": 4,
+      "n_hits": 3,
+      "doc_rank": 4
+    },
+    {
+      "qid": "c12",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "cross-page",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9942561388015747,
+      "top_dense": 0.6208222210407257,
+      "top_doc": "systemd.resource-control.5",
+      "first_hit_rank": 1,
+      "n_hits": 4,
+      "doc_rank": 1
+    },
+    {
+      "qid": "u01",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.0888785719871521,
+      "top_dense": 0.5317229926586151,
+      "top_doc": "org.freedesktop.machine1.5"
+    },
+    {
+      "qid": "u02",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9791556596755981,
+      "top_dense": 0.5502197742462158,
+      "top_doc": "gitfaq.7"
+    },
+    {
+      "qid": "u03",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.013909067027270794,
+      "top_dense": 0.5013972222805023,
+      "top_doc": "sessreg.1"
+    },
+    {
+      "qid": "u04",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.027875991538167,
+      "top_dense": 0.5565988719463348,
+      "top_doc": "sane-pixma.5"
+    },
+    {
+      "qid": "u05",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6437479853630066,
+      "top_dense": 0.5544426143169403,
+      "top_doc": "pcap-filter.7"
+    },
+    {
+      "qid": "u06",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.990180253982544,
+      "top_dense": 0.5554596483707428,
+      "top_doc": "vdso.7"
+    },
+    {
+      "qid": "u07",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.03990274295210838,
+      "top_dense": 0.4851263761520386,
+      "top_doc": "x86_64-linux-gnu-objdump.1"
+    },
+    {
+      "qid": "u08",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.013005838729441166,
+      "top_dense": 0.5071557462215424,
+      "top_doc": "sshd_config.5"
+    },
+    {
+      "qid": "u09",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.05118152126669884,
+      "top_dense": 0.525681883096695,
+      "top_doc": "fsfreeze.8"
+    },
+    {
+      "qid": "u10",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.32665181159973145,
+      "top_dense": 0.4983648657798767,
+      "top_doc": "lsns.8"
+    },
+    {
+      "qid": "u11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9920176267623901,
+      "top_dense": 0.6368337571620941,
+      "top_doc": "git-grep.1"
+    },
+    {
+      "qid": "u12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.026567546650767326,
+      "top_dense": 0.5219832062721252,
+      "top_doc": "systemd-detect-virt.1"
+    },
+    {
+      "qid": "u13",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9945641756057739,
+      "top_dense": 0.6112334132194519,
+      "top_doc": "systemd-cgtop.1"
+    },
+    {
+      "qid": "u14",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.0850425511598587,
+      "top_dense": 0.5493568778038025,
+      "top_doc": "nft.8"
+    },
+    {
+      "qid": "u15",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.012222206220030785,
+      "top_dense": 0.4944038391113281,
+      "top_doc": "dpkg.1"
+    },
+    {
+      "qid": "u16",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.017697736620903015,
+      "top_dense": 0.4758061170578003,
+      "top_doc": "keepassxc-cli.1"
+    },
+    {
+      "qid": "u17",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6842702031135559,
+      "top_dense": 0.55662402510643,
+      "top_doc": "lsof.8"
+    },
+    {
+      "qid": "u18",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.4542432427406311,
+      "top_dense": 0.49873924255371094,
+      "top_doc": "xterm.1"
+    },
+    {
+      "qid": "u19",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9747958779335022,
+      "top_dense": 0.5648599863052368,
+      "top_doc": "dash.1"
+    },
+    {
+      "qid": "u20",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.17306765913963318,
+      "top_dense": 0.5126421749591827,
+      "top_doc": "devlink-health.8"
+    },
+    {
+      "qid": "u21",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.2976854145526886,
+      "top_dense": 0.48060983419418335,
+      "top_doc": "dash.1"
+    },
+    {
+      "qid": "u22",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9830201268196106,
+      "top_dense": 0.6210566461086273,
+      "top_doc": "pip3-install.1"
+    },
+    {
+      "qid": "u23",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9307010769844055,
+      "top_dense": 0.5614253282546997,
+      "top_doc": "xorriso.1"
+    },
+    {
+      "qid": "u24",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.28252023458480835,
+      "top_dense": 0.5627031922340393,
+      "top_doc": "sfdisk.8"
+    },
+    {
+      "qid": "u25",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6216042041778564,
+      "top_dense": 0.6098217964172363,
+      "top_doc": "systemctl.1"
+    },
+    {
+      "qid": "u26",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.005645290017127991,
+      "top_dense": 0.5087475180625916,
+      "top_doc": "initrd-release.5"
+    },
+    {
+      "qid": "u27",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9830527305603027,
+      "top_dense": 0.5539160370826721,
+      "top_doc": "proc_version.5"
+    },
+    {
+      "qid": "p01",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a01",
+      "top_score": 0.9964125156402588,
+      "top_dense": 0.5934857130050659,
+      "top_doc": "dpkg-source.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "p02",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a04",
+      "top_score": 0.9875554442405701,
+      "top_dense": 0.5980821847915649,
+      "top_doc": "git-diff-tree.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "p03",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a09",
+      "top_score": 0.9826196432113647,
+      "top_dense": 0.5511614680290222,
+      "top_doc": "git-filter-branch.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": null
+    },
+    {
+      "qid": "p04",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a25",
+      "top_score": 0.9878419637680054,
+      "top_dense": 0.6384062469005585,
+      "top_doc": "sed.1",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "p05",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a27",
+      "top_score": 0.22793453931808472,
+      "top_dense": 0.5347495973110199,
+      "top_doc": "tail.1",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "p06",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "a35",
+      "top_score": 0.9953919649124146,
+      "top_dense": 0.5393238067626953,
+      "top_doc": "daemon.7",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 9
+    },
+    {
+      "qid": "p07",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "b05",
+      "top_score": 0.9970864653587341,
+      "top_dense": 0.6210694313049316,
+      "top_doc": "sshd.8",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "p08",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "b12",
+      "top_score": 0.992219090461731,
+      "top_dense": 0.5936592519283295,
+      "top_doc": "systemctl.1",
+      "first_hit_rank": 9,
+      "n_hits": 1,
+      "doc_rank": 9
+    },
+    {
+      "qid": "p09",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "c01",
+      "top_score": 0.9883592128753662,
+      "top_dense": 0.5532039105892181,
+      "top_doc": "intro.1",
+      "first_hit_rank": 6,
+      "n_hits": 5,
+      "doc_rank": null
+    },
+    {
+      "qid": "p10",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "c05",
+      "top_score": 0.971207320690155,
+      "top_dense": 0.5309771001338959,
+      "top_doc": "services.5",
+      "first_hit_rank": 3,
+      "n_hits": 3,
+      "doc_rank": null
+    },
+    {
+      "qid": "p11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "u02",
+      "top_score": 0.629962682723999,
+      "top_dense": 0.5353937149047852,
+      "top_doc": "cp.1"
+    },
+    {
+      "qid": "p12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "u06",
+      "top_score": 0.963285505771637,
+      "top_dense": 0.6050092279911041,
+      "top_doc": "enosys.1"
+    },
+    {
+      "qid": "p13",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": "u24",
+      "top_score": 0.42161089181900024,
+      "top_dense": 0.5280461609363556,
+      "top_doc": "systemd-gpt-auto-generator.8"
+    },
+    {
+      "qid": "a01.t",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a01",
+      "paraphrase_of": null,
+      "top_score": 0.9921526312828064,
+      "top_dense": 0.6192320585250854,
+      "top_doc": "dpkg-source.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a01.n",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a01",
+      "paraphrase_of": null,
+      "top_score": 0.8435198664665222,
+      "top_dense": 0.6390874087810516,
+      "top_doc": "7zr.1",
+      "first_hit_rank": 11,
+      "n_hits": 1,
+      "doc_rank": 10
+    },
+    {
+      "qid": "a01.z",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a01",
+      "paraphrase_of": null,
+      "top_score": 0.9949116706848145,
+      "top_dense": 0.6603222787380219,
+      "top_doc": "tar.1",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a04.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a04",
+      "paraphrase_of": null,
+      "top_score": 0.9855375289916992,
+      "top_dense": 0.6194758117198944,
+      "top_doc": "grep.1",
+      "first_hit_rank": 1,
+      "n_hits": 8,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a04.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a04",
+      "paraphrase_of": null,
+      "top_score": 0.9141719341278076,
+      "top_dense": 0.5933753550052643,
+      "top_doc": "zipgrep.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a04.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a04",
+      "paraphrase_of": null,
+      "top_score": 0.973528265953064,
+      "top_dense": 0.5777807533740997,
+      "top_doc": "find.1",
+      "first_hit_rank": 9,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "a09.t",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a09",
+      "paraphrase_of": null,
+      "top_score": 0.99934321641922,
+      "top_dense": 0.6122633218765259,
+      "top_doc": "find.1",
+      "first_hit_rank": 3,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a09.n",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a09",
+      "paraphrase_of": null,
+      "top_score": 0.9347823858261108,
+      "top_dense": 0.515633225440979,
+      "top_doc": "xargs.1",
+      "first_hit_rank": 4,
+      "n_hits": 1,
+      "doc_rank": null
+    },
+    {
+      "qid": "a09.z",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a09",
+      "paraphrase_of": null,
+      "top_score": 0.9989110231399536,
+      "top_dense": 0.5734964311122894,
+      "top_doc": "git-filter-branch.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 12
+    },
+    {
+      "qid": "a11.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a11",
+      "paraphrase_of": null,
+      "top_score": 0.9909921884536743,
+      "top_dense": 0.6243979930877686,
+      "top_doc": "busybox.1",
+      "first_hit_rank": 4,
+      "n_hits": 2,
+      "doc_rank": 6
+    },
+    {
+      "qid": "a11.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a11",
+      "paraphrase_of": null,
+      "top_score": 0.9779927730560303,
+      "top_dense": 0.6562053859233856,
+      "top_doc": "df.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": null
+    },
+    {
+      "qid": "a11.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a11",
+      "paraphrase_of": null,
+      "top_score": 0.9694255590438843,
+      "top_dense": 0.6083401143550873,
+      "top_doc": "isosize.8",
+      "first_hit_rank": 3,
+      "n_hits": 2,
+      "doc_rank": 17
+    },
+    {
+      "qid": "a15.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a15",
+      "paraphrase_of": null,
+      "top_score": 0.9889967441558838,
+      "top_dense": 0.6410342454910278,
+      "top_doc": "chmod.1",
+      "first_hit_rank": 6,
+      "n_hits": 5,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a15.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a15",
+      "paraphrase_of": null,
+      "top_score": 0.843275249004364,
+      "top_dense": 0.5809029936790466,
+      "top_doc": "setfacl.1",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 11
+    },
+    {
+      "qid": "a15.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a15",
+      "paraphrase_of": null,
+      "top_score": 0.9821605086326599,
+      "top_dense": 0.5972695350646973,
+      "top_doc": "chacl.1",
+      "first_hit_rank": 18,
+      "n_hits": 2,
+      "doc_rank": 8
+    },
+    {
+      "qid": "a21.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a21",
+      "paraphrase_of": null,
+      "top_score": 0.981036901473999,
+      "top_dense": 0.6195003390312195,
+      "top_doc": "sort.1",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a21.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a21",
+      "paraphrase_of": null,
+      "top_score": 0.5962862372398376,
+      "top_dense": 0.5294008255004883,
+      "top_doc": "ls.1",
+      "first_hit_rank": 5,
+      "n_hits": 1,
+      "doc_rank": 5
+    },
+    {
+      "qid": "a21.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a21",
+      "paraphrase_of": null,
+      "top_score": 0.9900212287902832,
+      "top_dense": 0.6452325582504272,
+      "top_doc": "sort.1",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a25.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a25",
+      "paraphrase_of": null,
+      "top_score": 0.9980996251106262,
+      "top_dense": 0.6491867005825043,
+      "top_doc": "sed.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a25.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a25",
+      "paraphrase_of": null,
+      "top_score": 0.8038697242736816,
+      "top_dense": 0.5671762526035309,
+      "top_doc": "busybox.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a25.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a25",
+      "paraphrase_of": null,
+      "top_score": 0.9437018036842346,
+      "top_dense": 0.6158465445041656,
+      "top_doc": "busybox.1",
+      "first_hit_rank": 3,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a27.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a27",
+      "paraphrase_of": null,
+      "top_score": 0.9922425746917725,
+      "top_dense": 0.6225231289863586,
+      "top_doc": "tail.1",
+      "first_hit_rank": 1,
+      "n_hits": 6,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a27.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a27",
+      "paraphrase_of": null,
+      "top_score": 0.6105605363845825,
+      "top_dense": 0.537279337644577,
+      "top_doc": "cat.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "a27.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a27",
+      "paraphrase_of": null,
+      "top_score": 0.9142245054244995,
+      "top_dense": 0.5532085299491882,
+      "top_doc": "logrotate.8",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a30.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a30",
+      "paraphrase_of": null,
+      "top_score": 0.9974111914634705,
+      "top_dense": 0.626824140548706,
+      "top_doc": "curl.1",
+      "first_hit_rank": 1,
+      "n_hits": 9,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a30.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a30",
+      "paraphrase_of": null,
+      "top_score": 0.6467652916908264,
+      "top_dense": 0.5985333025455475,
+      "top_doc": "wget.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a30.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a30",
+      "paraphrase_of": null,
+      "top_score": 0.9927446842193604,
+      "top_dense": 0.6340872347354889,
+      "top_doc": "curl.1",
+      "first_hit_rank": 1,
+      "n_hits": 8,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a35.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a35",
+      "paraphrase_of": null,
+      "top_score": 0.9956594109535217,
+      "top_dense": 0.5871113240718842,
+      "top_doc": "systemctl.1",
+      "first_hit_rank": 5,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a35.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a35",
+      "paraphrase_of": null,
+      "top_score": 0.9417778849601746,
+      "top_dense": 0.5468230545520782,
+      "top_doc": "daemon.7",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 3
+    },
+    {
+      "qid": "a35.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a35",
+      "paraphrase_of": null,
+      "top_score": 0.9964644908905029,
+      "top_dense": 0.5606743693351746,
+      "top_doc": "boot.7",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": null
+    },
+    {
+      "qid": "a37.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "a37",
+      "paraphrase_of": null,
+      "top_score": 0.9996401071548462,
+      "top_dense": 0.6834996044635773,
+      "top_doc": "mount.8",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "a37.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "a37",
+      "paraphrase_of": null,
+      "top_score": 0.2547973096370697,
+      "top_dense": 0.564768373966217,
+      "top_doc": "sfdisk.8",
+      "first_hit_rank": 6,
+      "n_hits": 1,
+      "doc_rank": 12
+    },
+    {
+      "qid": "a37.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "a37",
+      "paraphrase_of": null,
+      "top_score": 0.9998303651809692,
+      "top_dense": 0.6130897700786591,
+      "top_doc": "mount.8",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b03.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "b03",
+      "paraphrase_of": null,
+      "top_score": 0.9897476434707642,
+      "top_dense": 0.6617319583892822,
+      "top_doc": "crontab.5",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b03.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "b03",
+      "paraphrase_of": null,
+      "top_score": 0.899250328540802,
+      "top_dense": 0.5722206830978394,
+      "top_doc": "crontab.5",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b03.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "b03",
+      "paraphrase_of": null,
+      "top_score": 0.9876172542572021,
+      "top_dense": 0.5842946171760559,
+      "top_doc": "anacron.8",
+      "first_hit_rank": 3,
+      "n_hits": 2,
+      "doc_rank": 2
+    },
+    {
+      "qid": "b05.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "b05",
+      "paraphrase_of": null,
+      "top_score": 0.9947355389595032,
+      "top_dense": 0.6612217426300049,
+      "top_doc": "sshd_config.5",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b05.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "b05",
+      "paraphrase_of": null,
+      "top_score": 0.17604807019233704,
+      "top_dense": 0.5392876267433167,
+      "top_doc": "ssh-agent.1",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 18
+    },
+    {
+      "qid": "b05.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "b05",
+      "paraphrase_of": null,
+      "top_score": 0.9824106693267822,
+      "top_dense": 0.6063008308410645,
+      "top_doc": "sshd_config.5",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b12.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "b12",
+      "paraphrase_of": null,
+      "top_score": 0.9984617233276367,
+      "top_dense": 0.6356691420078278,
+      "top_doc": "systemd.service.5",
+      "first_hit_rank": 1,
+      "n_hits": 6,
+      "doc_rank": 1
+    },
+    {
+      "qid": "b12.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "b12",
+      "paraphrase_of": null,
+      "top_score": 0.9557127356529236,
+      "top_dense": 0.5258593857288361,
+      "top_doc": "systemd.1",
+      "first_hit_rank": 2,
+      "n_hits": 1,
+      "doc_rank": 2
+    },
+    {
+      "qid": "b12.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "b12",
+      "paraphrase_of": null,
+      "top_score": 0.993838906288147,
+      "top_dense": 0.5873361527919769,
+      "top_doc": "systemd.service.5",
+      "first_hit_rank": 1,
+      "n_hits": 10,
+      "doc_rank": 1
+    },
+    {
+      "qid": "c01.t",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "c01",
+      "paraphrase_of": null,
+      "top_score": 0.993236243724823,
+      "top_dense": 0.6577018797397614,
+      "top_doc": "kill.1",
+      "first_hit_rank": 6,
+      "n_hits": 4,
+      "doc_rank": null
+    },
+    {
+      "qid": "c01.n",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "variant_of": "c01",
+      "paraphrase_of": null,
+      "top_score": 0.4743075370788574,
+      "top_dense": 0.5535368621349335,
+      "top_doc": "systemd.kill.5",
+      "first_hit_rank": 1,
+      "n_hits": 3,
+      "doc_rank": null
+    },
+    {
+      "qid": "c01.z",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "c01",
+      "paraphrase_of": null,
+      "top_score": 0.9943746328353882,
+      "top_dense": 0.6571192443370819,
+      "top_doc": "kill.1",
+      "first_hit_rank": 6,
+      "n_hits": 4,
+      "doc_rank": null
+    },
+    {
+      "qid": "u02.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "u02",
+      "paraphrase_of": null,
+      "top_score": 0.2504488229751587,
+      "top_dense": 0.6112404465675354,
+      "top_doc": "gzip.1"
+    },
+    {
+      "qid": "u02.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "u02",
+      "paraphrase_of": null,
+      "top_score": 0.45463812351226807,
+      "top_dense": 0.5397018194198608,
+      "top_doc": "rmdir.1"
+    },
+    {
+      "qid": "u03.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "u03",
+      "paraphrase_of": null,
+      "top_score": 0.01594206690788269,
+      "top_dense": 0.5119761526584625,
+      "top_doc": "org.freedesktop.portable1.5"
+    },
+    {
+      "qid": "u03.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "u03",
+      "paraphrase_of": null,
+      "top_score": 0.30994755029678345,
+      "top_dense": 0.5177776217460632,
+      "top_doc": "sessreg.1"
+    },
+    {
+      "qid": "u06.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "u06",
+      "paraphrase_of": null,
+      "top_score": 0.9950103163719177,
+      "top_dense": 0.6152042150497437,
+      "top_doc": "proc_pid_syscall.5"
+    },
+    {
+      "qid": "u06.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "u06",
+      "paraphrase_of": null,
+      "top_score": 0.9508928060531616,
+      "top_dense": 0.5423651933670044,
+      "top_doc": "lft.1"
+    },
+    {
+      "qid": "u14.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "u14",
+      "paraphrase_of": null,
+      "top_score": 0.6795088052749634,
+      "top_dense": 0.5599363148212433,
+      "top_doc": "nft.8"
+    },
+    {
+      "qid": "u14.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "u14",
+      "paraphrase_of": null,
+      "top_score": 0.568601131439209,
+      "top_dense": 0.5834862589836121,
+      "top_doc": "nft.8"
+    },
+    {
+      "qid": "u24.t",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "variant_of": "u24",
+      "paraphrase_of": null,
+      "top_score": 0.8943783640861511,
+      "top_dense": 0.5840626358985901,
+      "top_doc": "e2freefrag.8"
+    },
+    {
+      "qid": "u24.z",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "variant_of": "u24",
+      "paraphrase_of": null,
+      "top_score": 0.03327590599656105,
+      "top_dense": 0.5224128663539886,
+      "top_doc": "e2freefrag.8"
+    }
+  ]
+}

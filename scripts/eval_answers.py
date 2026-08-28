@@ -38,7 +38,7 @@ from smm import grammar, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
-from smm.retrieve import Retriever, gate_score  # noqa: E402
+from smm.retrieve import Retriever, expand, gate_score  # noqa: E402
 
 ABSTAIN_RE = re.compile(
     r"\bi\s*(?:do\s*n[o']?t|don'?t)\s+know\b"
@@ -63,6 +63,9 @@ def main() -> int:
     ap.add_argument("--mode", choices=("dense", "bm25", "hybrid"), default="dense")
     ap.add_argument("--rerank", action="store_true")
     ap.add_argument("--candidates", type=int, default=50)
+    ap.add_argument("--expand", type=int, default=0,
+                    help="structured index: widen each hit by N neighbouring chunks "
+                         "within its own section before the model reads it")
     ap.add_argument("--gate", type=float, default=0.0,
                     help="refuse before generation below this top-1 score (0 = no gate)")
     ap.add_argument("--grammar", action="store_true", help="GBNF-enforced citations")
@@ -95,7 +98,11 @@ def main() -> int:
         r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode, candidates=args.candidates)
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
-            retrieved[row["qid"]] = r.retrieve(row["question"], k=args.k)
+            hits = r.retrieve(row["question"], k=args.k)
+            # Expansion changes what the model reads, not how anything ranked, so it
+            # belongs here rather than inside the retriever - and `evidence_retrieved`
+            # below then means what it says: the answer was in front of the model.
+            retrieved[row["qid"]] = expand(db, hits, span=args.expand) if args.expand else hits
             if sys.stdout.isatty():
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
@@ -207,7 +214,8 @@ def main() -> int:
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
-                   "grammar": args.grammar, "candidates": args.candidates},
+                   "grammar": args.grammar, "candidates": args.candidates,
+                   "expand": args.expand, "db": args.db},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),

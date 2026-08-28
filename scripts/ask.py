@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Ask the corpus a question. Phase 2: rerank, gate, cited answer.
+"""Ask the corpus a question: rerank, gate, cited answer.
+
+The default index is the phase 2 flat one. Phase 3's structure-aware chunker is
+still here behind `--db data/index/phase3-mixed.db --expand 1`, and it is not the
+default because it did not beat this - see docs/phase3-results.md.
 
   .venv/bin/python scripts/ask.py "how do I exclude files listed in a text file from a tar archive"
   .venv/bin/python scripts/ask.py --retrieve-only -k 10 "watch a log file as it grows"
@@ -23,7 +27,7 @@ from smm import grammar, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
-from smm.retrieve import Retriever, gate_score  # noqa: E402
+from smm.retrieve import Retriever, expand, gate_score  # noqa: E402
 
 # sweep_gate.py --answers, swept on end-to-end outcomes rather than on a retrieval
 # proxy for them: 92.5% abstention recall for 1.6 points of answer accuracy.
@@ -36,6 +40,9 @@ def main() -> int:
     ap.add_argument("-k", type=int, default=5)
     ap.add_argument("--db", default="data/index/phase2.db")
     ap.add_argument("--candidates", type=int, default=50)
+    ap.add_argument("--expand", type=int, default=0,
+                    help="structured index only: widen each hit by N neighbouring "
+                         "chunks in its section (a no-op on the flat default index)")
     ap.add_argument("--gate", type=float, default=GATE)
     ap.add_argument("--no-gate", action="store_true")
     ap.add_argument("--no-rerank", action="store_true")
@@ -60,6 +67,8 @@ def main() -> int:
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense", candidates=args.candidates)
     hits = r.retrieve(question, k=args.k)
     score = gate_score(hits)
+    if args.expand:
+        hits = expand(db, hits, span=args.expand)
 
     if args.retrieve_only or args.show_context:
         for i, h in enumerate(hits, 1):
