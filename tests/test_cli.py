@@ -21,28 +21,17 @@ BIN_SMM = ROOT / "bin" / "smm"
 DAEMON = ROOT / "src" / "smm" / "daemon.py"
 STUB_DIR = ROOT / ".run" / "test-stub-bin"  # scratch, gitignored, not scope.paths
 
-# bin/smm insists on $ROOT/.venv/bin/python (never the ambient interpreter -
-# that is the point of goal #1). This worktree has no .venv of its own (it's
-# gitignored - see task env facts), so point it at whatever venv is actually
-# running this test file, which for `.venv/bin/python tests/test_cli.py` is
-# already the real one.
+# Used to invoke src/smm/daemon.py directly (bypassing bin/smm) for the
+# lifecycle/reaper tests below - whatever interpreter is running this test
+# file. This worktree deliberately has no .venv (it's gitignored, and
+# tests/test_cli.py must pass without one - status/stop are stdlib-only and
+# must work before a venv exists; see test_status_works_without_venv).
 VENV_PY = Path(sys.executable).resolve()
 
 
 def check(cond, msg):
     if not cond:
         raise AssertionError(msg)
-
-
-def ensure_repo_venv():
-    """bin/smm resolves ROOT/.venv/bin/python relative to its own real path.
-    This worktree doesn't ship a .venv (gitignored); point at the venv this
-    test is actually running under so bin/smm subprocess calls work."""
-    venv_link = ROOT / ".venv"
-    if venv_link.exists():
-        return
-    real_venv_root = VENV_PY.parent.parent
-    venv_link.symlink_to(real_venv_root)
 
 
 def free_port() -> int:
@@ -202,6 +191,46 @@ def test_status_starts_nothing():
     check("down" in proc.stdout or "UP" in proc.stdout, "status should say up/down")
 
 
+def test_status_works_without_venv():
+    """Regression: `status`/`stop` must work with NO project venv - they only
+    poll /health and read pidfiles (src/smm/daemon.py is stdlib-only), and
+    they are exactly the commands someone reaches for when something -
+    including a missing venv - is broken. `ask`/`ingest` genuinely import
+    smm.* and must keep hard-requiring the venv, with the README pointer.
+
+    Built in a scratch copy of the repo layout so this can't pass by
+    accident just because *this* worktree happens to have no .venv - it
+    fails the same way even if one exists, because the copy never has one."""
+    tmp = ROOT / ".run" / "test-no-venv"
+    shutil.rmtree(tmp, ignore_errors=True)
+    (tmp / "bin").mkdir(parents=True)
+    (tmp / "src" / "smm").mkdir(parents=True)
+    (tmp / "scripts").mkdir(parents=True)
+    shutil.copy2(BIN_SMM, tmp / "bin" / "smm")
+    (tmp / "bin" / "smm").chmod(0o755)
+    shutil.copy2(DAEMON, tmp / "src" / "smm" / "daemon.py")
+    shutil.copy2(ROOT / "scripts" / "servers.sh", tmp / "scripts" / "servers.sh")
+    check(not (tmp / ".venv").exists(), "scratch copy must start with no venv")
+    try:
+        proc = subprocess.run([str(tmp / "bin" / "smm"), "status"], cwd="/tmp",
+                               capture_output=True, text=True, timeout=30)
+        check(proc.returncode == 0,
+              f"status must work with no venv present: {proc.stderr}")
+        check("embedder" in proc.stdout, f"should reach real daemon output: {proc.stdout}")
+
+        proc2 = subprocess.run([str(tmp / "bin" / "smm"), "stop"], cwd="/tmp",
+                                capture_output=True, text=True, timeout=30)
+        check(proc2.returncode == 0, f"stop must work with no venv present: {proc2.stderr}")
+
+        proc3 = subprocess.run([str(tmp / "bin" / "smm"), "a question"], cwd="/tmp",
+                                capture_output=True, text=True, timeout=30)
+        check(proc3.returncode == 1, f"ask without a venv should still fail: {proc3.stdout}")
+        check("venv" in proc3.stderr and "README" in proc3.stderr,
+              f"ask's venv error should point at the README: {proc3.stderr}")
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def test_name_from_argv0():
     """Usage text reads back the name the tool was actually invoked as -
     renaming must never require a code edit (bin/smm derives it from $0)."""
@@ -240,7 +269,6 @@ def test_install_default_name_and_path_warning():
 
 
 def test_works_from_any_cwd_via_symlink():
-    ensure_repo_venv()
     tmp = ROOT / ".run" / "test-anycwd"
     tmp.mkdir(parents=True, exist_ok=True)
     prefix = tmp / "bin"

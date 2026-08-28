@@ -18,9 +18,19 @@ set -euo pipefail
 
 SELF="$(readlink -f "${BASH_SOURCE[0]}")"
 ROOT="$(cd "$(dirname "$SELF")/.." && pwd)"
-PYTHON="$ROOT/.venv/bin/python"
+VENV_PYTHON="$ROOT/.venv/bin/python"
 DAEMON="$ROOT/src/smm/daemon.py"
 NAME="$(basename "$0")"
+
+# src/smm/daemon.py is stdlib-only, so `status`/`stop` - the commands someone
+# reaches for when something is broken, including before the venv exists -
+# work under whatever python3 is on $PATH. `ask`/`ingest` import smm.* (numpy,
+# sqlite-vec, ...) and genuinely need the project venv; those still hard-fail
+# with a pointer to the README if it is missing.
+STATUS_PYTHON="$VENV_PYTHON"
+if [ ! -x "$STATUS_PYTHON" ]; then
+  STATUS_PYTHON="$(command -v python3 || true)"
+fi
 
 usage() {
   cat >&2 <<EOF
@@ -69,17 +79,24 @@ if [ "$sub" = "install" ]; then
   exit $?
 fi
 
-if [ ! -x "$PYTHON" ]; then
-  echo "$NAME: no venv at $PYTHON - see README (python3 -m venv --copies .venv && ...)" >&2
-  exit 1
-fi
-
 case "$sub" in
-  status) exec "$PYTHON" "$DAEMON" status ;;
-  stop)   exec "$PYTHON" "$DAEMON" stop ;;
-  ask)
-    if [ $# -eq 0 ]; then usage; exit 1; fi
-    exec "$PYTHON" "$DAEMON" run "$PYTHON" "$ROOT/scripts/ask.py" -- "$@" ;;
-  ingest)
-    exec "$PYTHON" "$DAEMON" run "$PYTHON" "$ROOT/scripts/ingest.py" -- "$@" ;;
+  status)
+    if [ -z "$STATUS_PYTHON" ]; then
+      echo "$NAME: no python3 found on \$PATH" >&2
+      exit 1
+    fi
+    exec "$STATUS_PYTHON" "$DAEMON" status ;;
+  stop)
+    if [ -z "$STATUS_PYTHON" ]; then
+      echo "$NAME: no python3 found on \$PATH" >&2
+      exit 1
+    fi
+    exec "$STATUS_PYTHON" "$DAEMON" stop ;;
+  ask|ingest)
+    if [ ! -x "$VENV_PYTHON" ]; then
+      echo "$NAME: no venv at $VENV_PYTHON - see README (python3 -m venv --copies .venv && ...)" >&2
+      exit 1
+    fi
+    if [ "$sub" = "ask" ] && [ $# -eq 0 ]; then usage; exit 1; fi
+    exec "$VENV_PYTHON" "$DAEMON" run "$VENV_PYTHON" "$ROOT/scripts/$sub.py" -- "$@" ;;
 esac
