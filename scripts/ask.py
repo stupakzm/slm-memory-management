@@ -46,7 +46,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("question", nargs="+")
     ap.add_argument("-k", type=int, default=5)
-    ap.add_argument("--db", default="data/index/phase2.db")
+    ap.add_argument("--db", default="data/index/main.db")
     ap.add_argument("--candidates", type=int, default=50)
     ap.add_argument("--domain", default=None,
                     help="restrict retrieval to one ingested namespace")

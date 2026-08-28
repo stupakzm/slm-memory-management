@@ -64,12 +64,12 @@ cmake --build ~/opt/llama.cpp/build -j"$(nproc)" \
 .venv/bin/python scripts/extract_man.py --sections 1,5,7,8
 .venv/bin/python scripts/resolve_gold.py          # eval set must validate clean
 
-# 3. index (~42 min on an RTX 3060)
+# 3. index (~41 min on an RTX 3060; the GPU is saturated, batching does not help)
 ./scripts/servers.sh start embedder
-.venv/bin/python scripts/build_index.py --out data/index/phase1-prefix.db
+.venv/bin/python scripts/build_index.py --out data/index/main.db
+.venv/bin/python scripts/corpus_fingerprint.py --write   # record what was indexed
 
 # 4. ask it something
-.venv/bin/python scripts/build_lexical.py --from data/index/phase1-prefix.db --out data/index/phase2.db
 ./scripts/servers.sh stop && ./scripts/servers.sh start serve
 .venv/bin/python scripts/ask.py "how do I exclude files listed in a text file from a tar archive"
 .venv/bin/python scripts/ask.py --act "make a gzip-compressed archive of the reports folder"

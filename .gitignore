@@ -19,3 +19,12 @@ models/
 
 # retrieval cache used to split eval into two stages
 data/eval/results/*-retrieved.json
+.work/
+
+# orchestration layer (ORCH) — machinery, runtime state, and project memory.
+# Deliberately untracked: this repo keeps orchestration local to the machine.
+# Reinstall with: python3 - ORCH.md <<< the installer block in ORCH.md §0
+ORCH.md
+CLAUDE.md
+.claude/
+.orch/

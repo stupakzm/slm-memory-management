@@ -49,7 +49,7 @@ def collect(paths: list[str]) -> list[Path]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("paths", nargs="*", help="files or directories of text/markdown")
-    ap.add_argument("--db", default="data/index/phase5.db")
+    ap.add_argument("--db", default="data/index/main.db")
     ap.add_argument("--domain", required=True)
     ap.add_argument("--url", action="append", default=[])
     ap.add_argument("--url-mode", action="store_true", help=argparse.SUPPRESS)
