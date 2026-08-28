@@ -23,6 +23,15 @@ reproduces today's single-query path exactly. Under `--retrieve-only` the defaul
 is 0 instead of 1 - that mode stays generator-free unless `--rewrites` is passed
 explicitly.
 
+The gate itself, with rewrites on, still reads the ORIGINAL question's own
+reranked top-1 - never the fused list's. rrf() orders by rank, so the fused
+top-1's rerank_score is whatever the winning variant happened to score, not a
+number comparable across queries; gating on it dropped answerable p10 from 0.80
+to 0.30 and no threshold recovered the baseline trade (measured,
+tsk_20260828_a47f0496). `GATE`/`GATE_ACT` were swept against the original
+question's own top-1, so that is what stays gated on - the generator answers
+from the fused `hits`, the gate decides from `gate_hits`.
+
 Known, accepted tradeoff: with `--rewrites` > 0 the generator has to produce the
 rewrites *before* retrieval can run, so it now starts before the embedder/reranker
 and before the gate decision - on every such ask, including one the gate goes on
@@ -119,10 +128,16 @@ def main() -> int:
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                   candidates=args.candidates, domain=args.domain)
     if args.rewrites > 0:
-        hits, interpreted_idx, _variants = r.retrieve_fused(question, rewrites=rewrite_texts, k=args.k)
+        hits, interpreted_idx, _variants, gate_hits = r.retrieve_fused(
+            question, rewrites=rewrite_texts, k=args.k)
     else:
         hits = r.retrieve(question, k=args.k)
-    score = gate_score(hits)
+        gate_hits = hits  # --rewrites 0: identical list, gate on exactly what it always has
+    # Gate on the ORIGINAL question's own reranked top-1, never the fused one:
+    # after rrf() the fused list is ordered by rank, so its top-1 rerank_score is
+    # whichever variant happened to win, not the distribution GATE/GATE_ACT were
+    # swept against (measured, tsk_20260828_a47f0496 - see retrieve_fused).
+    score = gate_score(gate_hits)
     if args.act and args.gate == GATE:
         args.gate = GATE_ACT
     if args.expand:

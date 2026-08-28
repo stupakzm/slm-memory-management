@@ -33,7 +33,7 @@ from smm import fingerprint, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
-from smm.retrieve import Retriever  # noqa: E402
+from smm.retrieve import Retriever, gate_score  # noqa: E402
 
 KS = (1, 3, 5, 10, 20)
 
@@ -118,18 +118,25 @@ def main() -> int:
     for i, row in enumerate(rows, 1):
         if args.rewrites:
             rewrites = gen.rewrites(row["question"], n=args.rewrites)
-            res, _winner, _variants = r.retrieve_fused(row["question"], rewrites=rewrites,
-                                                        k=args.topk)
+            res, _winner, _variants, gate_hits = r.retrieve_fused(row["question"], rewrites=rewrites,
+                                                                   k=args.topk)
         else:
             res = r.retrieve(row["question"], k=args.topk)
+            gate_hits = res
         top = res[0] if res else None
         rec = {
             "qid": row["qid"], "kind": row["kind"], "tags": row["tags"],
             "variant_kind": row.get("variant_kind"), "variant_of": row.get("variant_of"),
             "paraphrase_of": row.get("paraphrase_of"),
-            # `top_score` is whatever the *gate* would threshold: the reranker score
-            # when there is one, the dense/RRF score otherwise.
+            # `top_score` is the fused top hit's own score - unchanged meaning, so
+            # existing analyses of this field do not shift under anyone.
             "top_score": (top.get("rerank_score", top.get("score", 0.0)) if top else 0.0),
+            # `gate_score` is what the *gate* would actually threshold: the
+            # original question's own reranked top-1 (== top_score when
+            # --rewrites is 0). Fused and gate scores diverge exactly when a
+            # rewrite's list won the fused ranking - see src/smm/retrieve.py
+            # retrieve_fused / scripts/ask.py (tsk_20260828_a47f0496).
+            "gate_score": gate_score(gate_hits),
             "top_dense": (top.get("score", 0.0) if top else 0.0),
             "top_doc": top["doc_id"] if top else None,
         }

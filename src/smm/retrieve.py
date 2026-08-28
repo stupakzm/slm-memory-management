@@ -148,7 +148,7 @@ class Retriever:
     def retrieve_fused(self, question: str, rewrites: list[str] | None = None,
                         k: int = KEEP, variant_candidates: int = VARIANT_CANDIDATES,
                         variant_k: int = VARIANT_K,
-                        ) -> tuple[list[dict], int, list[str]]:
+                        ) -> tuple[list[dict], int, list[str], list[dict]]:
         """`retrieve()`, fused across the question and its rewrites.
 
         Each variant (index 0 is `question`, the rest are `rewrites`) is retrieved
@@ -157,20 +157,35 @@ class Retriever:
         there for why per-variant reranking, not a single fused-then-reranked pool)
         and the fused result is truncated to `k`. `variant_k` is deliberately NOT
         `k`: rrf() needs the lower-ranked-but-right hits a shallow list would have
-        already dropped - see the measured numbers on VARIANT_K above. Returns
-        `(fused hits, winning variant index, variants)` so a caller can report which
-        rewrite - or the original question - produced the top hit.
+        already dropped - see the measured numbers on VARIANT_K above.
+
+        Also returns `gate_hits`: variant 0's (the original question's) own
+        reranked list, unfused. After `rrf()` the fused list is ordered by RANK,
+        not score, so `fused[0]["rerank_score"]` is whatever the winning variant
+        happened to score - not comparable across queries, and not what
+        `sweep_gate.py` swept `GATE`/`GATE_ACT` against (measured,
+        tsk_20260828_a47f0496: gating on the fused top-1 dropped answerable p10
+        from 0.80 to 0.30 and no threshold recovered the baseline trade). The
+        gate must keep reading `gate_score(gate_hits)` - the original question's
+        own top-1 - while the generator reads the fused `hits`. This is why
+        `gate_score()` itself is untouched: it is still one definition, applied
+        to a different, correctly-scoped list.
+
+        Returns `(fused hits, winning variant index, variants, gate_hits)`.
         """
         variants = [question] + list(rewrites or [])
+        lists_by_variant: list[list[dict]] = []
 
         def rerank_variant(q: str) -> list[dict]:
             cands = self.candidates_for(q, n=variant_candidates)
-            if self.reranker is None:
-                return cands[:variant_k]
-            return self.reranker.rerank(q, cands, top_k=variant_k)
+            result = (cands[:variant_k] if self.reranker is None
+                      else self.reranker.rerank(q, cands, top_k=variant_k))
+            lists_by_variant.append(result)
+            return result
 
         fused, winner = fuse_variants(rerank_variant, variants, k=k)
-        return fused, winner, variants
+        gate_hits = lists_by_variant[0] if lists_by_variant else []
+        return fused, winner, variants, gate_hits
 
 
 def expand(db, hits: list[dict], span: int = 1, budget: int = 6000) -> list[dict]:

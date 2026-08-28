@@ -33,7 +33,7 @@ if "sqlite_vec" not in sys.modules:
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from smm.retrieve import KEEP, VARIANT_K, Retriever, fuse_variants, rrf  # noqa: E402
+from smm.retrieve import KEEP, VARIANT_K, Retriever, fuse_variants, gate_score, rrf  # noqa: E402
 
 
 def check(cond, msg):
@@ -149,7 +149,7 @@ def test_retrieve_fused_with_no_rewrites_issues_exactly_one_retrieval_call():
 
     r.candidates_for = fake_candidates_for  # instance override; no real db touched
 
-    fused, winner, variants = r.retrieve_fused("how do I list files", rewrites=None, k=KEEP)
+    fused, winner, variants, gate_hits = r.retrieve_fused("how do I list files", rewrites=None, k=KEEP)
 
     check(len(calls) == 1, f"expected exactly one retrieval call, got {len(calls)}: {calls}")
     check(variants == ["how do I list files"], f"variants should be just the question: {variants}")
@@ -170,7 +170,7 @@ def test_retrieve_fused_issues_one_call_per_variant_at_variant_candidates():
 
     r.candidates_for = fake_candidates_for
 
-    fused, winner, variants = r.retrieve_fused(
+    fused, winner, variants, gate_hits = r.retrieve_fused(
         "how do I list files", rewrites=["show files by size", "ls command sort"], k=KEEP,
     )
 
@@ -216,7 +216,7 @@ def test_retrieve_fused_reranks_each_variant_to_variant_k_not_k():
 
     r.candidates_for = fake_candidates_for
 
-    fused, winner, variants = r.retrieve_fused(
+    fused, winner, variants, gate_hits = r.retrieve_fused(
         "how to list files via size", rewrites=["largest files command"], k=5,
     )
 
@@ -239,7 +239,7 @@ def test_retrieve_fused_variant_k_is_overridable():
 
     r.candidates_for = fake_candidates_for
 
-    fused, winner, variants = r.retrieve_fused(
+    fused, winner, variants, gate_hits = r.retrieve_fused(
         "how to list files via size", rewrites=["largest files command"], k=3, variant_k=7,
     )
 
@@ -247,6 +247,84 @@ def test_retrieve_fused_variant_k_is_overridable():
     check(all(top_k == 7 for _, top_k in calls),
           f"explicit variant_k=7 must override the VARIANT_K default: {calls}")
     check(len(fused) == 3, f"fused output should still respect k=3, got {len(fused)}")
+
+
+# --------------------------------------------------------------------------
+# Gate contract: gate_hits must be variant 0's (the original question's) own
+# reranked list, never the fused one. After rrf() the fused list is ordered by
+# RANK, so its top-1 rerank_score is whatever the winning variant happened to
+# score - not comparable across queries, and not the distribution GATE/GATE_ACT
+# were swept against. Measured, tsk_20260828_a47f0496: gating on the fused
+# top-1 dropped answerable p10 from 0.80 to 0.30; no threshold recovered the
+# baseline trade. Modelled below on the real numbers: a rewrite wins the fused
+# ranking with a low score (~0.30) while the original question's own top-1
+# carries a high one (~0.98).
+# --------------------------------------------------------------------------
+
+
+def test_gate_hits_is_the_original_questions_own_list_not_the_fused_winner():
+    """Modelled on the coordinator's measured numbers: a fused winner scoring
+    ~0.30 vs. the original question's own top-1 scoring ~0.98. `ls.1:4` is
+    buried at rank 3 in the original's own list (score 0.30 there) but wins
+    the FUSED ranking because the rewrite also ranks it first; rrf() seeds a
+    merged chunk's score fields from whichever list it saw first (here, the
+    original's own low score, 0.30 - not the rewrite's 0.99). The gate must
+    read `size.1:1` at 0.98 (the original's own top-1), never `ls.1:4` at 0.30
+    (the fused winner's own score)."""
+    question = "how to list files via size"
+    rewrite = "command to see the largest files in a directory"
+
+    original_reranked = [
+        c("size.1:1", rerank_score=0.98),
+        c("size.1:2", rerank_score=0.90),
+        c("ls.1:4", rerank_score=0.30),
+    ]
+    rewrite_reranked = [c("ls.1:4", rerank_score=0.99)]
+    lists = {question: original_reranked, rewrite: rewrite_reranked}
+
+    r = Retriever(db=None, embedder=None, reranker=StubReranker(), mode="dense")
+    r.candidates_for = lambda q, n=None: lists[q]
+
+    fused, winner, variants, gate_hits = r.retrieve_fused(question, rewrites=[rewrite], k=5)
+
+    check(fused and fused[0]["chunk_id"] == "ls.1:4",
+          f"expected ls.1:4 to win the fused ranking, got {fused}")
+    check(fused[0]["rerank_score"] == 0.30,
+          f"sanity: the fused winner's own carried score is the low one (0.30), got {fused[0]}")
+    check(gate_hits == original_reranked,
+          f"gate_hits must be variant 0's own reranked list, got {gate_hits}")
+    check(gate_score(gate_hits) == 0.98,
+          f"gate_score(gate_hits) must read the original's own top-1 (0.98), "
+          f"got {gate_score(gate_hits)}")
+    check(gate_score(gate_hits) != gate_score(fused),
+          f"the gate must not read the fused winner's own score (0.30): "
+          f"gate_score(gate_hits)={gate_score(gate_hits)} gate_score(fused)={gate_score(fused)}")
+
+
+def test_gate_hits_equals_fused_hits_when_there_are_no_rewrites():
+    """`rewrites=0`/`None`: with only one variant, rrf() over a single list
+    cannot reorder it, so gate_hits (variant 0's own reranked list) must carry
+    the same ranking, and the same gate score, as the fused list - the
+    single-variant case ask.py's `--rewrites 0` path relies on (there, ask.py
+    skips retrieve_fused entirely and sets `gate_hits = hits` directly; this
+    pins that retrieve_fused itself agrees when it is given zero rewrites)."""
+    r = Retriever(db=None, embedder=None, reranker=None, mode="dense")
+
+    def fake_candidates_for(question, n=None):
+        return [c("only.1:1", score=0.9), c("only.1:2", score=0.5)]
+
+    r.candidates_for = fake_candidates_for
+
+    fused, winner, variants, gate_hits = r.retrieve_fused("q", rewrites=None, k=5)
+
+    fused_ids = [h["chunk_id"] for h in fused]
+    gate_ids = [h["chunk_id"] for h in gate_hits[:len(fused)]]
+    check(fused_ids == gate_ids,
+          f"with no rewrites, gate_hits and fused hits must rank identically: "
+          f"{gate_ids} != {fused_ids}")
+    check(gate_score(gate_hits) == gate_score(fused),
+          f"with no rewrites, gate_score must agree whether read from gate_hits "
+          f"or fused: {gate_score(gate_hits)} != {gate_score(fused)}")
 
 
 if __name__ == "__main__":
