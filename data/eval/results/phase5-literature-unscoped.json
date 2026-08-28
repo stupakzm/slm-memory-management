@@ -1,0 +1,298 @@
+{
+  "name": "phase5-literature-unscoped",
+  "db": "data/index/phase5.db",
+  "meta": {
+    "dim": "1024",
+    "chunk_chars": "1000",
+    "overlap": "150",
+    "prefix": "True",
+    "corpus": "data/corpus/man.jsonl",
+    "chunker": "flat",
+    "section_path": "False",
+    "max_entry": "",
+    "tagged_ratio": "",
+    "phase": "1-flat-dense",
+    "corpus_digest": "b11bbf0145f18aed"
+  },
+  "config": {
+    "mode": "dense",
+    "rerank": true,
+    "candidates": 50,
+    "dense_weight": 1.0,
+    "bm25_weight": 1.0,
+    "domain": null,
+    "domains_in_index": {
+      "linux": 56567,
+      "literature": 32708
+    }
+  },
+  "n_chunks": 89275,
+  "elapsed_s": 55.8,
+  "recall": {
+    "@1": 0.5625,
+    "@3": 0.625,
+    "@5": 0.625,
+    "@10": 0.625,
+    "@20": 0.6875
+  },
+  "mrr@10": 0.59375,
+  "gold_doc_top5": 1.0,
+  "per_question": [
+    {
+      "qid": "L1342",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.4978220462799072,
+      "top_dense": 0.4707759618759155,
+      "top_doc": "1342.literature",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L2701",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9870355725288391,
+      "top_dense": 0.5253341794013977,
+      "top_doc": "2701.literature",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L98",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9093468189239502,
+      "top_dense": 0.5909751951694489,
+      "top_doc": "98.literature",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L11",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9985259771347046,
+      "top_dense": 0.613838255405426,
+      "top_doc": "11.literature",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L35",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.2973575294017792,
+      "top_dense": 0.5628384053707123,
+      "top_doc": "35.literature",
+      "first_hit_rank": 1,
+      "n_hits": 12,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L120",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9886341094970703,
+      "top_dense": 0.5336819887161255,
+      "top_doc": "120.literature",
+      "first_hit_rank": 1,
+      "n_hits": 2,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L236",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9830042123794556,
+      "top_dense": 0.5074741840362549,
+      "top_doc": "236.literature",
+      "first_hit_rank": 1,
+      "n_hits": 11,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L215",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.7022765278816223,
+      "top_dense": 0.5456851720809937,
+      "top_doc": "215.literature",
+      "first_hit_rank": 1,
+      "n_hits": 17,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L1260",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.9582625031471252,
+      "top_dense": 0.6274622976779938,
+      "top_doc": "1260.literature",
+      "first_hit_rank": null,
+      "n_hits": 0,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L5200",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.997583270072937,
+      "top_dense": 0.6111566424369812,
+      "top_doc": "5200.literature",
+      "first_hit_rank": 1,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L16328",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.985066294670105,
+      "top_dense": 0.5375662446022034,
+      "top_doc": "16328.literature",
+      "first_hit_rank": 1,
+      "n_hits": 13,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L25344",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.997016429901123,
+      "top_dense": 0.577391654253006,
+      "top_doc": "25344.literature",
+      "first_hit_rank": 1,
+      "n_hits": 10,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L345",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.837358295917511,
+      "top_dense": 0.4763733148574829,
+      "top_doc": "345.literature",
+      "first_hit_rank": 1,
+      "n_hits": 4,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L1661",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6876234412193298,
+      "top_dense": 0.49546706676483154,
+      "top_doc": "1661.literature",
+      "first_hit_rank": 2,
+      "n_hits": 6,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L84",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.6986016035079956,
+      "top_dense": 0.4898552894592285,
+      "top_doc": "84.literature",
+      "first_hit_rank": 19,
+      "n_hits": 1,
+      "doc_rank": 1
+    },
+    {
+      "qid": "L205",
+      "kind": "answerable",
+      "tags": [
+        "literature"
+      ],
+      "variant_kind": null,
+      "variant_of": null,
+      "paraphrase_of": null,
+      "top_score": 0.8582345247268677,
+      "top_dense": 0.5916784107685089,
+      "top_doc": "205.literature",
+      "first_hit_rank": 1,
+      "n_hits": 5,
+      "doc_rank": 1
+    }
+  ]
+}

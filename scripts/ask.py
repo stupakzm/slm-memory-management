@@ -48,6 +48,8 @@ def main() -> int:
     ap.add_argument("-k", type=int, default=5)
     ap.add_argument("--db", default="data/index/phase2.db")
     ap.add_argument("--candidates", type=int, default=50)
+    ap.add_argument("--domain", default=None,
+                    help="restrict retrieval to one ingested namespace")
     ap.add_argument("--expand", type=int, default=0,
                     help="structured index only: widen each hit by N neighbouring "
                          "chunks in its section (a no-op on the flat default index)")
@@ -77,7 +79,8 @@ def main() -> int:
             return 2
 
     db = store.connect(ROOT / args.db)
-    r = Retriever(db, embedder=emb, reranker=rr, mode="dense", candidates=args.candidates)
+    r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
+                  candidates=args.candidates, domain=args.domain)
     hits = r.retrieve(question, k=args.k)
     score = gate_score(hits)
     if args.act and args.gate == GATE:

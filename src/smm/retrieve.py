@@ -54,21 +54,27 @@ class Retriever:
 
     def __init__(self, db: sqlite3.Connection, embedder=None, reranker=None,
                  mode: str = "hybrid", candidates: int = CANDIDATES,
-                 dense_weight: float = 1.0, bm25_weight: float = 1.0):
+                 dense_weight: float = 1.0, bm25_weight: float = 1.0,
+                 domain: str | None = None):
         self.db = db
         self.embedder = embedder
         self.reranker = reranker
         self.mode = mode
         self.candidates = candidates
         self.weights = (dense_weight, bm25_weight)
+        # None means every domain competes, which is the thing phase 5 measures
+        # rather than assumes.
+        self.domain = domain
 
     def candidates_for(self, question: str, n: int | None = None) -> list[dict]:
         n = n or self.candidates
         if self.mode == "dense":
-            return store.search(self.db, self.embedder.embed_query(question), k=n)
+            return store.search(self.db, self.embedder.embed_query(question), k=n,
+                                domain=self.domain)
         if self.mode == "bm25":
             return lexical.search(self.db, question, k=n)
-        dense = store.search(self.db, self.embedder.embed_query(question), k=n)
+        dense = store.search(self.db, self.embedder.embed_query(question), k=n,
+                             domain=self.domain)
         sparse = lexical.search(self.db, question, k=n)
         return rrf([dense, sparse], weights=list(self.weights))[:n]
 

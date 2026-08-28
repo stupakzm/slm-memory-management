@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import store  # noqa: E402
+from smm import fingerprint, store  # noqa: E402
 from smm.chunk import (CHUNK_CHARS, MAX_ENTRY_CHARS, OVERLAP_CHARS,  # noqa: E402
                        TAGGED_SECTION_RATIO, chunk_corpus, chunk_corpus_structured,
                        to_dict)
@@ -68,6 +68,8 @@ def main() -> int:
     store.set_meta(
         db, dim=dim, chunk_chars=args.chunk_chars, overlap=args.overlap,
         prefix=not args.no_prefix, corpus=args.corpus,
+        corpus_digest=fingerprint.compute(
+            ROOT / args.corpus, ROOT / "src" / "smm" / "corpus" / "manpages.py")["digest"],
         chunker=args.chunker, section_path=args.section_path,
         max_entry=args.max_entry if args.chunker == "structured" else "",
         tagged_ratio=args.tagged_ratio if args.chunker == "structured" else "",

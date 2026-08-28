@@ -37,7 +37,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import store, tools  # noqa: E402
+from smm import fingerprint, store, tools  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
@@ -136,6 +136,10 @@ def main() -> int:
                   "&& ./scripts/servers.sh start reranker", file=sys.stderr)
             return 2
         db = store.connect(ROOT / args.db)
+        warn = fingerprint.stale_warning(store.get_meta(db), ROOT / args.corpus,
+                                         ROOT / "src/smm/corpus/manpages.py")
+        if warn:
+            print(f"!! {warn}\n", file=sys.stderr)
         r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                       candidates=args.candidates)
         got, t0 = {}, time.time()

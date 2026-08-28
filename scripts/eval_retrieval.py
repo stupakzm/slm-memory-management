@@ -29,7 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import lexical, store  # noqa: E402
+from smm import fingerprint, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
 from smm.retrieve import Retriever  # noqa: E402
@@ -50,6 +50,9 @@ def main() -> int:
     ap.add_argument("--name", default="run")
     ap.add_argument("--mode", choices=("dense", "bm25", "hybrid"), default="dense")
     ap.add_argument("--rerank", action="store_true", help="cross-encoder over the candidate pool")
+    ap.add_argument("--domain", default=None,
+                    help="restrict retrieval to one namespace; omit to let every "
+                         "domain in the index compete, which is what phase 5 measures")
     ap.add_argument("--candidates", type=int, default=50, help="pool size handed to the reranker")
     ap.add_argument("--dense-weight", type=float, default=1.0)
     ap.add_argument("--bm25-weight", type=float, default=1.0)
@@ -76,14 +79,20 @@ def main() -> int:
               file=sys.stderr)
         return 2
     meta = store.get_meta(db)
+    warn = fingerprint.stale_warning(meta, ROOT / "data/corpus/man.jsonl",
+                                     ROOT / "src/smm/corpus/manpages.py")
+    if warn:
+        print(f"!! {warn}\n", file=sys.stderr)
     n_chunks = store.count(db)
     # Without a reranker the candidate pool *is* the ranking, so it need only be as
     # deep as the metrics are scored; with one, the pool is what gets rescored.
     pool = max(args.candidates, args.topk) if args.rerank else args.topk
     r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode, candidates=pool,
-                  dense_weight=args.dense_weight, bm25_weight=args.bm25_weight)
+                  dense_weight=args.dense_weight, bm25_weight=args.bm25_weight,
+                  domain=args.domain)
     config = {"mode": args.mode, "rerank": args.rerank, "candidates": pool,
-              "dense_weight": args.dense_weight, "bm25_weight": args.bm25_weight}
+              "dense_weight": args.dense_weight, "bm25_weight": args.bm25_weight,
+              "domain": args.domain, "domains_in_index": store.domains(db)}
     print(f"index: {n_chunks} chunks  meta={meta}")
     print(f"pipeline: {config}\n")
 

@@ -42,7 +42,7 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 | 2 | Precision layer: reranker + abstention gate + GBNF citations | **done** — recall@5 71.4%, abstention 92.5%, uncited claims 0%; BM25 measured and rejected; see `docs/phase2-results.md` |
 | 3 | Structure-aware chunking | **done, reverted** — +8 questions, −8 questions, net zero; and cleaner chunks made the abstention gate *worse*; see `docs/phase3-results.md` |
 | 4 | Gated tool use | **done** — zero unconfirmed executions across 480 requests; GBNF takes valid calls from 17.5% to 100%; see `docs/phase4-results.md` |
-| 5 | User-fed knowledge loop | next |
+| 5 | User-fed knowledge loop | **done** — 41% of the index is user-fed and the Linux numbers are bit-identical; dilution tracks proximity, not volume; see `docs/phase5-results.md` |
 
 ## From a fresh clone
 
@@ -78,6 +78,18 @@ cmake --build ~/opt/llama.cpp/build -j"$(nproc)" \
 `--act` is tool mode: the system answers, proposes a command, opens a manual page, or
 refuses. A proposed command is printed with its risk and **never run** — execution is
 opt-in per tool and only a validated, read-only manual page qualifies.
+
+Your own material goes in alongside, in its own namespace:
+
+```bash
+.venv/bin/python scripts/ingest.py --db data/index/phase5.db --domain notes ~/notes/
+.venv/bin/python scripts/ask.py --db data/index/phase5.db --domain notes "what did I decide about X"
+```
+
+Adding 41% of an index in other domains leaves the Linux numbers unchanged to the
+digit. `scripts/corpus_fingerprint.py --check` says whether the corpus a number was
+measured on is still the corpus on disk — the man pages installed on a machine change
+underneath an eval set, and phase 4 found that out the hard way.
 
 Phase 2 answers a question with three models at once, so `servers.sh start serve`
 runs them with query-sized batches — the indexing profile reserves a 600 MB compute
@@ -129,6 +141,8 @@ C programming reference and are deliberately excluded.
 src/smm/corpus/manpages.py   discover / render / parse man pages
 src/smm/structure.py         split a section into the entries a reader sees in it
 src/smm/tools.py             tool schemas, GBNF per schema, validate-before-execute
+src/smm/ingest.py            user material -> documents the pipeline already handles
+src/smm/fingerprint.py       corpus identity, so an index and an eval can disagree loudly
 src/smm/chunk.py             flat windows (default) and the structure-aware chunker
 src/smm/retrieve.py          the pipeline: candidates -> fuse -> rerank -> gate
 src/smm/rerank.py            cross-encoder client
@@ -137,6 +151,8 @@ src/smm/grammar.py           GBNF citation grammar and the check it enables
 scripts/extract_man.py       corpus extraction driver
 scripts/build_lexical.py     add the BM25 half to an existing dense index
 scripts/chunk_stats.py       chunking cost and ceiling, before spending GPU time
+scripts/ingest.py            add files, directories or URLs to an index under a domain
+scripts/corpus_fingerprint.py  record or check what corpus the numbers were measured on
 scripts/corpus_grep.py       search the extracted corpus
 scripts/resolve_gold.py      eval-set validator: no gold by assertion, no leaked answers
 scripts/resolve_tools.py     the same rule for the tool eval set

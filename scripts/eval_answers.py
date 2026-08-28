@@ -62,6 +62,9 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--mode", choices=("dense", "bm25", "hybrid"), default="dense")
     ap.add_argument("--rerank", action="store_true")
+    ap.add_argument("--domain", default=None,
+                    help="restrict retrieval to one namespace; omit to let every "
+                         "domain in the index compete, which is what phase 5 measures")
     ap.add_argument("--candidates", type=int, default=50)
     ap.add_argument("--expand", type=int, default=0,
                     help="structured index: widen each hit by N neighbouring chunks "
@@ -95,7 +98,8 @@ def main() -> int:
         if args.mode in ("bm25", "hybrid") and not lexical.has_index(db):
             print(f"{args.db} has no chunks_fts", file=sys.stderr)
             return 2
-        r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode, candidates=args.candidates)
+        r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
+                      candidates=args.candidates, domain=args.domain)
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
             hits = r.retrieve(row["question"], k=args.k)
@@ -215,7 +219,7 @@ def main() -> int:
         "name": args.name, "k": args.k, "n": len(results),
         "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
                    "grammar": args.grammar, "candidates": args.candidates,
-                   "expand": args.expand, "db": args.db},
+                   "expand": args.expand, "db": args.db, "domain": args.domain},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),

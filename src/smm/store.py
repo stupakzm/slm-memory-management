@@ -33,9 +33,18 @@ def create(db: sqlite3.Connection, dim: int) -> None:
                prefix     TEXT NOT NULL DEFAULT '',
                sec_id     TEXT NOT NULL DEFAULT '',
                tag        TEXT NOT NULL DEFAULT '',
+               domain     TEXT NOT NULL DEFAULT 'linux',
                text       TEXT NOT NULL)"""
     )
     db.execute("CREATE INDEX IF NOT EXISTS chunks_doc ON chunks(doc_id)")
+    # Migration, not just creation: an index built before phase 5 has a `chunks`
+    # table that CREATE TABLE IF NOT EXISTS will not touch, so the column has to be
+    # added explicitly before anything indexes it. Only writers reach here - readers
+    # call connect() without a dim - so opening an old index to query it never
+    # rewrites it.
+    if "domain" not in {r[1] for r in db.execute("PRAGMA table_info(chunks)")}:
+        db.execute("ALTER TABLE chunks ADD COLUMN domain TEXT NOT NULL DEFAULT 'linux'")
+    db.execute("CREATE INDEX IF NOT EXISTS chunks_domain ON chunks(domain)")
     db.execute(f"CREATE VIRTUAL TABLE IF NOT EXISTS vec_chunks USING vec0(embedding float[{dim}])")
     db.execute("CREATE TABLE IF NOT EXISTS meta(key TEXT PRIMARY KEY, value TEXT)")
     db.commit()
@@ -61,13 +70,18 @@ def add(db: sqlite3.Connection, rows: list[tuple[dict, list[float]]]) -> None:
     for c, emb in rows:
         cur.execute(
             "INSERT OR IGNORE INTO chunks"
-            "(chunk_id,doc_id,ord,char_start,char_end,prefix,sec_id,tag,text)"
-            " VALUES(?,?,?,?,?,?,?,?,?)",
+            "(chunk_id,doc_id,ord,char_start,char_end,prefix,sec_id,tag,domain,text)"
+            " VALUES(?,?,?,?,?,?,?,?,?,?)",
             (c["chunk_id"], c["doc_id"], c["ord"], c["char_start"], c["char_end"],
-             c.get("prefix", ""), c.get("sec_id", ""), c.get("tag", ""), c["text"]),
+             c.get("prefix", ""), c.get("sec_id", ""), c.get("tag", ""),
+             c.get("domain", "linux"), c["text"]),
         )
         rid = cur.execute("SELECT rowid FROM chunks WHERE chunk_id=?", (c["chunk_id"],)).fetchone()[0]
-        cur.execute("INSERT OR REPLACE INTO vec_chunks(rowid,embedding) VALUES(?,?)", (rid, pack(emb)))
+        # vec0 does not honour INSERT OR REPLACE on an existing rowid - it raises a
+        # UNIQUE violation - so the old vector goes first. This is what makes an
+        # interrupted ingest safe to re-run.
+        cur.execute("DELETE FROM vec_chunks WHERE rowid=?", (rid,))
+        cur.execute("INSERT INTO vec_chunks(rowid,embedding) VALUES(?,?)", (rid, pack(emb)))
     db.commit()
 
 
@@ -81,20 +95,48 @@ def has_structure(db: sqlite3.Connection) -> bool:
     return "sec_id" in {r[1] for r in db.execute("PRAGMA table_info(chunks)")}
 
 
-def search(db: sqlite3.Connection, query_vec: list[float], k: int = 5) -> list[dict]:
-    extra = "c.sec_id, c.tag" if has_structure(db) else "'' , ''"
-    rows = db.execute(
-        f"""SELECT c.chunk_id, c.doc_id, c.text, c.prefix, {extra}, c.ord, v.distance
-             FROM vec_chunks v JOIN chunks c ON c.rowid = v.rowid
-            WHERE v.embedding MATCH ? AND k = ?
-            ORDER BY v.distance""",
-        (pack(query_vec), k),
-    ).fetchall()
+def has_domain(db: sqlite3.Connection) -> bool:
+    return "domain" in {r[1] for r in db.execute("PRAGMA table_info(chunks)")}
+
+
+def domains(db: sqlite3.Connection) -> dict[str, int]:
+    if not has_domain(db):
+        return {"linux": count(db)}
+    return dict(db.execute("SELECT domain, count(*) FROM chunks GROUP BY domain"))
+
+
+def search(db: sqlite3.Connection, query_vec: list[float], k: int = 5,
+           domain: str | None = None, max_overfetch: int = 4096) -> list[dict]:
+    """Top-k by cosine distance, optionally restricted to one domain.
+
+    sqlite-vec's `k` is a global top-k over the whole table, so a namespace is served
+    by asking for more than k and discarding the rest. The multiplier grows until k
+    in-domain rows come back or the table is exhausted - a fixed multiple silently
+    under-delivers for a domain that is a small share of the index, which is exactly
+    the situation user-fed material starts in.
+    """
+    struct = "c.sec_id, c.tag" if has_structure(db) else "'' , ''"
+    dom = "c.domain" if has_domain(db) else "'linux'"
+    want = k if domain is None else min(max(k * 8, 64), max_overfetch)
+    while True:
+        rows = db.execute(
+            f"""SELECT c.chunk_id, c.doc_id, c.text, c.prefix, {struct}, c.ord,
+                       {dom}, v.distance
+                  FROM vec_chunks v JOIN chunks c ON c.rowid = v.rowid
+                 WHERE v.embedding MATCH ? AND k = ?
+                 ORDER BY v.distance""",
+            (pack(query_vec), want),
+        ).fetchall()
+        if domain is not None:
+            rows = [r for r in rows if r[7] == domain]
+        if domain is None or len(rows) >= k or want >= max_overfetch:
+            break
+        want = min(want * 4, max_overfetch)
     return [
         {"chunk_id": r[0], "doc_id": r[1], "text": r[2], "prefix": r[3],
-         "sec_id": r[4], "tag": r[5], "ord": r[6],
-         "distance": r[7], "score": 1.0 - r[7] / 2.0}
-        for r in rows
+         "sec_id": r[4], "tag": r[5], "ord": r[6], "domain": r[7],
+         "distance": r[8], "score": 1.0 - r[8] / 2.0}
+        for r in rows[:k]
     ]
 
 

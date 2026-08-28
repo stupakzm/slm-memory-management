@@ -7,6 +7,10 @@ __pycache__/
 data/corpus/*.jsonl
 data/index/
 
+# ingested user domains — refetch with scripts/fetch_domain.py and
+# scripts/collect_userdocs.sh; the fingerprint that identifies them is tracked
+data/corpus/domains/
+
 # GGUF weights — fetch with scripts/fetch_models.py
 models/
 
