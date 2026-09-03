@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Trees for Small Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #EFF2F3;
+    --surface:    #FFFFFF;
+    --surface-2:  #E4E9EB;
+    --ink:        #14181B;
+    --ink-soft:   #4A5459;
+    --ink-faint:  #78848A;
+    --rule:       #CBD3D7;
+    --rule-soft:  #DCE2E5;
+    --accent:     #0F5B72;
+    --accent-bg:  #DCE9ED;
+    --warn:       #9C4620;
+    --warn-bg:    #F2E2DA;
+    --good:       #3A6544;
+    --good-bg:    #DFE9E0;
+
+    --f-display: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    --f-body:    "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --f-mono:    "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+    --measure: 68ch;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #11161A;
+      --surface:    #182025;
+      --surface-2:  #1F292F;
+      --ink:        #DFE5E8;
+      --ink-soft:   #A2AFB5;
+      --ink-faint:  #77858C;
+      --rule:       #2C383F;
+      --rule-soft:  #232E34;
+      --accent:     #63B2CB;
+      --accent-bg:  #16323C;
+      --warn:       #DE8760;
+      --warn-bg:    #3A2118;
+      --good:       #8CBB94;
+      --good-bg:    #1C2E20;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #11161A;
+    --surface:    #182025;
+    --surface-2:  #1F292F;
+    --ink:        #DFE5E8;
+    --ink-soft:   #A2AFB5;
+    --ink-faint:  #77858C;
+    --rule:       #2C383F;
+    --rule-soft:  #232E34;
+    --accent:     #63B2CB;
+    --accent-bg:  #16323C;
+    --warn:       #DE8760;
+    --warn-bg:    #3A2118;
+    --good:       #8CBB94;
+    --good-bg:    #1C2E20;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 24px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ---- masthead ---- */
+
+  header.masthead {
+    padding: 72px 0 36px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .eyebrow .sep { color: var(--ink-faint); }
+
+  h1 {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: clamp(34px, 5.6vw, 52px);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    font-size: 18.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    margin: 0;
+  }
+
+  /* ---- sections ---- */
+
+  section {
+    padding: 52px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  h2 {
+    font-family: var(--f-display);
+    font-weight: 600;
+    font-size: 27px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: var(--f-body);
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.35;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  p, li { max-width: var(--measure); }
+  p { margin: 0; }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  strong { font-weight: 600; }
+
+  code {
+    font-family: var(--f-mono);
+    font-size: 0.875em;
+    background: var(--surface-2);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  ul, ol {
+    margin: 0;
+    padding-left: 1.25em;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  /* ---- finding blocks ---- */
+
+  .findings {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .finding {
+    background: var(--surface);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--accent);
+    border-radius: 2px;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .finding.critical { border-left-color: var(--warn); }
+
+  .finding-label {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .finding.critical .finding-label { color: var(--warn); }
+
+  .evidence {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--rule-soft);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .evidence .ev-head {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .implication {
+    font-size: 15.5px;
+    background: var(--accent-bg);
+    color: var(--ink);
+    padding: 11px 14px;
+    border-radius: 2px;
+  }
+  .finding.critical .implication { background: var(--warn-bg); }
+
+  /* ---- tables ---- */
+
+  .table-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    background: var(--surface);
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 620px;
+    font-size: 14.5px;
+  }
+
+  th {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    text-align: left;
+    color: var(--ink-faint);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule);
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+
+  td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--rule-soft);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  td.name { font-weight: 600; white-space: nowrap; }
+  td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .verdict {
+    font-family: var(--f-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    white-space: nowrap;
+    display: inline-block;
+  }
+  .v-use  { background: var(--good-bg);   color: var(--good); }
+  .v-skip { background: var(--warn-bg);   color: var(--warn); }
+  .v-read { background: var(--accent-bg); color: var(--accent); }
+
+  /* ---- pipeline ---- */
+
+  .pipeline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .stage {
+    flex: 1 1 148px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-top: 2px solid var(--accent);
+    border-radius: 2px;
+    padding: 13px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .stage.gate { border-top-color: var(--warn); }
+
+  .stage-n {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+  .stage-name { font-weight: 600; font-size: 14.5px; line-height: 1.25; }
+  .stage-what {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.45;
+  }
+
+  /* ---- phases ---- */
+
+  .phases {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .phase {
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .phase-n {
+    font-family: var(--f-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+
+  .phase-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .gate-line {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    padding: 8px 11px;
+    border-radius: 2px;
+    line-height: 1.5;
+  }
+  .gate-line b { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .phase { grid-template-columns: 1fr; gap: 8px; }
+  }
+
+  /* ---- sources ---- */
+
+  .sources {
+    font-size: 14px;
+    columns: 2;
+    column-gap: 34px;
+  }
+  .sources li { break-inside: avoid; margin-bottom: 9px; max-width: none; }
+  @media (max-width: 620px) { .sources { columns: 1; } }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    letter-spacing: 0.03em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="eyebrow">
+      <span>Research briefing</span><span class="sep">/</span>
+      <span>slm-memory-management</span><span class="sep">/</span>
+      <span>26 Aug 2026</span>
+    </div>
+    <h1>Knowledge Trees for Small Models</h1>
+    <p class="standfirst">
+      What the published work says about building a local, structured knowledge store that a
+      1.5–4B model can actually use on cheap hardware — and, critically, which part of that job
+      the small model must not be given.
+    </p>
+  </header>
+
+  <section>
+    <h2>The finding that reshapes the design</h2>
+    <p>
+      The intuitive architecture — point a local 3B model at your Linux books and let it build a
+      knowledge tree — is the single best-documented failure mode in this literature. Not a quality
+      problem. A crash.
+    </p>
+    <p>
+      The fix is not a bigger model. It is a <strong>split of roles</strong>: whatever builds the
+      structure is a separate concern from whatever answers the question, and only the second one
+      needs to be small, local, and fast. Everything below follows from that split.
+    </p>
+  </section>
+
+  <section>
+    <h2>Five findings that constrain the build</h2>
+
+    <div class="findings">
+
+      <article class="finding critical">
+        <div class="finding-label">Finding 01 · Load-bearing</div>
+        <h3>Small models cannot build the graph. The floor is ~7B, and it fails hard, not gracefully.</h3>
+        <p>
+          LLM-driven knowledge-graph construction (GraphRAG and descendants) asks the model to emit
+          strict JSON entity/relation records for every chunk. Sub-7B models do not reliably produce
+          parseable JSON at that volume, and the pipeline dies rather than degrading.
+        </p>
+        <div class="evidence">
+          <div class="ev-head">Evidence</div>
+          <div>
+            Microsoft GraphRAG v2.3.0 on a GTX 1070 Ti (8 GB): <strong>Phi-4-mini (3.8B) crashed</strong>
+            with <code>FailedToGenerateValidJsonError</code> after extracting just 16 entities and
+            5 relationships. The authors set "a practical minimum model size of approximately 7B
+            parameters for reliable GraphRAG operation."
+          </div>
+          <div>
+            FastGraphRAG is reported <strong>incompatible with 7–8B models entirely</strong> — the
+            required structured output could not be obtained even with five retries per call.
+          </div>
+          <div>
+            Even when it works it is slow: indexing one documentation set took 88 min (Qwen 2.5 7B)
+            to 211 min (Llama 3.1 8B); global search queries ran 110–281 s.
+          </div>
+        </div>
+        <div class="implication">
+          Your 1.5–4B model is the <em>reader</em>, never the <em>indexer</em>. Build structure by
+          other means (Finding 03), or run a one-time offline build with a larger model.
+        </div>
+      </article>
+
+      <article class="finding critical">
+        <div class="finding-label">Finding 02 · Load-bearing</div>
+        <h3>Small models are actively harmed by irrelevant retrieved context.</h3>
+        <p>
+          Retrieval utilisation does not scale uniformly with parameter count. Models under 4B are
+          measurably poor at discriminating useful passages from noise in their context window, and
+          degrade when fed contradictory ones — the opposite of the large-model habit of tolerating
+          a generous top-20 dump.
+        </p>
+        <div class="evidence">
+          <div class="ev-head">Evidence</div>
+          <div>
+            Sub-4B models show "poor robustness to noisy or contradictory retrieved passages,
+            frequently generating incorrect or confused responses." The recommendation is
+            <strong>aggressive retrieval filtering — only high-confidence passages</strong>.
+          </div>
+          <div>
+            Anthropic's contextual-retrieval benchmarks quantify the upside of getting this right:
+            retrieval failure 5.7% → 3.7% with contextual embeddings → 2.9% adding BM25 →
+            <strong>1.9% adding a reranker</strong>.
+          </div>
+        </div>
+        <div class="implication">
+          Precision beats recall here, and by more than usual. Budget for a reranker from day one and
+          pass 3–5 chunks, not 20. A reranker is not a late optimisation on this stack — it is what
+          makes a 4B model usable.
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-label">Finding 03 · Enabling</div>
+        <h3>Structure can be built with no LLM at all — 100–1000× cheaper, and often more accurate.</h3>
+        <p>
+          A 2026 line of work removes the LLM from index construction entirely, deriving hierarchy and
+          graph topology from embedding geometry, clustering, and co-occurrence statistics. These are
+          not merely cheaper; several beat the LLM-built graphs on retrieval quality.
+        </p>
+        <div class="evidence">
+          <div class="ev-head">Evidence</div>
+          <div>
+            <strong>LiteSemRAG</strong> builds a heterogeneous semantic graph from contextual token
+            embeddings with <strong>zero LLM tokens</strong>. MRR@10 of 0.694 on HotpotQA vs
+            LightRAG's 0.419; ~20× faster indexing than LightRAG, ~10× than GraphRAG.
+          </div>
+          <div>
+            <strong>ContextRAG</strong> builds a 3-level hierarchy by residual-quantised k-means over
+            chunk embeddings: <strong>22,073 indexing tokens vs 23,017,780</strong> (1043× lower),
+            30 LLM calls vs 5,655, 563 s vs 237,938 s. The topology costs zero tokens; the small
+            token spend is only cluster summaries.
+          </div>
+          <div>
+            <strong>RAPTOR</strong> remains the reference "actual tree": recursive clustering plus
+            abstractive summarisation, leaves to root, retrievable at any level of abstraction. The
+            LLM is needed only to summarise clusters — batchable, one-time, and safely delegated to a
+            bigger model.
+          </div>
+        </div>
+        <div class="implication">
+          Your knowledge tree is buildable without a capable LLM in the loop. And for the Linux corpus
+          specifically, most of the hierarchy already exists — man page sections, wiki headings, book
+          chapters are the tree. Parse it; don't infer it.
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-label">Finding 04 · Directly addresses your requirement</div>
+        <h3>"I don't know" has to be architectural. Prompting for it does not work at this scale.</h3>
+        <p>
+          You named this as a hard requirement, and it is the one most often implemented wrongly — as a
+          line in the system prompt. A 3B model asked to self-assess its own certainty is unreliable.
+          The robust designs never reach the model at all when evidence is thin.
+        </p>
+        <div class="evidence">
+          <div class="ev-head">Evidence</div>
+          <div>
+            Retrieval confidence works as "an interpretable proxy for evidence sufficiency" — abstain
+            before generation when top scores fall below threshold, so no speculative synthesis can
+            occur.
+          </div>
+          <div>
+            <strong>HALT-RAG</strong> uses calibrated NLI ensembles to check the generated answer
+            against retrieved context, with an explicit coverage target (e.g. 90%) and an uncertainty
+            band that gets rejected — trading a little coverage for a large precision gain.
+          </div>
+          <div>
+            The threshold is not guessable. The standard method is a labelled set, swept across
+            threshold values, choosing the precision/recall point your domain needs.
+          </div>
+        </div>
+        <div class="implication">
+          Three independent layers: (1) a score gate before generation — if nothing clears the
+          reranker threshold, return a fixed "I don't have that" and never invoke the model;
+          (2) grammar-enforced citation of chunk IDs, so an uncited claim is structurally impossible;
+          (3) an optional NLI check on the output. Layer 1 alone buys most of the benefit.
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-label">Finding 05 · Enables your tool-use goal</div>
+        <h3>Tool use at 1.5–4B is viable — but only with constrained decoding and a tiny tool set.</h3>
+        <p>
+          Free-form function calling at this scale is mediocre. Grammar-constrained decoding plus
+          validate-before-execute changes the picture completely, which is convenient, because
+          llama.cpp ships exactly that in GBNF.
+        </p>
+        <div class="evidence">
+          <div class="ev-head">Evidence</div>
+          <div>
+            Unconstrained on BFCL: xLAM-2-3b-fc-r 65.74%, Qwen3-4B 62.04%, Qwen3-1.7B 55.49%.
+            Models under 1B fail multi-turn, parallel and multi-function tasks outright.
+          </div>
+          <div>
+            With schema enforcement and validator-first execution, <strong>Phi-4-mini reaches ≥97%
+            function-call accuracy on BFCL-v4</strong> — matching or exceeding 70B models. Constrained
+            JSON decoding costs 5–60% latency depending on backend and schema.
+          </div>
+          <div>
+            Fragility is real: surface paraphrasing of the user's query causes 11–19% absolute AST
+            accuracy drops, and adding semantically-related distractor tools costs another 1–8%.
+          </div>
+        </div>
+        <div class="implication">
+          Keep the tool set small and scoped per domain rather than exposing one global toolbox.
+          For a system-tweak assistant, make the default output an explained command the user
+          confirms — execution behind an explicit gate, not the default path.
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>What already exists</h2>
+    <p>
+      You asked to look before building. Two of these are close enough to your description that
+      running them for a week is the cheapest research you can do.
+    </p>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>System</th><th>What it is</th><th>Relevance to you</th><th>Verdict</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">Khoj</td>
+            <td>Self-hosted "second brain"; indexes Markdown, PDFs, org-mode, repos; Ollama-backed</td>
+            <td>Closest shipping product to your description. AGPL. Feed it your Linux corpus and you have a baseline in an afternoon</td>
+            <td><span class="verdict v-use">Run first</span></td>
+          </tr>
+          <tr>
+            <td class="name">RAGFlow</td>
+            <td>Document-understanding RAG engine with RAPTOR built in</td>
+            <td>Lets you test whether hierarchical summarisation helps <em>your</em> corpus without implementing it</td>
+            <td><span class="verdict v-use">Run first</span></td>
+          </tr>
+          <tr>
+            <td class="name">LightRAG</td>
+            <td>Graph RAG without community traversal; delta-index for incremental adds</td>
+            <td>Cheapest of the LLM-built graph family, and handles incremental knowledge additions — but still needs ≥7B to index</td>
+            <td><span class="verdict v-read">Borrow ideas</span></td>
+          </tr>
+          <tr>
+            <td class="name">LiteSemRAG</td>
+            <td>Zero-LLM semantic graph from token embeddings</td>
+            <td>The method to copy if you want graph structure without a big model. Research code, not a product</td>
+            <td><span class="verdict v-read">Borrow ideas</span></td>
+          </tr>
+          <tr>
+            <td class="name">A-MEM</td>
+            <td>Zettelkasten-style agentic memory; notes auto-link and evolve as new ones arrive</td>
+            <td>The right model for the <em>user-fed</em> half of your system, as distinct from the document corpus</td>
+            <td><span class="verdict v-read">Borrow ideas</span></td>
+          </tr>
+          <tr>
+            <td class="name">cognee</td>
+            <td>Graph + vector memory, local-first, Apache-2.0</td>
+            <td>Explicitly targets privacy-critical local deployment with graph reasoning</td>
+            <td><span class="verdict v-read">Evaluate</span></td>
+          </tr>
+          <tr>
+            <td class="name">Letta / Mem0 / Zep</td>
+            <td>Agent conversation-memory frameworks</td>
+            <td>Solve remembering a <em>dialogue</em>, not organising a <em>corpus</em>. Zep is now largely SaaS</td>
+            <td><span class="verdict v-skip">Wrong problem</span></td>
+          </tr>
+          <tr>
+            <td class="name">Microsoft GraphRAG</td>
+            <td>Community-summary knowledge graph</td>
+            <td>Token-hungry, slow to update, needs ≥7B to index, 110–281 s global queries</td>
+            <td><span class="verdict v-skip">Skip</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Recommended architecture</h2>
+    <p>
+      Everything here fits comfortably in 8 GB and runs on CPU if it has to: bge-m3 (568M) +
+      bge-reranker-v2-m3 (568M) + Qwen3-4B at Q4 (~2.5 GB). The published CUBO work demonstrates this
+      class of pipeline inside a 16 GB laptop with a 10 GB corpus, using an embedding-300m model and
+      Llama 3.2 with hybrid dense/sparse retrieval, reranking, and an abstention mechanism.
+    </p>
+
+    <div class="pipeline">
+      <div class="stage">
+        <div class="stage-n">STAGE 1</div>
+        <div class="stage-name">Structure-aware ingest</div>
+        <div class="stage-what">Parse existing hierarchy: man sections, wiki headings, chapters. Free tree.</div>
+      </div>
+      <div class="stage">
+        <div class="stage-n">STAGE 2</div>
+        <div class="stage-name">Hybrid index</div>
+        <div class="stage-what">bge-m3 dense + BM25 sparse → sqlite-vec, single file, no server.</div>
+      </div>
+      <div class="stage">
+        <div class="stage-n">STAGE 3</div>
+        <div class="stage-name">Rerank</div>
+        <div class="stage-what">bge-reranker-v2-m3 over top-50 → keep 3–5. Non-optional.</div>
+      </div>
+      <div class="stage gate">
+        <div class="stage-n">STAGE 4</div>
+        <div class="stage-name">Abstention gate</div>
+        <div class="stage-what">Below threshold → "I don't know." Model never runs.</div>
+      </div>
+      <div class="stage">
+        <div class="stage-n">STAGE 5</div>
+        <div class="stage-name">Generate + cite</div>
+        <div class="stage-what">Qwen3-4B via llama-server, GBNF grammar enforces chunk citations.</div>
+      </div>
+    </div>
+
+    <p>
+      Note what is absent: no LLM-built knowledge graph. The hierarchy in stage 1 is parsed, not
+      inferred, which sidesteps Finding 01 entirely. If measurement later shows you need semantic
+      links across documents, add them by LiteSemRAG's embedding-clustering route or a one-time
+      RAPTOR pass with a borrowed larger model — not by asking your 4B to do it at query time.
+    </p>
+  </section>
+
+  <section>
+    <h2>Implementation and testing plan</h2>
+    <p>
+      These are numbered because the order is the point. Each phase has an exit gate; a phase that
+      fails its gate gets reverted rather than carried forward. The discipline that matters most is
+      phase 0 — most graph-RAG projects never establish whether their structure beat a tuned flat
+      baseline, because they built the structure first.
+    </p>
+
+    <div class="phases">
+
+      <div class="phase">
+        <div class="phase-n">PHASE 0</div>
+        <div class="phase-body">
+          <h3>Evaluation set, before any system exists</h3>
+          <ul>
+            <li>50–100 real questions against your Linux corpus, with the correct source passage recorded for each.</li>
+            <li><strong>20–30% must be unanswerable</strong> — questions the corpus genuinely does not cover. This set measures your core requirement, and nothing else will.</li>
+            <li>Include paraphrase pairs: the same question worded two ways, given the 11–19% paraphrase fragility in Finding 05.</li>
+            <li>Metrics: retrieval recall@k, context precision, faithfulness, and separately <em>abstention precision/recall</em>. ragas runs locally against your own models.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> the eval set exists and is version-controlled before phase 1 begins.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-n">PHASE 1</div>
+        <div class="phase-body">
+          <h3>Deliberately boring baseline</h3>
+          <ul>
+            <li>Fixed-size chunking, bge-m3 dense only, sqlite-vec, top-5, Qwen3-4B via llama-server.</li>
+            <li>No tree, no graph, no reranker. This number is the thing every later phase must beat.</li>
+            <li>Run the Khoj / RAGFlow comparison here too — if an off-the-shelf tool beats your baseline, that is a genuinely useful result.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> baseline numbers recorded for all four metrics.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-n">PHASE 2</div>
+        <div class="phase-body">
+          <h3>Precision layer — the highest-value work</h3>
+          <ul>
+            <li>Add BM25 and fuse with dense (BM25 catches <code>--exclude-from</code>, error codes, exact flag names where embeddings fail).</li>
+            <li>Add bge-reranker-v2-m3; cut what reaches the model to 3–5 chunks.</li>
+            <li>Add the abstention gate; sweep the threshold across your labelled set and pick the operating point.</li>
+            <li>Add GBNF-enforced citation of chunk IDs in the output.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> abstention recall high on the unanswerable set <em>without</em> collapsing answer coverage on the answerable set. Expect the largest single jump in the project here.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-n">PHASE 3</div>
+        <div class="phase-body">
+          <h3>Hierarchy — only if phase 2 leaves a gap</h3>
+          <ul>
+            <li>Structure-derived tree first: document → section → chunk, from headings you already parsed. Retrieve at section level, expand to chunks.</li>
+            <li>Only if that is insufficient, add RAPTOR-style cluster summaries — offline, batched, using a larger model once.</li>
+            <li>Measure against phase 2. Hierarchical summarisation has real costs: information loss and ingestion expense.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> keep it only if it beats phase 2 on the eval set. Revert without sentiment if it does not.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-n">PHASE 4</div>
+        <div class="phase-body">
+          <h3>Tool use, gated</h3>
+          <ul>
+            <li>GBNF grammar per tool schema; validate arguments before execution, never after.</li>
+            <li>Small, domain-scoped tool sets — expose the 3–5 tools relevant to the current topic, not a global registry.</li>
+            <li>Default output is an explained command awaiting confirmation. Direct execution is opt-in per tool.</li>
+            <li>Add tool-call accuracy and a "refused to act on thin evidence" case to the eval set.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> zero unconfirmed destructive executions across the full eval run.</div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-n">PHASE 5</div>
+        <div class="phase-body">
+          <h3>User-fed knowledge loop</h3>
+          <ul>
+            <li>Ingest path for arbitrary user material: paste, file, URL — reusing the phase 1–2 pipeline.</li>
+            <li>Namespace by domain so "Linux" and "cooking" do not dilute each other's retrieval — vector search degrades measurably when unrelated domains share an index.</li>
+            <li>A-MEM-style linking between user notes belongs here, if anywhere.</li>
+          </ul>
+          <div class="gate-line"><b>Gate:</b> adding a second unrelated domain does not regress the Linux eval numbers.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2>Open decisions</h2>
+    <ul>
+      <li><strong>Adopt or build.</strong> If Khoj plus your corpus already answers your Linux questions well, the project becomes "add a proper abstention gate to Khoj" rather than a ground-up build. Worth one week to find out.</li>
+      <li><strong>Where the one-time bigger model comes from.</strong> Phases 3 and 4 benefit from a 7B+ model for offline summarisation. Options: run 7B slowly once on your own hardware, or accept a one-time cloud pass for indexing while all query-time work stays local.</li>
+      <li><strong>Language scope.</strong> bge-m3 is the multilingual choice; Qwen3-Embedding-0.6B scores higher on English-only. If your corpus is English-only, that swap is worth testing in phase 1.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Sources</h2>
+    <ul class="sources">
+      <li><a href="https://arxiv.org/html/2605.20815v1">GraphRAG on Consumer Hardware: Benchmarking Local LLMs</a></li>
+      <li><a href="https://arxiv.org/pdf/2603.11513">Can Small Language Models Use What They Retrieve?</a></li>
+      <li><a href="https://arxiv.org/html/2604.16350v1">LiteSemRAG: LLM-Free Semantic-Aware Graph Retrieval</a></li>
+      <li><a href="https://arxiv.org/html/2605.19735">ContextRAG: Extraction-Free Hierarchical Graph Construction</a></li>
+      <li><a href="https://arxiv.org/pdf/2602.03731">CUBO: Self-Contained RAG on Consumer Laptops</a></li>
+      <li><a href="https://proceedings.iclr.cc/paper_files/paper/2024/file/8a2acd174940dbca361a6398a4f9df91-Paper-Conference.pdf">RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval</a></li>
+      <li><a href="https://proceedings.neurips.cc/paper_files/paper/2024/file/6ddc001d07ca4f319af96a3024f6dbd1-Paper-Conference.pdf">HippoRAG: Neurobiologically Inspired Long-Term Memory</a></li>
+      <li><a href="https://arxiv.org/html/2502.12110v2">A-MEM: Agentic Memory for LLM Agents</a></li>
+      <li><a href="https://arxiv.org/pdf/2509.07475">HALT-RAG: Hallucination Detection with Calibrated NLI and Abstention</a></li>
+      <li><a href="https://www.anthropic.com/engineering/contextual-retrieval">Contextual Retrieval (Anthropic Engineering)</a></li>
+      <li><a href="https://arxiv.org/html/2608.22472">Small Reasoning Models are Instruction Followers in Function Calling</a></li>
+      <li><a href="https://arxiv.org/pdf/2511.22138">TinyLLM: Small Language Models for Agentic Tasks on Edge Devices</a></li>
+      <li><a href="https://arxiv.org/pdf/2509.18667">TERAG: Token-Efficient Graph-Based RAG</a></li>
+      <li><a href="https://arxiv.org/pdf/2606.11350">When More Documents Hurt RAG: Vector Search Dilution</a></li>
+      <li><a href="https://learnopencv.com/lightrag/">LightRAG: Simple and Fast Alternative to GraphRAG</a></li>
+      <li><a href="https://www.i-scoop.eu/khoj/">Khoj, the Open-Source Second Brain</a></li>
+      <li><a href="https://futureagi.com/blog/best-rerankers-for-rag-2026/">Best Rerankers for RAG in 2026</a></li>
+      <li><a href="https://www.bentoml.com/blog/a-guide-to-open-source-embedding-models">Open-Source Embedding Models in 2026</a></li>
+    </ul>
+  </section>
+
+  <footer>
+    Research briefing compiled 26 Aug 2026 · findings current to the sources listed above
+  </footer>
+
+</div>
+</body>
+</html>
