@@ -38,7 +38,7 @@ from smm import gold, grammar, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
-from smm.retrieve import Retriever, expand, gate_score  # noqa: E402
+from smm.retrieve import Retriever, cap_per_doc, expand, gate_score  # noqa: E402
 
 ABSTAIN_RE = re.compile(
     r"\bi\s*(?:do\s*n[o']?t|don'?t)\s+know\b"
@@ -73,6 +73,23 @@ def unpack_entry(entry: object) -> tuple:
     return entry, entry
 
 
+def select_hits(hits: list, read_k: int, cap: int) -> list:
+    """Phase 7 (tsk_20260926_0967344e): cut what the MODEL reads, separately
+    from what the gate reads. `gate_hits`/`gate_score` are untouched by this -
+    see blk_fusion_gate_semantic_slip. Defaults (read_k=0, cap=0) return
+    `hits` unchanged, reproducing today's behaviour exactly.
+
+    `read_k<=0` means "every cached hit"; when capping is also requested
+    (cap > 0) that means capping over the whole list, not over zero items -
+    `cap_per_doc`'s own `k` is the read-k or the full length, never a bare
+    0 that would silently empty the result."""
+    if cap > 0:
+        return cap_per_doc(hits, read_k if read_k > 0 else len(hits), cap)
+    if read_k > 0:
+        return hits[:read_k]
+    return hits
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", default="data/index/phase2.db")
@@ -101,12 +118,26 @@ def main() -> int:
                          "retrieve) and for answer generation itself (stage generate)")
     ap.add_argument("--no-aliases", action="store_true",
                      help="restore strict scoring: no gold-token aliases (tsk_20260926_a51d0707)")
+    ap.add_argument("--cache", default=None,
+                    help="retrieval cache name, read and written as NAME-retrieved.json "
+                         "(default: --name); set this to share one retrieval run (e.g. "
+                         "made with a large -k) across several generation arms "
+                         "(tsk_20260926_0967344e)")
+    ap.add_argument("--read-k", type=int, default=0,
+                    help="how many cached hits the MODEL reads, cutting the cache down "
+                         "further at generate time (0 = every cached hit, today's "
+                         "behaviour); never affects gate_hits (tsk_20260926_0967344e)")
+    ap.add_argument("--cap-per-doc", type=int, default=0,
+                    help="cap how many of the read hits may come from one doc_id, so "
+                         "other documents' evidence is not crowded out (0 = off; "
+                         "tsk_20260926_0967344e)")
     args = ap.parse_args()
+    args.cache = args.cache or args.name
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
 
-    cache = ROOT / "data" / "eval" / "results" / f"{args.name}-retrieved.json"
+    cache = ROOT / "data" / "eval" / "results" / f"{args.cache}-retrieved.json"
     rows = [json.loads(l) for l in (ROOT / args.eval).open(encoding="utf-8")]
     if args.limit:
         rows = rows[: args.limit]
@@ -178,10 +209,13 @@ def main() -> int:
     results, t0 = [], time.time()
     for i, row in enumerate(rows, 1):
         hits, gate_hits = unpack_entry(retrieved[row["qid"]])
-        score = gate_score(gate_hits)
         # The gate is architectural: below threshold the model is never invoked, so
         # there is no opportunity to speculate. That is the whole of Finding 04.
+        # It reads gate_hits exactly as before select_hits ever runs - never the
+        # cut-down list the model actually reads (blk_fusion_gate_semantic_slip).
+        score = gate_score(gate_hits)
         gated = bool(args.gate) and score < args.gate
+        hits = select_hits(hits, args.read_k, args.cap_per_doc)
         text = grammar.REFUSAL if gated else gen.answer(row["question"], hits,
                                                         cite_grammar=args.grammar)
         rec = {
@@ -268,7 +302,9 @@ def main() -> int:
         "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
                    "grammar": args.grammar, "candidates": args.candidates,
                    "expand": args.expand, "db": args.db, "domain": args.domain,
-                   "rewrites": args.rewrites, "aliases": not args.no_aliases},
+                   "rewrites": args.rewrites, "aliases": not args.no_aliases,
+                   "cache": args.cache, "read_k": args.read_k,
+                   "cap_per_doc": args.cap_per_doc},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),

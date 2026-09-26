@@ -216,3 +216,36 @@ def gate_score(hits: list[dict]) -> float:
     if not hits:
         return float("-inf")
     return hits[0].get("rerank_score", hits[0].get("score", 0.0))
+
+
+def cap_per_doc(hits: list[dict], k: int, cap: int) -> list[dict]:
+    """Cap how many hits from any one `doc_id` survive into the top-k.
+
+    Exists for the phase 7 same-document crowding measurement: 41/166 top-5
+    lists held 4+ chunks of a single document, squeezing out other documents
+    whose evidence sat just below k. This is a query-side cut of an already
+    ranked pool - it never reads gate_hits and the gate never reads its
+    output (blk_fusion_gate_semantic_slip: the gate keeps reading
+    gate_score(gate_hits), computed before this runs).
+
+    Walks `hits` in order, keeping a hit while fewer than `cap` hits from its
+    `doc_id` have been kept so far, until `k` are kept. If fewer than `k`
+    survive that pass, tops up with the skipped hits, in their original pool
+    order, so the result always has `min(k, len(hits))` items. `cap <= 0`
+    means no cap: returns `hits[:k]`. Never mutates `hits` or its dicts.
+    """
+    if cap <= 0:
+        return hits[:k]
+    kept, skipped, per_doc = [], [], {}
+    for h in hits:
+        if len(kept) >= k:
+            break
+        doc_id = h.get("doc_id")
+        if per_doc.get(doc_id, 0) < cap:
+            kept.append(h)
+            per_doc[doc_id] = per_doc.get(doc_id, 0) + 1
+        else:
+            skipped.append(h)
+    if len(kept) < k:
+        kept.extend(skipped[: k - len(kept)])
+    return kept
