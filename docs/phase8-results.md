@@ -320,16 +320,243 @@ so the same numbers apply unchanged.
 
 ## Per-arm results
 
-RESULTS PENDING
+Re-derived directly from the answer records (`data/eval/results/p7-A-answers.json`
+for A, and the untracked `p8-A0g-answers.json` / `p8-B4g-answers.json` for A′
+and B — read from the orchestrator's run, not present in this worktree, so
+quoted with attribution and cross-checked field by field below):
+
+```
+$ python3 -c "
+import json
+def load(p): return json.load(open(p))
+def index(d): return {r['qid']: r for r in d['results']}
+A  = index(load('data/eval/results/p7-A-answers.json'))
+Ap = index(load('<orchestrator p8-A0g-answers.json>'))
+B  = index(load('<orchestrator p8-B4g-answers.json>'))
+
+def row(idx):
+    recs = list(idx.values())
+    ans = [r for r in recs if r['kind'] == 'answerable']
+    una = [r for r in recs if r['kind'] != 'answerable']
+    correct = sum(1 for r in recs if r.get('correct'))
+    strict = sum(1 for r in recs if r.get('correct_strict'))
+    ev = sum(1 for r in ans if r.get('evidence_retrieved'))
+    cge = sum(1 for r in ans if r.get('evidence_retrieved') and r.get('correct'))
+    una_abst = sum(1 for r in una if r['abstained'])
+    awoe = [r for r in ans if not r.get('evidence_retrieved')]
+    no_ev_answered = sum(1 for r in awoe if not r['abstained'])
+    gated = sum(1 for r in recs if r['gated'])
+    print(f'{correct} ({strict}) | {ev} | {cge}/{ev} | {una_abst}/{len(una)} | {no_ev_answered}/{len(awoe)} | {gated}')
+
+for name, idx in (('A', A), (\"A'\", Ap), ('B', B)):
+    print(name, end=': '); row(idx)
+"
+A: 81 (63) | 90 | 76/90 | 38/39 | 23/37 | 33
+A': 81 (63) | 90 | 76/90 | 38/39 | 23/37 | 33
+B: 82 (66) | 104 | 78/104 | 37/39 | 14/23 | 43
+```
+
+| arm | correct/127 (strict) | evidence in context | correct given evidence | unanswerable abstained/39 | answered with no evidence / answerable-without-evidence | gated (all 166) |
+|---|---|---|---|---|---|---|
+| A shipped (0.6B, 0.65) | 81 (63) | 90 | 76/90 | 38 | 23/37 | 33 |
+| A′ (0.6B, 0.5806) | 81 (63) | 90 | 76/90 | 38 | 23/37 | 33 |
+| B (4B, 0.7631) | 82 (66) | 104 | 78/104 | 37 | 14/23 | 43 |
+
+A′ is identical to A on every count above — the gate re-sweep alone changes
+nothing end-to-end (§"Reranker vs gate" confirms it is the same 33 questions,
+not merely the same count).
+
+**Sign tests over discordant answerable questions** (exact two-sided, same
+protocol as phase 7 §4):
+
+```
+$ python3 -c "
+import json, math
+def load(p): return json.load(open(p))
+def index(d): return {r['qid']: r for r in d['results']}
+A  = index(load('data/eval/results/p7-A-answers.json'))
+Ap = index(load('<orchestrator p8-A0g-answers.json>'))
+B  = index(load('<orchestrator p8-B4g-answers.json>'))
+qids = sorted(q for q, r in A.items() if r['kind'] == 'answerable')
+
+def sign_test(up, down):
+    n = up + down
+    k = min(up, down)
+    p = sum(math.comb(n, i) for i in range(k + 1)) * (0.5 ** n) * 2
+    return min(p, 1.0)
+
+def compare(idx1, idx2, name):
+    up = down = 0
+    for q in qids:
+        c1, c2 = idx1[q].get('correct'), idx2[q].get('correct')
+        if c1 == c2: continue
+        if c2 and not c1: up += 1
+        elif c1 and not c2: down += 1
+    print(f'{name}: +{up}/-{down} p={sign_test(up, down)}')
+
+compare(A, B, 'B vs A')
+compare(Ap, B, \"B vs A'\")
+compare(A, Ap, \"A' vs A\")
+"
+B vs A: +9/-8 p=1.0
+B vs A': +9/-8 p=1.0
+A' vs A: +0/-0 p=None
+```
+
+Gains for B vs A (9): a18 a25 a40 p02 a01.n a11.t a15.z a37.t b12.t.
+Losses (8): a27 a30 b06 b11 c12 p10 a04.z b03.n. B vs A′ is exactly the same
+discordant set — A′ contributes nothing beyond A here, as expected since A′
+= A on every per-record outcome. A′ vs A is 0 discordant questions, so no
+sign test applies.
+
+**Verdict under §6**: B fails (a) — beats A on aliased correct/127 (82 vs
+81) but the sign test over the 17 discordant questions gives p=1.0, far
+above the p<0.05 bar. It passes (b): B's unanswerable abstained is 37/39,
+meeting A's 38 minus 1. It passes (c) trivially — no win is claimed from the
+strict-label gap (66 vs 63) since the aliased result already fails (a). All
+three of (a)/(b)/(c) must hold for a win; (a) alone sinks it. **Null.**
+Nothing ships; the 0.6B stays the default reranker.
 
 ## Reranker vs gate
 
-RESULTS PENDING
+**A′ = A.** Re-sweeping the 0.6B's gate at 0.5805671225057373 instead of the
+shipped 0.65 changes every per-arm count by exactly zero (table above), and
+it is not just the same *count* of 33 gated questions — it is the same
+*set*:
+
+```
+$ python3 -c "
+import json
+def load(p): return json.load(open(p))
+def index(d): return {r['qid']: r for r in d['results']}
+A  = index(load('data/eval/results/p7-A-answers.json'))
+Ap = index(load('<orchestrator p8-A0g-answers.json>'))
+gA  = {q for q, r in A.items()  if r['gated']}
+gAp = {q for q, r in Ap.items() if r['gated']}
+print(len(gA), len(gAp), gA == gAp)
+"
+33 33 True
+```
+
+Both thresholds (0.65 shipped, 0.5806 re-swept) gate the identical 33
+questions on this pool, so the re-sweep in §5 is not silently doing work
+that then gets attributed to the reranker swap in B — the comparison B vs
+A′ isolates the reranker's own effect cleanly.
+
+**Gate decomposition.** B's gate refuses 11 answerable questions (vs A's 6);
+of B's 11, 6 had evidence in context (vs A's 2 of 6); of those, only 1 would
+have been correct if let through ungated (vs A's 1 of 2):
+
+```
+$ python3 -c "
+import json
+def load(p): return json.load(open(p))
+def index(d): return {r['qid']: r for r in d['results']}
+A    = index(load('data/eval/results/p7-A-answers.json'))
+B    = index(load('<orchestrator p8-B4g-answers.json>'))
+A0u  = index(load('<orchestrator p8-A0u-answers.json>'))
+B4u  = index(load('<orchestrator p8-B4u-answers.json>'))
+
+def stats(gated_idx, ungated_idx, name):
+    refused = [q for q, r in gated_idx.items() if r['kind'] == 'answerable' and r['gated']]
+    with_ev = [q for q in refused if gated_idx[q].get('evidence_retrieved')]
+    would_be = [q for q in refused if ungated_idx[q].get('correct')]
+    print(f'{name}: refuses {len(refused)} answerable, {len(with_ev)} with evidence, {len(would_be)} would be correct ungated')
+
+stats(A, A0u, 'A')
+stats(B, B4u, 'B')
+"
+A: refuses 6 answerable, 2 with evidence, 1 would be correct ungated
+B: refuses 11 answerable, 6 with evidence, 1 would be correct ungated
+```
+
+**Discordant losses under B**, checked against context and evidence: of the
+8 losses, 5 (a27 a30 b06 c12 b03.n) had the evidence in context under
+*both* rerankers and were answered wrong under B — the other extracts and
+their order changed, and the 4B-context model misread the same evidence it
+had before. Two (b11, a04.z) were gated by B's own re-swept threshold;
+replaying them ungated (`p8-B4u`) shows only a04.z would have been correct,
+b11 would still have been wrong. The last (p10) lost its evidence entirely
+under B (not in the top-5 cache) and was refused by the model itself for
+lack of evidence, not by the gate.
+
+**Correct given evidence among non-gated questions**: A 76/88, B 78/98
+(re-derived: answerable, not gated, evidence in context, correct — 76/88
+and 78/98 respectively, matching the per-arm table's 76/90 and 78/104 once
+the gated-with-evidence questions are excluded from each denominator).
+
+**SECONDARY, not pre-registered as a criterion** — the unsupported-answer
+rate (answerable-with-no-evidence-answered plus unanswerable-answered) falls
+from 24/166 (23+1) = 14.5% under A to 16/166 (14+2) = 9.6% under B:
+
+```
+$ python3 -c "
+import json
+def load(p): return json.load(open(p))
+def index(d): return {r['qid']: r for r in d['results']}
+A = index(load('data/eval/results/p7-A-answers.json'))
+B = index(load('<orchestrator p8-B4g-answers.json>'))
+
+def unsupported(idx, name):
+    ans_no_ev = [r for r in idx.values() if r['kind'] == 'answerable' and not r.get('evidence_retrieved') and not r['abstained']]
+    una_answered = [r for r in idx.values() if r['kind'] != 'answerable' and not r['abstained']]
+    total = len(ans_no_ev) + len(una_answered)
+    print(f'{name}: {len(ans_no_ev)} + {len(una_answered)} = {total}/166 = {total/166:.1%}')
+
+unsupported(A, 'A')
+unsupported(B, 'B')
+"
+A: 23 + 1 = 24/166 = 14.5%
+B: 14 + 2 = 16/166 = 9.6%
+```
+
+This is mostly mechanical: B's stronger reranker leaves only 23 answerable
+questions without evidence instead of A's 37, so there are fewer
+opportunities for an unsupported answer in the first place. This was never
+part of §6's win criterion and is not claimed as one here — it is reported
+as a candidate primary metric worth pre-registering in a future phase,
+nothing more.
 
 ## Cost: latency and memory
 
-RESULTS PENDING
+**Retrieval evidence** (rank of first evidence chunk after reranking,
+cumulative): for the 0.6B, within its own top-20 pool
+(`data/eval/results/p7-k20-retrieved.json`, untracked, same file as §3's
+gate2-premise numbers) rank ≤1/3/5/20 is 56/80/90/113. For the 4B reranking
+the full 50 retrieval candidates (`p8-k20`, also untracked — neither cache
+is present in this worktree, `find data/eval/results -iname '*k20*'` returns
+nothing here), the orchestrator reports 60/87/104/115. The rank ≤5 figures
+(90 vs 104) are the ones that reach the model at k=5 and match this
+document's per-arm table exactly; rank ≤20 rising 113→115 shows the 4B over
+the full 50-candidate pool surfaces two evidence chunks the 0.6B's own top
+20 never contained at all, beyond what §3's within-pool premise check could
+show.
+
+**Latency and VRAM** (reported by the orchestrator; not independently
+re-derived here — no timing instrumentation is stored in the answer JSONs,
+and, as in §3's smoke scores, no reranker weights are present in this
+worktree to re-run retrieval): retrieval over 166 questions took 471 s for
+the 0.6B (2.8 s/q, phase 7's k=20 run) versus 1466 s for the 4B (8.8 s/q) —
+3.1× slower. The 4B reranker alone uses roughly 4.2 GB VRAM at this
+project's query-sized settings (`-c 1024 -b 768 --parallel 1`, nvidia-smi
+4204 MiB with the lean embedder also resident), versus the current 0.6B
+profile that holds embedder + reranker + generator together in roughly
+5.6 GB (§6). The 4B cannot share the card with the generator at that
+budget; a serving path built on it would need lazy per-model loading rather
+than all three models resident at once.
 
 ## What this changes
 
-RESULTS PENDING
+Null; nothing ships. Across phases 6-8 the finding side of the pipeline can
+still be moved — a stronger reranker lifts evidence-in-context 90→104 at
+the same k=5 shown to the model — but end-to-end aliased correctness does
+not follow it (81→82/127, p=1.0), because the 4B generator's reading is
+brittle to context composition: of the 17 discordant answerable questions,
+about 8 answers flip either way from reordering the other four extracts
+alone, not from any change in whether the gold evidence is present (§
+"Reranker vs gate", the 5 both-had-evidence losses). The binding constraint
+is the reader, not the retriever.
+
+The obvious next test is a stronger generator, not a stronger reranker or a
+wider k. This document does not design that test; it names it as the open
+question phase 8 leaves for whichever phase comes next.
