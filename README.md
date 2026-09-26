@@ -43,6 +43,7 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 | 3 | Structure-aware chunking | **done, reverted** — +8 questions, −8 questions, net zero; and cleaner chunks made the abstention gate *worse*; see `docs/phase3-results.md` |
 | 4 | Gated tool use | **done** — zero unconfirmed executions across 480 requests; GBNF takes valid calls from 17.5% to 100%; see `docs/phase4-results.md` |
 | 5 | User-fed knowledge loop | **done** — 41% of the index is user-fed and the Linux numbers are bit-identical; dilution tracks proximity, not volume; see `docs/phase5-results.md` |
+| 6 | Independent verifier: claims re-read against cited extracts | **done, null** — all three mechanisms (lexical, cross-encoder, self-judge) fail the pre-registered win test; AUC 0.44–0.56, chance range; see `docs/phase6-results.md` |
 
 ## From a fresh clone
 
