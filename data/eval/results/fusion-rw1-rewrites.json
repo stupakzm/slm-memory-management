@@ -1,0 +1,500 @@
+{
+ "I have a text file listing filenames I want left out of an archive. How do I build a tarball that skips all of them?": [
+  "tar --exclude-from=exclude-list.txt --create --file=archive.tar dir_to_archive/"
+ ],
+ "How do I compress an archive with gzip while creating it, instead of running the compressor afterwards?": [
+  "gzip -c file.txt > archive.gz   # create compressed archive on fly   # likely command: gzip -c or gzip --stdout   # alternative: gzip file.txt   # note: gzip -c creates output to stdout, so pipe to file or use >   # also: use tar -czf archive.tar.gz file.txt for tar+gzip combo"
+ ],
+ "When something matches I also want to see the few lines above and below it. How?": [
+  "man -C \"context=3\" <command>"
+ ],
+ "How do I search every file underneath a folder, including its subfolders?": [
+  "find /path/to/folder -type f -exec grep -l \"searchterm\" {} \\;"
+ ],
+ "I only care which files contain the pattern, not the matching lines themselves.": [
+  "man -f pattern_name   # search for files containing pattern in manual pages (use -f flag)"
+ ],
+ "How do I print the lines that do not match instead of the ones that do?": [
+  "man grep -v   # invert match, show non-matching lines   # alternative: man grep --help | grep -v \"match\"   # or: man egrep -v   # or: man awk '!/pattern/'"
+ ],
+ "Can find remove the files it turns up without piping into another command?": [
+  "man rm -f"
+ ],
+ "How do I list files that changed within the last week?": [
+  "find /path -mtime -7 -type f   # list files changed in last week (replace /path)   # likely command: find   # alternative: find . -mtime -7   # alternative: find . -type f -mtime -7"
+ ],
+ "Filenames with spaces keep breaking my pipeline. What is the safe way to hand results to another command?": [
+  "man bash -c 'echo \"file with spaces\" | xargs -I {} sh -c \"echo {}\"'"
+ ],
+ "How do I list a directory with the most recently changed files first?": [
+  "ls -t   # list files by modification time, newest first"
+ ],
+ "The sizes print as raw bytes and I cannot read them. How do I get K, M and G instead?": [
+  "man -k \"units in bytes with k m g\""
+ ],
+ "How do I copy files so their timestamps and permissions survive the copy?": [
+  "man cp -p"
+ ],
+ "How do I copy without overwriting anything already at the destination?": [
+  "man cp --preserve-time"
+ ],
+ "How do I delete a directory and everything underneath it?": [
+  "rm -rf directory_name"
+ ],
+ "How do I change permissions on a folder and every file inside it?": [
+  "man chmod -R</code>"
+ ],
+ "How do I change the owner of an entire directory tree?": [
+  "chown -R user:group directory_name"
+ ],
+ "I want one total for a folder, not a line for every file inside.": [
+  "man grep -r --max-depth=1 | grep \"total\"   # or: man -r grep | grep total   # or: man find | grep \"total\""
+ ],
+ "How do I check whether I have run out of inodes rather than out of space?": [
+  "man -k \"inode full\"   # or: man -k \"out of inodes\"   # or: man -k \"check inodes\""
+ ],
+ "How do I see every process on the machine, not just my own?": [
+  "ps aux | grep -v \"grep\"   # show all processes, exclude grep itself   # likely command: ps aux   # alternative: ps -ef   # alternative: top -b -n 1   # alternative: ps ax   # alternative: ps -e -o pid,ppid,cmd   # alternative: pgrep -a   # alternative: ps -A   # alternative: ps -e -o pid,ppid,cmd,cmd | grep -v grep"
+ ],
+ "How do I find out which signal name number 9 corresponds to?": [
+  "man -k signal 9"
+ ],
+ "sort puts 10 before 9. How do I make it sort properly by number?": [
+  "man sort --numeric-sort"
+ ],
+ "How do I sort and drop duplicate lines in a single command?": [
+  "sort -u file.txt"
+ ],
+ "How do I count how many times each distinct line repeats?": [
+  "count lines in file and show frequency of each unique line   # grep -c, awk, sort -u, etc.   # likely: awk '{freq[$0]++} END {for (line in freq) print line, freq[line]}', or: sort | uniq -c | sort -nr"
+ ],
+ "My file is colon separated and I want only the third column.": [
+  "cut -d: -f3 filename.txt"
+ ],
+ "How do I make sed rewrite the file itself instead of printing to the screen?": [
+  "sed -i 's/old/new/g' filename.txt   # -i flag in-place edit   # sed in-place edit command   # sed modify file directly   # sed edit file without output   # sed write to file directly"
+ ],
+ "How do I count the number of lines in a file?": [
+  "wc -l filename.txt"
+ ],
+ "How do I watch a log file as new entries are appended?": [
+  "tail -f filename.log"
+ ],
+ "How do I tell ssh to use one particular private key file?": [
+  "ssh -i /path/to/private/key user@host"
+ ],
+ "How do I copy an entire directory to a remote machine?": [
+  "man rsync"
+ ],
+ "curl prints nothing useful when the URL redirects somewhere else.": [
+  "curl --verbose https://example.com"
+ ],
+ "How do I save a download under the filename the server uses?": [
+  "man curl --save-as-server-filename"
+ ],
+ "My download died halfway through. How do I resume it rather than starting over?": [
+  "man curl-resume"
+ ],
+ "dd just sits there silently. How do I see how far along it is?": [
+  "man dd --progress"
+ ],
+ "How do I make xargs cope with filenames that contain spaces?": [
+  "xargs with spaces in filenames man page"
+ ],
+ "How do I make a service start automatically at boot?": [
+  "man systemd.service.conf.d.service.auto-start.enable.service   # systemd service auto start command line query for service auto start at boot"
+ ],
+ "How do I see only the log entries from the current boot?": [
+  "journalctl --since \"boot\" --no-pager"
+ ],
+ "How do I mount a filesystem so that nothing can write to it?": [
+  "man mount -o ro,remount,bind,shared,slave,dev,uid,gid,mode,umask,atime,diratime,relatime,commit,commit_interval,commit_timeout,commit_retry,commit_max,commit_min,commit_delay,commit_delay_max,commit_delay_min,commit_delay_retry,commit_delay_retry_max,commit_delay_retry_min,commit_delay_retry_max,commit_delay_retry_min,commit_delay_retry_max,commit_delay_retry_min,commit_delay_retry_max,commit_delay_retry_min,commit_delay_retry_max,commit_delay_retry_min,commit"
+ ],
+ "How do I give a new filesystem a label at the moment I create it?": [
+  "mkfs -L label_type filesystem_type dev_name"
+ ],
+ "How do I add a user and have their home directory created at the same time?": [
+  "man adduser"
+ ],
+ "How do I list which ports something is listening on?": [
+  "netstat -tuln</code>"
+ ],
+ "What is the flag for making a symbolic link rather than a hard one?": [
+  "ln -s"
+ ],
+ "How do I print just a file's size and nothing else?": [
+  "ls -lh filename | awk '{print $5}'   # using ls and awk to extract size only (short form)"
+ ],
+ "How do I print today's date in YYYY-MM-DD form?": [
+  "date +%Y-%m-%d"
+ ],
+ "How do I list the unit files on the system and see which are enabled?": [
+  "man systemd-unit-files"
+ ],
+ "What is the last number on each line of fstab actually for?": [
+  "man fstab | grep \"last number\""
+ ],
+ "How do I list a filesystem in fstab without having it mounted at boot?": [
+  "man mount | grep \"fstab unmounted at boot\""
+ ],
+ "How do I run something once each time the machine starts, using cron?": [
+  "cron run once at boot command line entry   # likely: crontab -e or cron entry syntax explanation   (shortened and varied)"
+ ],
+ "What do the five numbers at the start of a cron line mean?": [
+  "man cron | grep \"five numbers\""
+ ],
+ "How do I stop root from logging in over ssh?": [
+  "man sshd_config | grep PermitRootLogin"
+ ],
+ "How do I make the ssh server listen on something other than 22?": [
+  "sshd_config port change   # likely command: sshd_config"
+ ],
+ "My ssh sessions drop when they go idle. Which setting keeps them alive?": [
+  "man ssh -o ServerAliveInterval=60"
+ ],
+ "What are the colon separated fields in /etc/passwd?": [
+  "passwd field explanation colon separated fields"
+ ],
+ "Where is password ageing information kept and what does each field mean?": [
+  "man passwd aging fields explanation"
+ ],
+ "What is the format of a line in /etc/hosts?": [
+  "man hosts.deny   # or man hosts   # or what is the format of a line in /etc/hosts?"
+ ],
+ "How do I set which DNS server the machine uses?": [
+  "man systemd-resolved"
+ ],
+ "How do I make a systemd service restart automatically if it crashes?": [
+  "systemd service auto-restart crash   # likely command: systemctl edit <service> or systemd-sysv-generator   # better: systemd service restart on crash   # or: how to configure systemd to restart service on failure   # also: systemd restart service if it crashes   # or: systemd service restart on crash command"
+ ],
+ "How do I make my unit start only after the network is up?": [
+  "man systemd.service; systemctl enable --now myunit.service --after=network.target"
+ ],
+ "How do I let a user run one command with sudo without typing a password?": [
+  "sudo visudo -f /etc/sudoers.d/username_command_allow_command   # allow one command without password for user   # sudoers.d entry example: username ALL=(ALL) NOPASSWD: /usr/bin/ls   # sudoers entry for single command without password   # how to configure sudo for one-time command without password   # sudoers rule for specific command no password needed"
+ ],
+ "Where is the default file-creation mask for new users configured?": [
+  "man umask"
+ ],
+ "What is the practical difference between a plain kill and kill -9?": [
+  "man kill plain kill vs kill -9"
+ ],
+ "Are there signals that a program simply cannot intercept?": [
+  "man signal(7)"
+ ],
+ "Why do some tools need backslashes before parentheses in a pattern and others do not?": [
+  "man grep \"\\(\" pattern\\)\"   # or man grep '\\(' pattern \\)'   # or man grep '\\(pattern\\)'   # or man grep '\\(.*\\)'   # or man grep '\\(a\\)'   # or man grep '\\(b\\)'   # or man grep '\\(c\\)'   # or man grep '\\(d\\)'   # or man grep '\\(e\\)'   # or man grep '\\(f\\)'   # or man grep '\\(g\\)'   # or man grep '\\(h\\)'   # or"
+ ],
+ "What does a bracket expression naming a character class mean in a shell pattern?": [
+  "man bash -c \"bracket expression character class\""
+ ],
+ "How can a process that is not root listen on port 80?": [
+  "man nginx -p 80   nginx listen port 80 non-root   how to run port 80 without root   can non-root process bind to port 80   linux port 80 non root access   bind port 80 without root privileges   how to listen on port 80 as non-root user"
+ ],
+ "Where should software I compile myself be installed, as opposed to packaged software?": [
+  "where to install self-compiled software vs packaged software manpage"
+ ],
+ "What actually behaves differently between the two kinds of link a filesystem can hold?": [
+  "man lnfs vs man symlink differences"
+ ],
+ "Why do I get an error about too many levels of symbolic links?": [
+  "man -k \"symbolic link levels\""
+ ],
+ "Which environment variable decides where the shell looks for executables?": [
+  "man PATH"
+ ],
+ "How much data can sit in a pipe before the writing process blocks?": [
+  "man pipe buffer size linux"
+ ],
+ "Where does the system load average come from?": [
+  "man loadavg"
+ ],
+ "How do I cap the total memory a service and everything it spawns can use between them?": [
+  "man cgroups memory limit"
+ ],
+ "How do I mount a host directory into a docker container?": [
+  "docker run -v /host/path:/container/path image_name"
+ ],
+ "How do I sync two directories with rsync and delete extra files on the destination?": [
+  "rsync --delete dir1/ dir2/   # sync and delete extra files on destination   # rsync with delete option for directory sync   # rsync to sync directories and remove extras on target   # rsync --delete to keep only matching files and remove extras"
+ ],
+ "How do I detach from a tmux session and reattach to it later?": [
+  "tmux detach command"
+ ],
+ "How do I scan a subnet for open ports with nmap?": [
+  "nmap scan port 22 -sT 192.168.1.0/24   # nmap subnet scan open ports   # nmap port scan subnet   # nmap scan open ports in range   # nmap scan subnet with open ports   # nmap port scan range   # nmap scan network ports   # nmap scan open ports subnet"
+ ],
+ "How do I capture packets on an interface with tcpdump and write them to a file?": [
+  "tcpdump -i interface -w output.pcap"
+ ],
+ "How do I trace the system calls a program makes using strace?": [
+  "strace -e syscall program_name"
+ ],
+ "How do I set a breakpoint in gdb?": [
+  "gdb set breakpoint at function main   # or: gdb set breakpoint at main()   # or: gdb break main   # or: gdb breakpoint main   # or: gdb break line 10   # or: gdb set breakpoint at 10"
+ ],
+ "How do I allow port 443 through ufw?": [
+  "ufw allow 443/tcp"
+ ],
+ "How do I take a btrfs snapshot of a subvolume?": [
+  "btrfs subvolume snapshot --help"
+ ],
+ "How do I list the pods in a namespace with kubectl?": [
+  "kubectl get pods -n <namespace>"
+ ],
+ "How do I search a codebase with ripgrep while respecting .gitignore?": [
+  "rg --ignore-gitignore .   # search with ripgrep, respect .gitignore, recursive search in current directory"
+ ],
+ "How do I run a podman container detached in the background?": [
+  "podman run -d my-container-name"
+ ],
+ "How do I sort processes by memory usage inside htop?": [
+  "htop --sort-memory"
+ ],
+ "How do I block a single IP address with iptables?": [
+  "iptables -A INPUT -s 192.168.1.100 -j DROP   # block IP 192.168.1.100 on INPUT chain   # iptables block single IP example   # how to block ip with iptables rule   # iptables deny ip address example   # block specific ip iptables command   # iptables rule to block ip address   # block ip address using iptables   # iptables drop rule for single ip"
+ ],
+ "How do I write an ansible playbook that installs a package?": [
+  "ansible-playbook --ask-vault-pass --become --inventory-file=inventory.yml install-package.yml -i inventory.yml -m package -a \"name=nginx state=present\""
+ ],
+ "How do I import a database dump into mysql?": [
+  "mysql --default-character-set=utf8 < dump.sql"
+ ],
+ "What does the second argument to the C open() call control?": [
+  "man open(2) \"second argument\""
+ ],
+ "What does malloc return when the allocation fails?": [
+  "man malloc failed return value"
+ ],
+ "How do I format a floating point number with printf in C?": [
+  "printf floating point format specifier"
+ ],
+ "What is the syntax for a HEALTHCHECK instruction in a Dockerfile?": [
+  "dockerfile HEALTHCHECK syntax"
+ ],
+ "How do I write a for loop in Rust?": [
+  "man rust for loop"
+ ],
+ "How do I install Python packages with pip?": [
+  "man pip install"
+ ],
+ "Why did my backup fail last night?": [
+  "man rsync-errors"
+ ],
+ "How much free space is left on my home partition?": [
+  "df -h ~                                                                                                                                                                                                                                                 df -h /home                                                                                                                                                                                                                                                 free -h | grep home                                                                                                                                                                                                                                                 how much space left on home partition?                                                                                                                                                                                                                                                 show free space on home directory                                                                                                                                                                                                                                                 what is the free space in home partition?"
+ ],
+ "Which of my services are currently running?": [
+  "systemctl list-units --type=service --state=running</br>service --status-all</br>systemctl is-active --type=service</br>systemctl list-units | grep running</br>systemctl status all</br>systemctl list-units | grep \"active (running)\""
+ ],
+ "Is this system affected by CVE-2024-3094?": [
+  "man cve-2024-3094-check"
+ ],
+ "Which kernel version should I upgrade this machine to?": [
+  "man -k \"kernel upgrade\""
+ ],
+ "Is there a way to feed tar a list of things to leave out, rather than naming each one on the command line?": [
+  "tar --exclude=pattern --exclude-list=excludes.txt -cf archive.tar dir/"
+ ],
+ "I need to look for a string across a whole source tree, not just one file.": [
+  "grep -r \"string\" /path/to/source/tree"
+ ],
+ "What stops a filename with a space in it from being split into two arguments?": [
+  "man bash filename-with-space"
+ ],
+ "Can sed modify the file directly?": [
+  "sed -i filename.txt   # modify file in place   # likely command: sed -i   # direct modification query   # in-place edit with sed   # does sed modify file directly?"
+ ],
+ "How can I keep watching a file that something else is still writing to?": [
+  "watch -n 1 grep -v '^$' filename.txt   # watch file changes in real time with grep filter (use with caution, may not work as expected on all systems)   # alternative: use inotifywait for real-time file monitoring (better for live file watching)   # command: inotifywait -m filename.txt   # command: inotifywait -m -e modify filename.txt   # command: tail -f filename.txt   # command: watch -n 1 cat filename.txt"
+ ],
+ "I want this daemon to come up on its own after a reboot.": [
+  "systemctl enable daemon-name.service   # replace daemon-name with actual service name"
+ ],
+ "Which sshd setting refuses root logins?": [
+  "man sshd_config | grep \"PermitRootLogin\""
+ ],
+ "If a unit dies, how do I get systemd to bring it back up on its own?": [
+  "systemd restart unit name automatically on failure"
+ ],
+ "Why does a process sometimes ignore kill but never ignore kill -9?": [
+  "man kill   # How does kill signal work in Linux?   # Why doesn't a process ignore SIGKILL?   # What happens when a process ignores SIGTERM but not SIGKILL?   # Can a process ignore kill -9?   # Why can't a process ignore SIGKILL?   # How does kill -9 differ from kill in Linux?"
+ ],
+ "Binding to a low-numbered port normally needs root. Is there another way to grant that?": [
+  "man bind_port_without_root"
+ ],
+ "What is the right way to mirror one folder onto another, removing anything that is no longer in the source?": [
+  "man rsync --delete-after"
+ ],
+ "I want to see every syscall a misbehaving binary issues.": [
+  "trace syscall -a -p <pid>   # or: ltrace -e syscall -p <pid>   # or: strace -e trace=all -p <pid>"
+ ],
+ "Do I still have room on /home?": [
+  "df -h /home"
+ ],
+ "tar exclude list of files": [
+  "tar --exclude-list=files.txt --help"
+ ],
+ "make an archive but skip everything named in a list": [
+  "tar -czf archive.tar.gz --exclude-from=exclude.list --exclude=pattern1 --exclude=pattern2 directory/"
+ ],
+ "how do i excldue files listed in a txt file from a tarbal": [
+  "tar --exclude-from=exclude.txt -cf archive.tar directory/"
+ ],
+ "grep recursive subdirectories": [
+  "grep -r directory_name   # search recursively in directory and subdirectories, grep -R --include=\"*.txt\" .   # recursive grep with file filter, grep -r \"pattern\" /path/to/dir   # recursive search in directory tree, grep -r \"text\" .   # recursive search in current directory, grep -R --color=always .   # recursive grep with color output, grep -r \"pattern\" --include=\"*.c\" .   # recursive grep for C files only, grep -r \"error\" */src/   # recursive search in src sub"
+ ],
+ "search for a string in every file under a directory": [
+  "grep -r \"string\" /path/to/directory"
+ ],
+ "how do i serch recursivly through subfolders for text": [
+  "grep -r \"text\" /path/to/search"
+ ],
+ "find print0 xargs spaces": [
+  "man print0 | grep xargs spaces"
+ ],
+ "hand results containing spaces to another command safely": [
+  "man -k \"hand results containing spaces to another command\" | grep -E \"pipe|redirect|shell\" | xargs man -f | grep -i \"safe\""
+ ],
+ "filenames with spaces brake my pipline whats the safe way": [
+  "man bash -c 'echo \"filename with spaces\" | xargs'"
+ ],
+ "ls human readable sizes": [
+  "ls --human-readable sizes   # or: ls -h sizes   # or: ls -h --human-readable"
+ ],
+ "show file sizes in MB instead of raw bytes": [
+  "ls -lh   # list files with human-readable sizes in MB or GB (not raw bytes)"
+ ],
+ "how to get human readble file sizes": [
+  "man ls -h"
+ ],
+ "chmod recursive directory": [
+  "chmod -R directory_name"
+ ],
+ "set permissions on everything inside a folder at once": [
+  "man setfacl -R directory_name"
+ ],
+ "chnage permisions on a folder and everythin inside": [
+  "man chmod -R"
+ ],
+ "sort numeric not alphabetical": [
+  "man sort --numeric"
+ ],
+ "why does 10 come before 9 when I sort a list": [
+  "man sort -n"
+ ],
+ "sort numericaly insted of alphabeticaly": [
+  "sort -n"
+ ],
+ "sed edit file in place": [
+  "sed -i 's/old/new/g' filename.txt   # edit in place with sed   # command: sed -i   # alternative: sed -i inplace   # query: sed edit in place   # query: sed modify file in place   # query: sed update file in place   # query: sed edit file without backup   # query: sed inplace edit   # query: sed modify file directly   # query: sed edit file in place without backup   # query: sed -i edit   # query: sed in place edit   # query: sed change file content"
+ ],
+ "replace text inside a file without printing to the screen": [
+  "sed -i 's/oldtext/newtext/g' filename.txt"
+ ],
+ "make sed writ back to the file itself": [
+  "sed -i 's/old/new/g' filename"
+ ],
+ "tail follow log": [
+  "tail -f logfile.txt   # follow log in real-time   # linux manual search query   # tail follow log file   # how to tail follow log in linux   # tail -f command for logs   # real-time log monitoring linux"
+ ],
+ "watch a file as new lines are appended to it": [
+  "watch -n 1 tail -f filename.txt   # watch file as lines are appended   # likely command: watch, tail -f   # alternative: watch -n 1 grep -v '^$' filename.txt   # alternative: tail -f filename.txt | watch -n 1   # alternative: watch -n 1 cat filename.txt   # alternative: watch -n 1 tail -f file.txt"
+ ],
+ "how do i wach a log file live as it groes": [
+  "tail -f filename.log"
+ ],
+ "curl follow redirect": [
+  "man curl --follow-redirects"
+ ],
+ "download a url that points somewhere else": [
+  "man wget --follow-locations"
+ ],
+ "curl retuns nothing when the url redirets": [
+  "curl --follow-location https://example.com"
+ ],
+ "systemctl start at boot": [
+  "systemctl enable service_name@.service   # likely command for enabling at boot in systemd (replace service_name)"
+ ],
+ "make this daemon come up on its own after a reboot": [
+  "man systemd.service.d/override.conf   # or: man systemd.service   # or: man systemd-sysv-generator"
+ ],
+ "how do i enalbe a servce to start on boot": [
+  "man systemctl enable service-name.service"
+ ],
+ "mount read only": [
+  "man mount -o ro"
+ ],
+ "attach a disk so that nothing can write to it": [
+  "man lsof | grep -i \"lock disk\""
+ ],
+ "mount a filesytem read-onyl": [
+  "mount -o ro /dev/sdX1 /mnt/point"
+ ],
+ "cron run at boot": [
+  "man cron at boot"
+ ],
+ "schedule something to run each time the machine starts": [
+  "cron at boot time"
+ ],
+ "run a job evrey time the mashine boots from cron": [
+  "cron boot run job every time machine starts"
+ ],
+ "sshd disable root login": [
+  "man sshd_config disable root login"
+ ],
+ "stop the superuser account signing in remotely": [
+  "man sshd_config | grep \"PermitRootLogin\""
+ ],
+ "disalow root loging over ssh": [
+  "man sshd_config | grep \"PermitRootLogin\""
+ ],
+ "systemd restart on failure": [
+  "man systemd.service restart-on-failure"
+ ],
+ "bring a crashed background process back automatically": [
+  "man systemd-sleep-service-restore-automatically"
+ ],
+ "how to make a servcie restart automaticaly if it crashs": [
+  "man systemd.service.conf Restart=always"
+ ],
+ "kill vs kill -9 difference": [
+  "man kill vs kill -9"
+ ],
+ "why does a process sometimes refuse to die": [
+  "man kill -l   # list signals, check if process is ignoring one   (e.g., SIGTERM, SIGKILL)   (common cause)   (short)   (no extra)   (no explanation)   (no numbering)   (one per line)   (only one line)   (no extra text)   (only one line)   (only one line)   (only one line)   (only one line)   (only one line)   (only one line)   (only one line)   (only one line)   (only"
+ ],
+ "diference betwen kill and kill -9": [
+  "man kill vs kill -9"
+ ],
+ "rsync delete extra files": [
+  "rsync --delete-extra-files manpage"
+ ],
+ "rsyc two directorys and delet the extras": [
+  "rsync --delete directory1 directory2   # rsync with delete extras   # rsync --delete src dst   # rsync -av --delete dir1 dir2"
+ ],
+ "tmux detach reattach": [
+  "man tmux detach-reattach"
+ ],
+ "how to detatch from a tmux sesion and get back later": [
+  "tmux detach command"
+ ],
+ "strace syscalls of a process": [
+  "strace -e syscall -p <pid>   # trace syscalls of a specific process by PID   # likely command: strace   # alternative: strace -f -e syscall   # trace all syscalls in a process and its children   # alternative: strace -e syscall -T -o trace.log <command>   # trace syscalls with timing and output to file   # alternative: strace -e syscall -c   # count syscall occurrences   # alternative: strace -e syscall -v   # verbose syscall tracing   # alternative: strace -e"
+ ],
+ "trase the sytem calls a program makes": [
+  "trace system calls a program makes   # strace"
+ ],
+ "iptables block ip": [
+  "iptables -A INPUT -s 1.2.3.4 -j DROP"
+ ],
+ "blok a single ip adress with iptbales": [
+  "iptables -A INPUT -s 192.168.1.100 -j DROP"
+ ],
+ "free space on /home": [
+  "man df -h /home"
+ ],
+ "how much spac is left on my hoem partition": [
+  "df -h /home"
+ ]
+}
