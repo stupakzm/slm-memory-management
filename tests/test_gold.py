@@ -97,11 +97,21 @@ def _scp_doc() -> dict:
 
 
 def _ls_doc() -> dict:
-    """A synthetic ls(1)-like doc: a bare flag whose description contains a
-    phrase a question might use as its gold token."""
+    """A synthetic ls(1)-like doc with the two real-corpus shapes attempt 2
+    fixed:
+
+    - `-t` has its description inline on the same physical line (a run of
+      2+ spaces, not a following indented line) - the real bug that made
+      'newest' look like an option.
+    - `--full-time`'s description names `-t` in prose ("like -t, but..."),
+      which used to make `-t` and `--full-time` false description-rule
+      aliases of each other, since a bare flag token is a substring of
+      countless unrelated words (`-t` inside `--full-time` itself)."""
     text = (
-        "-t\n"
-        "       sort by time, newest first\n"
+        "-t     sort by time, newest first\n"
+        "\n"
+        "--full-time\n"
+        "       like -t, but show full-iso timestamps\n"
     )
     return {
         "doc_id": "ls.1", "name": "ls", "section": "1", "path": "/ls.1",
@@ -130,6 +140,15 @@ def test_synonym_rule():
               f"--exclude-from=FILE should strip =FILE and alias to -X, got {got2}")
         check(stats["per_rule"]["synonym"] >= 2, f"expected >=2 synonym matches: {stats}")
 
+        # attempt 2, fix 2: an inline-description option line (`-t     sort
+        # by time, newest first`) must not be mis-split into bogus options
+        # (`newest`), so it must yield no synonym for -t at all - there is
+        # only one option (`-t` itself) on that line.
+        ls_doc = _ls_doc()
+        ls_matches = derive_gold_aliases.alias_matches_for_token(ls_doc, "-t")
+        check(not any(e["rule"] == "synonym" for e in ls_matches),
+              f"an inline-description line must yield no synonym for -t, got {ls_matches}")
+
 
 def test_argument_rule():
     with tempfile.TemporaryDirectory() as td:
@@ -156,9 +175,25 @@ def test_description_rule():
         ])
         aliases, _stats = derive_gold_aliases.derive(corpus, qs)
 
+        # attempt 2, fix 2: `-t`'s description is inline on the option line
+        # itself (`-t     sort by time, newest first`); the phrase must
+        # still get -t as its alias, and nothing else (no bogus 'newest').
         got = aliases["a3"]["sort by time"]
         check(any(e["alias"] == "-t" and e["rule"] == "description" for e in got),
               f"'sort by time' should get alias -t via description rule, got {got}")
+        check(got == [{"alias": "-t", "rule": "description",
+                       "sec_id": "ls.1#OPTIONS", "line": "-t     sort by time, newest first"}],
+              f"'sort by time' should get exactly one alias (-t), nothing else, got {got}")
+
+        # attempt 2, fix 1: a flag token (`-t`) must get NO description
+        # alias, even though --full-time's description names it in prose
+        # ("like -t, but ..." - -t is also a literal substring of
+        # --full-time itself). Description aliases are for phrase tokens
+        # only; a flag token's aliases come from the synonym rule alone.
+        ls_doc = _ls_doc()
+        flag_matches = derive_gold_aliases.alias_matches_for_token(ls_doc, "-t")
+        check(not any(e["rule"] == "description" for e in flag_matches),
+              f"a flag token must get no description alias, got {flag_matches}")
 
 
 def test_alias_boundary():

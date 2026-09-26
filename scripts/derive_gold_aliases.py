@@ -18,14 +18,31 @@ token, searches the gold doc's option lines for three kinds of match:
   argument    the token is the argument placeholder on an option line
               (`identity_file` on `-i identity_file`); that line's options
               become its aliases.
-  description the token is a phrase that occurs verbatim in an option
-              entry's description text (`sort by time` under `-t`); that
-              entry's options become its aliases.
+  description the token is a *phrase* (it does not start with `-`) that
+              occurs verbatim in an option entry's description text
+              (`sort by time` under `-t`); that entry's options become its
+              aliases. A flag token (`-t`, `--location`) never gets a
+              description alias - man pages cross-reference other flags by
+              name in prose (`-t`'s description mentions `--full-time`), and
+              that is not a synonym.
 
 Every alias is recorded with the rule that produced it, the section it came
 from, and the option line itself - so any alias can be traced back to the
 one man page sentence that licenses it, and none of this ever looks at a
-model's answer.
+model's answer. Every alias, regardless of rule, is itself a flag (starts
+with `-`); anything else is dropped.
+
+Two real-corpus defects fixed here (attempt 2):
+  - an option line's inline description (`-t     sort by time, newest
+    first`, description on the same physical line, separated by a run of
+    2+ spaces or a tab) was being fed whole into the comma/space option
+    parser, producing bogus "options" like `newest`. The line is now split
+    at the first such run before parsing: the left part is the option
+    spec, the right part joins the entry's description text.
+  - the description rule was firing for flag tokens too (`-t`'s
+    description mentioning `--full-time` made `--full-time` an alias of
+    `-t`, and vice versa), which is backwards - see the `description` rule
+    above.
 
 Usage: derive_gold_aliases.py [--corpus data/corpus/man.jsonl]
                                [--eval data/eval/questions.jsonl]
@@ -43,10 +60,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 _MAX_OPT_INDENT = 7
+_INLINE_SPLIT_RE = re.compile(r"\t| {2,}")
 
 
 def _indent(line: str) -> int:
     return len(line) - len(line.lstrip(" "))
+
+
+def _split_option_spec(line: str) -> tuple[str, str]:
+    """Split an option line at the first run of 2+ spaces or a tab: the left
+    part is the option spec (parsed for flags/args), the right part is
+    inline description text belonging to the same entry (`-t     sort by
+    time, newest first` -> ("-t", "sort by time, newest first")). No such
+    run means the whole line is the option spec and there is no inline
+    description."""
+    m = _INLINE_SPLIT_RE.search(line)
+    if not m:
+        return line, ""
+    return line[:m.start()].rstrip(), line[m.end():].strip()
 
 
 def parse_option_line(line: str) -> list[tuple[str, str | None]]:
@@ -86,7 +117,8 @@ def parse_option_entries(text: str) -> list[dict]:
         indent = _indent(line)
         if stripped and indent <= _MAX_OPT_INDENT and stripped.startswith("-"):
             opt_indent = indent
-            desc_lines: list[str] = []
+            opt_spec, inline_desc = _split_option_spec(stripped)
+            desc_lines: list[str] = [inline_desc] if inline_desc else []
             j = i + 1
             while j < n:
                 nxt = lines[j]
@@ -100,7 +132,7 @@ def parse_option_entries(text: str) -> list[dict]:
                     j += 1
                 else:
                     break
-            units = parse_option_line(stripped)
+            units = parse_option_line(opt_spec)
             entries.append({
                 "line": stripped,
                 "units": units,
@@ -119,6 +151,8 @@ def alias_matches_for_token(doc: dict, token: str) -> list[dict]:
     seen = set()
 
     def add(alias: str, rule: str, sec_id: str, line: str) -> None:
+        if not alias.startswith("-"):
+            return  # every alias, in every rule, must itself be a flag
         key = (alias, rule, sec_id, line)
         if key in seen:
             return
@@ -142,8 +176,12 @@ def alias_matches_for_token(doc: dict, token: str) -> list[dict]:
                 for flag in flags:
                     add(flag, "argument", sec_id, line)
 
-            # description: token is a phrase in this entry's description.
-            if entry["description"] and token in entry["description"]:
+            # description: token is a phrase (not a flag) in this entry's
+            # description text. A flag token never gets a description alias:
+            # man pages routinely name other flags in prose (-t's
+            # description mentions --full-time), and that is not a synonym.
+            if (not token.startswith("-") and entry["description"]
+                    and token in entry["description"]):
                 for flag in flags:
                     add(flag, "description", sec_id, line)
 
