@@ -1,0 +1,5207 @@
+{
+  "name": "p7-B",
+  "k": 5,
+  "n": 166,
+  "config": {
+    "mode": "dense",
+    "rerank": false,
+    "gate": 0.65,
+    "grammar": true,
+    "candidates": 50,
+    "expand": 0,
+    "db": "/home/stupakzm/projects/slm-memory-management/data/index/main.db",
+    "domain": null,
+    "rewrites": 0,
+    "aliases": true,
+    "cache": "p7-k20",
+    "read_k": 8,
+    "cap_per_doc": 0
+  },
+  "answer_accuracy": 0.6692913385826772,
+  "accuracy_given_evidence": 0.801980198019802,
+  "false_abstention_with_evidence": 0.04950495049504951,
+  "abstention_recall": 0.9230769230769231,
+  "spoke_without_evidence": 0.6153846153846154,
+  "unsupported_rate": 0.1144578313253012,
+  "results": [
+    {
+      "qid": "a01",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "I have a text file listing filenames I want left out of an archive. How do I build a tarball that skips all of them?",
+      "answer": "-X, --exclude-from=FILE [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dpkg-source.1",
+        "ptargrep.1",
+        "tar.1",
+        "tar.1",
+        "ptargrep.1",
+        "tar.1",
+        "7zr.1",
+        "7z.1"
+      ],
+      "top_score": 0.9888752698898315,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a02",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I compress an archive with gzip while creating it, instead of running the compressor afterwards?",
+      "answer": "Compress an archive with gzip while creating it by using the command: `cat file1 file2 | gzip > foo.gz`. This compresses all members at once, resulting in better compression than compressing each file individually and concatenating them. [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "zcat.1",
+        "gunzip.1",
+        "uncompress.1",
+        "gzip.1",
+        "gzip.1",
+        "uncompress.1",
+        "gunzip.1",
+        "zcat.1"
+      ],
+      "top_score": 0.9974738955497742,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        7
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a03",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "When something matches I also want to see the few lines above and below it. How?",
+      "answer": "Use the -A, -B, or -C options to show context lines. For example, -A 2 shows 2 lines of trailing context after matches, -B 2 shows 2 lines of leading context before matches, and -C 2 shows 2 lines of both leading and trailing context. These options are available in grep, rgrep, fgrep, egrep, and git-grep. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "grep.1",
+        "rgrep.1",
+        "fgrep.1",
+        "egrep.1",
+        "git-grep.1",
+        "rgrep.1",
+        "less.1"
+      ],
+      "top_score": 0.9883639812469482,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a04",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I search every file underneath a folder, including its subfolders?",
+      "answer": "Use the `-recursive` option with `find`. However, based on the provided extracts, the correct and relevant option is `-depth` or more directly, the default behavior when no depth restriction is specified. But since the manual does not explicitly state `-recursive` as a flag for `find`, and the closest relevant extract is from `grep.1` which mentions `-r, --recursive` for recursive file search, and since `find` by default searches recursively unless restricted, the correct answer based on the provided extracts is that `find` searches recursively by default when no depth or path restrictions are specified. However, the manual does not explicitly state this behavior in the provided extracts. Therefore, based on the extracts, the most accurate and directly supported option is not explicitly named in the provided extracts for `find` to search every file underneath a folder including subfolders. But since `find` by default searches recursively, and no explicit flag is mentioned in the extracts for recursive search, the answer is not directly available. However, in the absence of a clear flag in the extracts, and since the question is about searching every file under a folder including subfolders, and the only relevant mention of recursion is in `grep.1`, which is not about `find`, we must conclude that the correct flag for `find` to do this is not explicitly provided in the extracts. Therefore, I don't know. [1] does not mention recursion explicitly. [5] mentions -xdev, which is not relevant. [8] mentions -perm, not recursion. So, I don't know. [1]",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "find.1",
+        "find.1",
+        "find.1",
+        "find.1",
+        "grep.1",
+        "find.1",
+        "find.1"
+      ],
+      "top_score": 0.9936082363128662,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        5,
+        8
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a05",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "I only care which files contain the pattern, not the matching lines themselves.",
+      "answer": "-l, --files-with-matches [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "rgrep.1",
+        "grep.1",
+        "egrep.1",
+        "fgrep.1",
+        "busybox.1",
+        "grep.1",
+        "rgrep.1"
+      ],
+      "top_score": 0.9979621171951294,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a06",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I print the lines that do not match instead of the ones that do?",
+      "answer": "Use the -v, --invert-match option. [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "pager.1",
+        "less.1",
+        "fgrep.1",
+        "fgrep.1",
+        "rgrep.1",
+        "grep.1",
+        "egrep.1",
+        "grep.1"
+      ],
+      "top_score": 0.9970607161521912,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        8
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a07",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "Can find remove the files it turns up without piping into another command?",
+      "answer": "Yes. find can remove files it turns up without piping into another command using the -delete action. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "find.1",
+        "find.1",
+        "find.1",
+        "xargs.1",
+        "intro.1",
+        "find.1",
+        "find.1"
+      ],
+      "top_score": 0.9840419292449951,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a08",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I list files that changed within the last week?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "git-blame.1",
+        "git-whatchanged.1",
+        "find.1",
+        "githooks.5",
+        "git-whatchanged.1",
+        "flatpak-history.1",
+        "git-rev-list.1",
+        "git-log.1"
+      ],
+      "top_score": 0.9948667287826538,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a09",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Filenames with spaces keep breaking my pipeline. What is the safe way to hand results to another command?",
+      "answer": "Use the `-0` option with `xargs` and ensure the input program (like `find`) uses `-print0` to produce null-separated filenames. This safely handles filenames with spaces or newlines. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-filter-branch.1",
+        "xargs.1",
+        "git-filter-branch.1",
+        "xargs.1",
+        "find.1",
+        "xargs.1",
+        "bash.1",
+        "xargs.1"
+      ],
+      "top_score": 0.9974104762077332,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a10",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I list a directory with the most recently changed files first?",
+      "answer": "-t     sort by time, newest first [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dir.1",
+        "vdir.1",
+        "ls.1",
+        "vdir.1",
+        "dir.1",
+        "ls.1",
+        "dir.1",
+        "vdir.1"
+      ],
+      "top_score": 0.9971729516983032,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a11",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "The sizes print as raw bytes and I cannot read them. How do I get K, M and G instead?",
+      "answer": "Use the `-h`, `--human-readable` option. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "free.1",
+        "find.1",
+        "od.1",
+        "dd.1",
+        "units.7",
+        "du.1",
+        "hexdump.1",
+        "lzcat.1"
+      ],
+      "top_score": 0.9973437190055847,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        6
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a12",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I copy files so their timestamps and permissions survive the copy?",
+      "answer": "Use the `--preserve-timestamps` and `--preserve=mode,ownership,timestamps` options with `install(1)` or `cp(1)` respectively. [3] and [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "cmake-commands.7",
+        "znew.1",
+        "install.1",
+        "install.1",
+        "cp.1",
+        "cpio.1",
+        "cpio.1",
+        "cp.1"
+      ],
+      "top_score": 0.9801263213157654,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a13",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I copy without overwriting anything already at the destination?",
+      "answer": "Use the `-n` or `--no-clobber` option. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "cp.1",
+        "busybox.1",
+        "cp.1",
+        "mv.1",
+        "gio.1",
+        "mv.1",
+        "cp.1",
+        "install.1"
+      ],
+      "top_score": 0.9848734140396118,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a14",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I delete a directory and everything underneath it?",
+      "answer": "Use the `rm` command with the `-r` or `--recursive` option. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "rmdir.1",
+        "rm.1",
+        "rm.1",
+        "find.1",
+        "tmpfiles.d.5",
+        "rm.1",
+        "git-rm.1",
+        "dvddirdel.1"
+      ],
+      "top_score": 0.9783045053482056,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        6
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a15",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I change permissions on a folder and every file inside it?",
+      "answer": "Use the `-R` flag with `chmod`. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "chmod.1",
+        "chown.1",
+        "busybox.1",
+        "chacl.1",
+        "chmod.1",
+        "find.1",
+        "chmod.1",
+        "chmod.1"
+      ],
+      "top_score": 0.9444019794464111,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a16",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I change the owner of an entire directory tree?",
+      "answer": "Use the `-R` option to operate recursively on files and directories. For example: `chown -R root /u`. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "chown.1",
+        "chown.1",
+        "chown.1",
+        "cgroups.7",
+        "chown.1",
+        "chown.1",
+        "chgrp.1",
+        "tmpfiles.d.5"
+      ],
+      "top_score": 0.9899460673332214,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a17",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "I want one total for a folder, not a line for every file inside.",
+      "answer": "-s, --summarize [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "du.1",
+        "zipinfo.1",
+        "wc.1",
+        "du.1",
+        "du.1",
+        "wc.1",
+        "nl.1",
+        "git-show.1"
+      ],
+      "top_score": 0.9796933531761169,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a18",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I check whether I have run out of inodes rather than out of space?",
+      "answer": "Use the `-i` option with `df` to list inode information instead of block usage. [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_sys_fs.5",
+        "proc_sys_fs.5",
+        "e2fsck.8",
+        "debugfs.8",
+        "debugfs.8",
+        "fsck.ext3.8",
+        "fsck.ext4.8",
+        "df.1"
+      ],
+      "top_score": 0.9976699948310852,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        8
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a19",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I see every process on the machine, not just my own?",
+      "answer": "Use the `ps ax` command. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ps.1",
+        "ps.1",
+        "w.1",
+        "proc_pid.5",
+        "pstree.x11.1",
+        "proc_self.5",
+        "ps.1",
+        "pstree.1"
+      ],
+      "top_score": 0.9986546039581299,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a20",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I find out which signal name number 9 corresponds to?",
+      "answer": "Use the command `kill -l 9` [2] or `kill -l 9` [7] to find out which signal name corresponds to number 9. The -l option lists signal names, and specifying a number (like 9) converts it to a signal name. From the signal table [6] it is clear that signal number 9 corresponds to SIGKILL. Thus, the answer is SIGKILL. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "kill.1",
+        "kill.1",
+        "bash-builtins.7",
+        "bash.1",
+        "bash.1",
+        "signal.7",
+        "bash-builtins.7",
+        "builtins.7"
+      ],
+      "top_score": 0.9977940320968628,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        7,
+        6
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a21",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "sort puts 10 before 9. How do I make it sort properly by number?",
+      "answer": "Use the `--numeric-sort` or `-n` option to sort numerically instead of lexicographically. This ensures that numbers like 10 are sorted after 9, rather than before. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "zipinfo.1",
+        "sort.1",
+        "sort.1",
+        "cmake-generator-expressions.7",
+        "ls.1",
+        "sort.1",
+        "vdir.1",
+        "cmake-commands.7"
+      ],
+      "top_score": 0.9407362937927246,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a22",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I sort and drop duplicate lines in a single command?",
+      "answer": "sort -u file.txt [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "uniq.1",
+        "busybox.1",
+        "uniq.1",
+        "uniq.1",
+        "sort.1",
+        "sort.1",
+        "busybox.1",
+        "busybox.1"
+      ],
+      "top_score": 0.9846054315567017,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a23",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I count how many times each distinct line repeats?",
+      "answer": "-c, --count [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "uniq.1",
+        "git-show.1",
+        "uniq.1",
+        "git-log.1",
+        "git-format-patch.1",
+        "eximstats.8",
+        "grep.1",
+        "busybox.1"
+      ],
+      "top_score": 0.9061562418937683,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a24",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "My file is colon separated and I want only the third column.",
+      "answer": "Use the `cut` command with the `-f` option to select the third field and the `-d` option to specify the colon as the delimiter. For example: `cut -d: -f3 file`. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "colrm.1",
+        "pr.1",
+        "cut.1",
+        "pr.1",
+        "column.1",
+        "column.1",
+        "col.1",
+        "join.1"
+      ],
+      "top_score": 0.9419365525245667,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a25",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I make sed rewrite the file itself instead of printing to the screen?",
+      "answer": "-i [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sed.1",
+        "pager.1",
+        "sed.1",
+        "busybox.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1"
+      ],
+      "top_score": 0.9483283162117004,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a26",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I count the number of lines in a file?",
+      "answer": "Use `wc -l` to count the number of lines in a file. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "nl.1",
+        "more.1",
+        "nl.1",
+        "wc.1",
+        "tail.1",
+        "git-blame.1",
+        "pager.1",
+        "head.1"
+      ],
+      "top_score": 0.9890097975730896,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a27",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I watch a log file as new entries are appended?",
+      "answer": "Use the `-f` or `--follow` option. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "journalctl.1",
+        "watchgnupg.1",
+        "watchgnupg.1",
+        "watchgnupg.1",
+        "logsave.8",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1"
+      ],
+      "top_score": 0.7277745008468628,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a28",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I tell ssh to use one particular private key file?",
+      "answer": "Use the -i option followed by the path to the private key file. For example: ssh -i ~/.ssh/id_ed25519 user@host [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ssh.1",
+        "ssh_config.5",
+        "gitfaq.7",
+        "ssh.1",
+        "ssh-keygen.1",
+        "ssh_config.5",
+        "ssh-keygen.1",
+        "gpg-agent.1"
+      ],
+      "top_score": 0.9981856942176819,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a29",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I copy an entire directory to a remote machine?",
+      "answer": "Use the --recursive or -r flag. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "gh-codespace-cp.1",
+        "scp.1",
+        "gh-codespace-cp.1",
+        "sftp.1",
+        "sftp.1",
+        "scp.1",
+        "cp.1",
+        "gh-codespace-cp.1"
+      ],
+      "top_score": 0.9968221187591553,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a30",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "curl prints nothing useful when the URL redirects somewhere else.",
+      "answer": "--silent [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1"
+      ],
+      "top_score": 0.9976734519004822,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a31",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I save a download under the filename the server uses?",
+      "answer": "Use the --remote-header-name option with curl. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "lwp-download.1p",
+        "wget.1",
+        "wget.1",
+        "wget.1",
+        "wget.1",
+        "wget.1"
+      ],
+      "top_score": 0.9912545084953308,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a32",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "My download died halfway through. How do I resume it rather than starting over?",
+      "answer": "Use the `-c` or `--continue` option. This tells wget to continue downloading from where it left off if a partial file exists [2] or [1] . Note that this requires server support for continued download (e.g., HTTP Range header) and may not work if the file was modified on the server [6] . For example: `wget -c ftp://sunsite.doc.ic.ac.uk/ls-lR.Z` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "wget.1",
+        "wget.1",
+        "wget.1",
+        "wget.1",
+        "wcurl.1",
+        "wget.1",
+        "gitremote-helpers.7",
+        "wget.1"
+      ],
+      "top_score": 0.9880449175834656,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        1,
+        6
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a33",
+      "kind": "answerable",
+      "tags": [
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "dd just sits there silently. How do I see how far along it is?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "dd.1",
+        "dd.1",
+        "pipesz.1",
+        "busybox.1",
+        "dd.1",
+        "dd.1",
+        "xorrecord.1",
+        "xorrecord.1"
+      ],
+      "top_score": 0.4099675416946411,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true
+    },
+    {
+      "qid": "a34",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I make xargs cope with filenames that contain spaces?",
+      "answer": "Use the -0 option with xargs, and ensure that the program feeding the input (like find) uses -print0 to separate filenames with null characters. This prevents incorrect processing of filenames containing spaces or newlines. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "xargs.1",
+        "xargs.1",
+        "find.1",
+        "xargs.1",
+        "git-filter-branch.1",
+        "find.1",
+        "xargs.1",
+        "xargs.1"
+      ],
+      "top_score": 0.9988032579421997,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a35",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I make a service start automatically at boot?",
+      "answer": "In systemd, to make a service start automatically at boot, place a symlink to the unit file in the `.wants/` directory of either `multi-user.target` or `graphical.target`, which are the default boot targets. [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "boot.7",
+        "boot.7",
+        "daemon.7",
+        "boot.7",
+        "systemd-rc-local-generator.8",
+        "daemon.7",
+        "daemon.7",
+        "rc-local.service.8"
+      ],
+      "top_score": 0.998435914516449,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        7
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a36",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I see only the log entries from the current boot?",
+      "answer": "Use the -b option (or --boot=) without any arguments. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1",
+        "journalctl.1"
+      ],
+      "top_score": 0.9993771314620972,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a37",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I mount a filesystem so that nothing can write to it?",
+      "answer": "Use the `-o ro` option to mount the filesystem read-only. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "bootparam.7",
+        "mount.8",
+        "mount.8",
+        "mount_namespaces.7",
+        "mount.8",
+        "mount.8"
+      ],
+      "top_score": 0.9919878244400024,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a38",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I give a new filesystem a label at the moment I create it?",
+      "answer": "Use the -L option with mkntfs(8) to set the volume label during creation of an NTFS file system [1] or use the -L option with mkfs.ext3(8), mkfs.ext2(8), or mkfs.ext4(8) for ext2/ext3/ext4 file systems [4] to set the volume label at creation time. For example: `mkfs.ext4 -L newlabel /dev/sda1`. The maximum label length is 16 characters for ext file systems [2] and 128 Unicode characters for NTFS [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ntfslabel.8",
+        "tune2fs.8",
+        "dosfslabel.8",
+        "mkfs.ext3.8",
+        "mount.8",
+        "mkfs.ext2.8",
+        "mkfs.ext4.8",
+        "mke2fs.8"
+      ],
+      "top_score": 0.9982420206069946,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        2
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a39",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I add a user and have their home directory created at the same time?",
+      "answer": "Use the -m, --create-home option with useradd. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "useradd.8",
+        "useradd.8",
+        "adduser.8",
+        "adduser.8",
+        "addgroup.8",
+        "adduser.8",
+        "addgroup.8",
+        "pam_mkhomedir.8"
+      ],
+      "top_score": 0.9993401169776917,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a40",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I list which ports something is listening on?",
+      "answer": "Use `ss -l` to list which ports something is listening on. [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "lsof.8",
+        "lsof.8",
+        "lsof.8",
+        "lsof.8",
+        "lsof.8",
+        "lsof.8",
+        "lsof.8",
+        "ss.8"
+      ],
+      "top_score": 0.976852297782898,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        8
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a41",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "What is the flag for making a symbolic link rather than a hard one?",
+      "answer": "-s, --symbolic [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ln.1",
+        "symlink.7",
+        "symlink.7",
+        "ln.1",
+        "cmake-commands.7",
+        "symlink.7",
+        "symlink.7",
+        "sln.8"
+      ],
+      "top_score": 0.9072954058647156,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a42",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I print just a file's size and nothing else?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "du.1",
+        "df.1",
+        "size.1",
+        "df.1",
+        "wc.1",
+        "x86_64-linux-gnu-size.1",
+        "isosize.8",
+        "lsof.8"
+      ],
+      "top_score": 0.9431892037391663,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a43",
+      "kind": "answerable",
+      "tags": [
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I print today's date in YYYY-MM-DD form?",
+      "answer": "%F [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "date.1",
+        "date.1",
+        "date.1",
+        "date.1",
+        "busybox.1",
+        "date.1",
+        "date.1",
+        "git-log.1"
+      ],
+      "top_score": 0.8838292956352234,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a44",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I list the unit files on the system and see which are enabled?",
+      "answer": "Use the `list-unit-files` command. It lists unit files installed on the system, in combination with their enablement state (as reported by is-enabled). [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.freedesktop.systemd1.5",
+        "systemctl.1",
+        "systemctl.1",
+        "systemctl.1",
+        "systemctl.1",
+        "org.freedesktop.systemd1.5",
+        "systemctl.1",
+        "systemctl.1"
+      ],
+      "top_score": 0.9997020363807678,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b01",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "What is the last number on each line of fstab actually for?",
+      "answer": "The last number on each line of fstab is the sixth field (fs_passno), which is used by fsck(8) to determine the order in which filesystem checks are done at boot time. The root filesystem should be specified with a fs_passno of 1, and other filesystems should have a fs_passno of 2. Defaults to zero (don\u2019t check the filesystem) if not present. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "fstab.5",
+        "fstab.5",
+        "fstab.5",
+        "fstab.5",
+        "fstab.5",
+        "kernel-command-line.7",
+        "fstab.5",
+        "fsck.8"
+      ],
+      "top_score": 0.7624637484550476,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b02",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I list a filesystem in fstab without having it mounted at boot?",
+      "answer": "Use the `noauto` keyword in the fstab entry. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "fstab.5",
+        "mount.8",
+        "systemd-fstab-generator.8",
+        "fstab.5",
+        "mount.8",
+        "fstab.5"
+      ],
+      "top_score": 0.9966742992401123,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        6
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b03",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I run something once each time the machine starts, using cron?",
+      "answer": "Use the @reboot special string in the crontab entry. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5"
+      ],
+      "top_score": 0.9978802800178528,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b04",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "What do the five numbers at the start of a cron line mean?",
+      "answer": "The five numbers at the start of a cron line specify the time and date when a command should be executed. They represent the following fields in order: minute, hour, day of month, month, and day of week. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "cron.8"
+      ],
+      "top_score": 0.9906043410301208,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b05",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I stop root from logging in over ssh?",
+      "answer": "Set `PermitRootLogin no` in the `sshd_config` file. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sshd.8",
+        "authorized_keys.5",
+        "sshd.8",
+        "authorized_keys.5",
+        "ssh.1",
+        "sshd_config.5",
+        "authorized_keys.5"
+      ],
+      "top_score": 0.9794949889183044,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b06",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "How do I make the ssh server listen on something other than 22?",
+      "answer": "Use the -p flag followed by the desired port number when starting the sshd daemon. For example, -p 2222. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd.8",
+        "authorized_keys.5",
+        "sshd_config.5",
+        "ssh.1",
+        "sshd_config.5",
+        "authorized_keys.5",
+        "sshd_config.5",
+        "sshd_config.5"
+      ],
+      "top_score": 0.9887760281562805,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b07",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "My ssh sessions drop when they go idle. Which setting keeps them alive?",
+      "answer": "The setting that keeps SSH sessions alive when they go idle is **ServerAliveInterval** in the client configuration (ssh_config), or **ClientAliveInterval** in the server configuration (sshd_config). These settings send encrypted \"alive\" messages to detect unresponsiveness. Since the question is about sessions dropping when idle, and the user is likely on the client side, the relevant setting is **ServerAliveInterval** [3] or [7] \u2014 which triggers a message to the server to check if the connection is still active. If no response is received after the interval, the session is terminated. However, if the session drops due to inactivity, the correct setting to prevent this is **ServerAliveInterval** combined with **ServerAliveCountMax** to define how many times the message is sent before disconnecting. The default values are set to 3 and 300 seconds respectively, so adjusting these can prevent idle drops. Therefore, the key setting is **ServerAliveInterval** [7] (or equivalent in client config). \u2705 [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sshd_config.5",
+        "ssh_config.5",
+        "ssh_config.5",
+        "sshd_config.5",
+        "ssh_config.5",
+        "ssh_config.5",
+        "sshd_config.5"
+      ],
+      "top_score": 0.995266854763031,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        7
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b08",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "What are the colon separated fields in /etc/passwd?",
+      "answer": "The colon-separated fields in /etc/passwd are: login name, optional encrypted password, numerical user ID, numerical group ID, user name or comment field, user home directory, and optional user command interpreter. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "passwd.5",
+        "group.5",
+        "shadow.5",
+        "passwd.5",
+        "shadow.5",
+        "shadow.5",
+        "top.1",
+        "access.conf.5"
+      ],
+      "top_score": 0.9989544153213501,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b09",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "Where is password ageing information kept and what does each field mean?",
+      "answer": "Password ageing information is kept in the /etc/shadow file [3] and each field means the following: [6] and [7] describe the fields in order: the date of last password change (days since Jan 1, 1970), minimum password age (days before rechange), maximum password age (days after which password must be changed), password warning period (days before expiry during which user is warned), and password inactivity period (days after expiry during which password is still accepted). An empty field means no restriction for that parameter. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "shadow.5",
+        "passwd.5",
+        "shadow.5",
+        "passwd.5",
+        "shadow.5",
+        "shadow.5",
+        "shadow.5",
+        "passwd.1"
+      ],
+      "top_score": 0.9988847374916077,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        6,
+        7,
+        5
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b10",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "What is the format of a line in /etc/hosts?",
+      "answer": "A line in /etc/hosts contains an IP address, followed by one or more hostnames (canonical hostname and optional aliases), separated by blanks or tabs. The format is: `IP_address canonical_hostname [1] aliases...`. Comments starting with `#` are ignored. Hostnames must begin with an alphabetic character, end with an alphanumeric character, and may contain alphanumeric characters, hyphens, and periods [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "hosts.5",
+        "avahi.hosts.5",
+        "hosts.equiv.5",
+        "hosts.allow.5",
+        "hosts_access.5",
+        "hosts.allow.5",
+        "hosts.deny.5",
+        "hosts_access.5"
+      ],
+      "top_score": 0.9988415241241455,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b11",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I set which DNS server the machine uses?",
+      "answer": "To set which DNS server the machine uses, add a `nameserver` entry with the IP address of the desired DNS server in the `/etc/resolv.conf` file. For example, to use 8.8.8.8, add the line `nameserver 8.8.8.8` to `/etc/resolv.conf`. Multiple servers can be listed in order, and the resolver will query them sequentially until a response is received [2] . Additionally, dnsmasq can be configured to act as a local DNS cache by setting `nameserver 127.0.0.1` in `/etc/resolv.conf` and specifying upstream servers via command-line options or a resolv-file [1] . For domain-specific forwarding, use `--server=/domain/ipv4` in dnsmasq configuration [3] . However, the primary method to set the DNS server for the system is through `/etc/resolv.conf` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dnsmasq.8",
+        "resolv.conf.5",
+        "dnsmasq.8",
+        "dnsmasq.8",
+        "hostname.1",
+        "domainname.1",
+        "domainname.1",
+        "ypdomainname.1"
+      ],
+      "top_score": 0.976470947265625,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        1,
+        3
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b12",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I make a systemd service restart automatically if it crashes?",
+      "answer": "Set Restart= to on-failure in the service unit configuration. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.1",
+        "systemd.service.5",
+        "systemd.service.5",
+        "daemon.7"
+      ],
+      "top_score": 0.9993185997009277,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b13",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I make my unit start only after the network is up?",
+      "answer": "Make your unit start only after the network is up by adding `Wants=network-online.target` to your unit file and ensuring it is ordered after this target using `After=network-online.target`. This ensures the unit waits for the network to be fully set up before starting. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "NetworkManager-wait-online.service.8",
+        "systemd.special.7",
+        "systemd.special.7",
+        "systemd.special.7",
+        "systemd.special.7",
+        "systemd.unit.5",
+        "systemd.unit.5",
+        "systemd.unit.5"
+      ],
+      "top_score": 0.9994538426399231,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b14",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I let a user run one command with sudo without typing a password?",
+      "answer": "Use the NOPASSWD tag in the sudoers file for that specific command. For example: `user host = NOPASSWD: /path/to/command`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sudoers.5",
+        "runuser.1",
+        "sudo.8",
+        "sudoers.5",
+        "sudoedit.8",
+        "sudo.8",
+        "sudoers.5",
+        "sudo.8"
+      ],
+      "top_score": 0.9944251775741577,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b15",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Where is the default file-creation mask for new users configured?",
+      "answer": "The default file-creation mask for new users is configured in /etc/login.defs, specifically in the UMASK setting [6] and [2] indicate that UMASK is initialized to 022 by default and is used by useradd and newusers to set the mode of the home directory they create. Therefore, the configuration is in /etc/login.defs. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "newusers.8",
+        "newusers.8",
+        "useradd.8",
+        "pam_mkhomedir.8",
+        "useradd.8",
+        "login.defs.5",
+        "adduser.conf.5",
+        "bash-builtins.7"
+      ],
+      "top_score": 0.9995707869529724,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        6,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c01",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "What is the practical difference between a plain kill and kill -9?",
+      "answer": "A plain `kill` sends the default signal, SIGTERM (a graceful termination request), while `kill -9` sends SIGKILL (an immediate termination signal that cannot be caught or ignored by the process). [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "kill.1",
+        "intro.1",
+        "kill.1",
+        "kill.1",
+        "bash.1",
+        "signal.7",
+        "skill.1",
+        "systemd.kill.5"
+      ],
+      "top_score": 0.797145664691925,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c02",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Are there signals that a program simply cannot intercept?",
+      "answer": "Yes, there are signals that a program simply cannot intercept. The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored [1] . This is explicitly stated in the manual page extract [1] . Therefore, a program cannot intercept or handle these signals. The answer is based on extract [1] . \u2705 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "signal.7",
+        "signal.7",
+        "sudo.8",
+        "sudoedit.8",
+        "bash.1",
+        "signal.7",
+        "bash.1",
+        "signal.7"
+      ],
+      "top_score": 0.996458113193512,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c03",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Why do some tools need backslashes before parentheses in a pattern and others do not?",
+      "answer": "Some tools need backslashes before parentheses in a pattern because they treat parentheses as special regex delimiters (e.g., in POSIX.2 regular expressions or CMake), and a backslash escapes the character to make it literal. In contrast, other tools (like bash globbing) do not require backslashes because parentheses are not special in pattern matching unless explicitly used in a context where they denote subexpressions (e.g., in extended globbing or regex). The need for backslashes depends on the tool's interpretation of special characters: in regex or extended pattern matching, parentheses are delimiters, so escaping is required to match them literally. In globbing, parentheses are not special unless used in extended globbing contexts. [5] and [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "cmake-commands.7",
+        "re_format.7",
+        "regex.7",
+        "bash.1",
+        "bash.1",
+        "regex.7",
+        "glob.7"
+      ],
+      "top_score": 0.9570889472961426,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        5,
+        7
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c04",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "What does a bracket expression naming a character class mean in a shell pattern?",
+      "answer": "A bracket expression naming a character class means that the named character class (e.g., [1] in [1] or [2] in [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "regex.7",
+        "re_format.7",
+        "egrep.1",
+        "grep.1",
+        "fgrep.1",
+        "rgrep.1",
+        "egrep.1",
+        "rgrep.1"
+      ],
+      "top_score": 0.9995055198669434,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c05",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How can a process that is not root listen on port 80?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "fuser.1",
+        "services.5",
+        "fuser.1",
+        "ssh.1",
+        "busybox.1",
+        "vlc-wrapper.1",
+        "fuser.1",
+        "sshd_config.5"
+      ],
+      "top_score": 0.5545830726623535,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false
+    },
+    {
+      "qid": "c06",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Where should software I compile myself be installed, as opposed to packaged software?",
+      "answer": "/usr/local/bin, /usr/local/lib, /usr/local/include, /usr/local/share, /usr/local/etc, /usr/local/games, /usr/local/man, /usr/local/info [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "cmake-env-variables.7",
+        "hier.7",
+        "busybox.1",
+        "cmake-packages.7",
+        "hier.7",
+        "cmake-modules.7",
+        "cmake-packages.7",
+        "ossl-guide-introduction.7ssl"
+      ],
+      "top_score": 0.8849437236785889,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c07",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "What actually behaves differently between the two kinds of link a filesystem can hold?",
+      "answer": "A symbolic link behaves differently from a hard link in that a symbolic link is a pointer to another name (pathname) and not to an underlying object, allowing it to refer to directories and cross filesystem boundaries, whereas a hard link is a reference to the same inode number as the original file and is indistinguishable from the original file [5] and [1] respectively. This means symbolic links can point to non-existent paths (dangling links), while hard links must point to existing files on the same filesystem [5] and [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "symlink.7",
+        "symlink.7",
+        "proc_sys_fs.5",
+        "osirrox.1",
+        "symlink.7",
+        "proc_sys_fs.5",
+        "xorriso.1",
+        "hardlink.1"
+      ],
+      "top_score": 0.9818530678749084,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        5,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c08",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Why do I get an error about too many levels of symbolic links?",
+      "answer": "Because the kernel limits the number of symbolic links that can be followed in a pathname resolution to 40, and exceeding this limit results in an ELOOP error [1] (also mentioned in [2] and [4] as a loop detection limit). This limit prevents stack overflow and denial-of-service attacks. Before Linux 2.6.18, the limit was 5, and it was raised to 8, then later reworked in Linux 4.2 to a maximum of 40 resolutions for the entire pathname [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "path_resolution.7",
+        "symlink.7",
+        "namei.1",
+        "path_resolution.7",
+        "find.1",
+        "symlink.7",
+        "symlink.7",
+        "symlink.7"
+      ],
+      "top_score": 0.9942745566368103,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        2,
+        4
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c09",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Which environment variable decides where the shell looks for executables?",
+      "answer": "PATH [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "bash.1",
+        "sh.1",
+        "dash.1",
+        "bash.1",
+        "environ.7",
+        "environ.7",
+        "find.1",
+        "bash.1"
+      ],
+      "top_score": 0.9847225546836853,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c10",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "How much data can sit in a pipe before the writing process blocks?",
+      "answer": "The amount of data that can sit in a pipe before the writing process blocks depends on the pipe capacity, which is typically 16 pages (65,536 bytes) on modern Linux systems since Linux 2.6.11 and 2.6.35 [2] and [1] \u2014 though this can be adjusted via `fcntl(2)` or `/proc/sys/fs/pipe-max-size` [5] and [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "pipe.7",
+        "pipe.7",
+        "pipe.7",
+        "pipe.7",
+        "pipe.7",
+        "less.1",
+        "pipesz.1",
+        "pager.1"
+      ],
+      "top_score": 0.9968101382255554,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        1,
+        5,
+        7
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c11",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token",
+        "split-page"
+      ],
+      "variant_kind": null,
+      "question": "Where does the system load average come from?",
+      "answer": "The system load average comes from /proc/loadavg [1] . The first three fields in this file are load average figures giving the number of jobs in the run queue (state R) or waiting for disk I/O (state D) averaged over 1, 5, and 15 minutes [1] . This information is the same as the load average numbers given by uptime(1) and other programs [1] . System load averages is the average number of processes that are either in a runnable or uninterruptable state [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_loadavg.5",
+        "uptime.1",
+        "tload.1",
+        "xload.1",
+        "xload.1",
+        "top.1",
+        "xload.1",
+        "w.1"
+      ],
+      "top_score": 0.9949783682823181,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c12",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "cross-page",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I cap the total memory a service and everything it spawns can use between them?",
+      "answer": "Use MemoryMax= to cap the total memory a service and everything it spawns can use. This setting applies to normal runtime and, if not set, also to startup and shutdown phases. It controls the \"memory.max\" control group attribute and is the main mechanism for limiting total memory usage [4] (and also referenced in [3] and [1] as part of the unified hierarchy). For more granular control, MemoryHigh= can be used as a throttling mechanism, but MemoryMax= is the primary cap on total memory usage [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.resource-control.5",
+        "systemd.exec.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.exec.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5"
+      ],
+      "top_score": 0.993889570236206,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4,
+        3,
+        1,
+        8
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "u01",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I mount a host directory into a docker container?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "org.freedesktop.machine1.5",
+        "org.freedesktop.machine1.5",
+        "bwrap.1",
+        "systemd-umount.1",
+        "systemctl.1",
+        "systemd-umount.1",
+        "systemd-mount.1",
+        "systemd-mount.1"
+      ],
+      "top_score": 0.09602400660514832
+    },
+    {
+      "qid": "u02",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I sync two directories with rsync and delete extra files on the destination?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "install.1",
+        "cp.1",
+        "cp.1",
+        "ln.1",
+        "busybox.1",
+        "uncompress.1",
+        "gunzip.1",
+        "gzip.1"
+      ],
+      "top_score": 0.7459826469421387
+    },
+    {
+      "qid": "u03",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I detach from a tmux session and reattach to it later?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "loginctl.1",
+        "xsm.1",
+        "xsm.1",
+        "xsm.1",
+        "sessreg.1",
+        "xsm.1",
+        "xsm.1",
+        "xsm.1"
+      ],
+      "top_score": 0.028360377997159958
+    },
+    {
+      "qid": "u04",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I scan a subnet for open ports with nmap?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "ssh-keyscan.1",
+        "netcat.1",
+        "nc.1",
+        "nc.traditional.1",
+        "sane-pixma.5",
+        "sane-airscan.5",
+        "ssh-keyscan.1",
+        "traceroute6.1"
+      ],
+      "top_score": 0.2684163749217987
+    },
+    {
+      "qid": "u05",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I capture packets on an interface with tcpdump and write them to a file?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "pcap-filter.7",
+        "ss.8",
+        "pcap-filter.7",
+        "pcap-filter.7",
+        "dnsmasq.8",
+        "nft.8",
+        "nftables.8",
+        "pcap-savefile.5"
+      ],
+      "top_score": 0.5464242696762085
+    },
+    {
+      "qid": "u06",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I trace the system calls a program makes using strace?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_pid_syscall.5",
+        "x86_64-linux-gnu-objdump.1",
+        "systemd.exec.5",
+        "pthreads.7",
+        "systemd-analyze.1",
+        "systemd.exec.5",
+        "systemd-analyze.1",
+        "pthreads.7"
+      ],
+      "top_score": 0.68314129114151
+    },
+    {
+      "qid": "u07",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I set a breakpoint in gdb?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "x86_64-linux-gnu-objdump.1",
+        "objdump.1",
+        "readelf.1",
+        "llvm-dwarfdump-19.1",
+        "x86_64-linux-gnu-readelf.1",
+        "pdb3.1",
+        "pdb3.13.1",
+        "lli-19.1"
+      ],
+      "top_score": 0.03817208111286163
+    },
+    {
+      "qid": "u08",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I allow port 443 through ufw?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sshd_config.5",
+        "nft.8",
+        "nftables.8",
+        "authorized_keys.5",
+        "nc.traditional.1",
+        "nc.1",
+        "netcat.1"
+      ],
+      "top_score": 0.013782731257379055
+    },
+    {
+      "qid": "u09",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I take a btrfs snapshot of a subvolume?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "fsfreeze.8",
+        "e2scrub.8",
+        "mount.8",
+        "tmpfiles.d.5",
+        "dmsetup.8",
+        "tmpfiles.d.5",
+        "fsfreeze.8",
+        "fsfreeze.8"
+      ],
+      "top_score": 0.20310981571674347
+    },
+    {
+      "qid": "u10",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I list the pods in a namespace with kubectl?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "lsns.8",
+        "lsns.8",
+        "lsns.8",
+        "lsns.8",
+        "builtins.7",
+        "top.1",
+        "bash-builtins.7",
+        "nsenter.1"
+      ],
+      "top_score": 0.25570014119148254
+    },
+    {
+      "qid": "u11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I search a codebase with ripgrep while respecting .gitignore?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-config.1",
+        "git-grep.1"
+      ],
+      "top_score": 0.9952118396759033
+    },
+    {
+      "qid": "u12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I run a podman container detached in the background?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemd-detect-virt.1",
+        "systemd-detect-virt.1",
+        "systemd-run.1",
+        "start-stop-daemon.8",
+        "start-stop-daemon.8",
+        "org.freedesktop.portable1.5",
+        "systemd-run.1",
+        "org.freedesktop.portable1.5"
+      ],
+      "top_score": 0.04251401498913765
+    },
+    {
+      "qid": "u13",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I sort processes by memory usage inside htop?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd-cgtop.1",
+        "ps.1",
+        "top.1",
+        "top.1",
+        "top.1",
+        "top.1",
+        "top.1",
+        "top.1"
+      ],
+      "top_score": 0.9941039085388184
+    },
+    {
+      "qid": "u14",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I block a single IP address with iptables?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "nft.8",
+        "nft.8",
+        "nftables.8",
+        "nft.8",
+        "nft.8",
+        "nftables.8",
+        "nftables.8",
+        "nft.8"
+      ],
+      "top_score": 0.06801224499940872
+    },
+    {
+      "qid": "u15",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I write an ansible playbook that installs a package?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "kpackagetool6.1",
+        "apt-get.8",
+        "dpkg.1",
+        "dpkg.1",
+        "apt-get.8",
+        "tasksel.8",
+        "apt-get.8",
+        "dpkg.1"
+      ],
+      "top_score": 0.00435905484482646
+    },
+    {
+      "qid": "u16",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I import a database dump into mysql?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "bogoutil.1",
+        "bogoutil-bdb.1",
+        "wtmpdb.8",
+        "keepassxc-cli.1",
+        "bogoutil-bdb.1",
+        "bogoutil-bdb.1",
+        "bogoutil.1",
+        "bogoutil.1"
+      ],
+      "top_score": 0.02607504092156887
+    },
+    {
+      "qid": "u17",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "question": "What does the second argument to the C open() call control?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "lsof.8",
+        "lsof.8",
+        "rmt-tar.8",
+        "rmt.8",
+        "rmt-tar.8",
+        "rmt.8",
+        "landlock.7",
+        "lsof.8"
+      ],
+      "top_score": 0.5805671215057373
+    },
+    {
+      "qid": "u18",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "question": "What does malloc return when the allocation fails?",
+      "answer": "NULL [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "xterm.1",
+        "proc_vmstat.5",
+        "proc_meminfo.5",
+        "provider-base.7ssl",
+        "pipe.7",
+        "ossl-guide-libraries-introduction.7ssl",
+        "provider-base.7ssl",
+        "provider-base.7ssl"
+      ],
+      "top_score": 0.9062939882278442
+    },
+    {
+      "qid": "u19",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "question": "How do I format a floating point number with printf in C?",
+      "answer": "Use the `%f` format specifier in printf to format a floating-point number [4] . For example, `printf \"%.2f\\n\", 3.14159;` will output `3.14`. Additional options like precision (e.g., `%.2f`) control the number of decimal places. The format also supports width and alignment (e.g., `%10.2f` for a minimum width of 10 characters with 2 decimal places). For left alignment, use a minus sign (`-`) before the width (e.g., `%-10.2f`). For a plus sign (`+`), a leading plus sign is always shown. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "numfmt.1",
+        "numfmt.1",
+        "awk.1",
+        "printf.1",
+        "nawk.1",
+        "mawk.1",
+        "numfmt.1",
+        "dash.1"
+      ],
+      "top_score": 0.9566357731819153
+    },
+    {
+      "qid": "u20",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "question": "What is the syntax for a HEALTHCHECK instruction in a Dockerfile?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "devlink-health.8",
+        "systemd.unit.5",
+        "FileCheck-19.1",
+        "devlink-health.8",
+        "devlink-health.8",
+        "systemd.unit.5",
+        "devlink-health.8",
+        "systemd.unit.5"
+      ],
+      "top_score": 0.016918178647756577
+    },
+    {
+      "qid": "u21",
+      "kind": "unanswerable",
+      "tags": [
+        "out-of-corpus"
+      ],
+      "variant_kind": null,
+      "question": "How do I write a for loop in Rust?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "bc.1",
+        "dash.1",
+        "nawk.1",
+        "sh.1",
+        "seq.1",
+        "clang-repl-19.1",
+        "llvm-exegesis-19.1",
+        "gvpr.1"
+      ],
+      "top_score": 0.08205467462539673
+    },
+    {
+      "qid": "u22",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token",
+        "corrected-phase4"
+      ],
+      "variant_kind": null,
+      "question": "How do I install Python packages with pip?",
+      "answer": "Use the command: `python -m pip install <package-name>` or `pip3 install <package-name>`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "pip-install.1",
+        "pip3-install.1",
+        "pip.1",
+        "pip3.1",
+        "pip3-install.1",
+        "pip.1",
+        "pip3-install.1",
+        "pip3.1"
+      ],
+      "top_score": 0.985377311706543,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "u23",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Why did my backup fail last night?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "ln.1",
+        "osirrox.1",
+        "xorriso.1",
+        "xorrisofs.1",
+        "osirrox.1",
+        "xorriso.1",
+        "cp.1",
+        "mv.1"
+      ],
+      "top_score": 0.8511261940002441
+    },
+    {
+      "qid": "u24",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "How much free space is left on my home partition?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "cfdisk.8",
+        "sfdisk.8",
+        "e2freefrag.8",
+        "partx.8",
+        "systemd-gpt-auto-generator.8",
+        "parted.8",
+        "partx.8",
+        "proc_partitions.5"
+      ],
+      "top_score": 0.6897994875907898
+    },
+    {
+      "qid": "u25",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Which of my services are currently running?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemctl.1",
+        "systemd-analyze.1",
+        "systemctl.1",
+        "systemctl.1",
+        "systemctl.1",
+        "user@.service.5",
+        "who.1",
+        "systemd-analyze.1"
+      ],
+      "top_score": 0.23927710950374603
+    },
+    {
+      "qid": "u26",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Is this system affected by CVE-2024-3094?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "org.freedesktop.systemd1.5"
+      ],
+      "top_score": 0.007197822444140911
+    },
+    {
+      "qid": "u27",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Which kernel version should I upgrade this machine to?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_version.5",
+        "update-initramfs.8",
+        "kernel-install.8",
+        "linux-update-symlinks.1",
+        "linux-version.1",
+        "linux-version.1",
+        "ld-linux.8",
+        "proc_sys_kernel.5"
+      ],
+      "top_score": 0.9858354330062866
+    },
+    {
+      "qid": "p01",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Is there a way to feed tar a list of things to leave out, rather than naming each one on the command line?",
+      "answer": "Yes, using the --exclude-from=FILE option, which excludes files matching patterns listed in FILE [6] (see also [2] for context on patterns and exclusion). This allows feeding a list of exclusions rather than specifying them individually on the command line. The option is documented in tar.1 under --exclude-from=FILE. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tar.1",
+        "dpkg-source.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "busybox.1"
+      ],
+      "top_score": 0.9944308400154114,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        6,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p02",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "I need to look for a string across a whole source tree, not just one file.",
+      "answer": "--recurse-submodules [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "git-diff-tree.1",
+        "git-diff-index.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "find-all-symbols-19.1",
+        "find.1"
+      ],
+      "top_score": 0.7960294485092163,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        6
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p03",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "What stops a filename with a space in it from being split into two arguments?",
+      "answer": "The `-0` option in `xargs` stops a filename with a space in it from being split into two arguments by using a null character (`\\0`) as a separator instead of whitespace [3] . This ensures that filenames containing spaces are correctly handled and not split during processing. \u2705 [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-filter-branch.1",
+        "xargs.1",
+        "xargs.1",
+        "bash.1",
+        "dpkg-split.1",
+        "bash.1",
+        "awk.1",
+        "bash.1"
+      ],
+      "top_score": 0.9828562140464783,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p04",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "Can sed modify the file directly?",
+      "answer": "Yes, sed can modify files directly using the `-i` option, which edits files in place. If a suffix is supplied, it appends that suffix to the original filename to create a backup [2] or [3] (e.g., `-i.bak`). This is explicitly mentioned in the manual page extracts as \"edit files in place (makes backup if SUFFIX supplied)\" [2] and \"Edit files in-place (otherwise write to stdout)\" [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sed.1",
+        "sed.1",
+        "busybox.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1"
+      ],
+      "top_score": 0.95074862241745,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p05",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How can I keep watching a file that something else is still writing to?",
+      "answer": "Use the `tail -f` command to keep watching a file as it is being written to. [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "less.1",
+        "pager.1",
+        "inotify.7",
+        "tee.1",
+        "watch.1",
+        "inotify.7",
+        "flock.1",
+        "tail.1"
+      ],
+      "top_score": 0.6861392259597778,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        8
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p06",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "I want this daemon to come up on its own after a reboot.",
+      "answer": "Place a symlink to the unit file in the .wants/ directory of either multi-user.target or graphical.target. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "mailq.8"
+      ],
+      "top_score": 0.9921910166740417,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p07",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Which sshd setting refuses root logins?",
+      "answer": "PermitRootLogin no [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd.8",
+        "sshd.8",
+        "authorized_keys.5",
+        "sshd_config.5",
+        "sshd_config.5",
+        "sshd_config.5",
+        "authorized_keys.5",
+        "sshd.8"
+      ],
+      "top_score": 0.9977182745933533,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p08",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "If a unit dies, how do I get systemd to bring it back up on its own?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "systemctl.1",
+        "systemctl.1",
+        "systemctl.1",
+        "systemd.1",
+        "systemctl.1",
+        "systemctl.1",
+        "org.freedesktop.systemd1.5",
+        "systemctl.1"
+      ],
+      "top_score": 0.9975232481956482,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p09",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Why does a process sometimes ignore kill but never ignore kill -9?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "kill.1",
+        "intro.1",
+        "kill.1",
+        "fuser.1",
+        "kill.1",
+        "systemd.kill.5",
+        "systemd.kill.5",
+        "systemd.kill.5"
+      ],
+      "top_score": 0.986460268497467,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p10",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Binding to a low-numbered port normally needs root. Is there another way to grant that?",
+      "answer": "Yes, another way to grant binding to a low-numbered port is by having the process hold the CAP_NET_BIND_SERVICE capability. This is specified in the ddp.7 manual page, which states: \"Only processes with the effective user ID 0 or the CAP_NET_BIND_SERVICE capability may bind(2) to these sockets.\" [3] This applies to ports below 129 in AppleTalk, and similar principles extend to other systems where low-numbered ports are restricted. In Linux, the CAP_NET_BIND_SERVICE capability allows a process to bind to low-numbered ports without requiring root privileges. [5] Thus, the capability is the alternative mechanism. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "services.5",
+        "services.5",
+        "ddp.7",
+        "systemd.resource-control.5",
+        "vsock.7",
+        "socket.7",
+        "ssh.1",
+        "ip-link.8"
+      ],
+      "top_score": 0.9991244673728943,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "What is the right way to mirror one folder onto another, removing anything that is no longer in the source?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "git-fast-import.1",
+        "cp.1",
+        "git-fast-import.1",
+        "mv.1",
+        "git-fast-import.1",
+        "gitfaq.7",
+        "cp.1",
+        "git-diff-files.1"
+      ],
+      "top_score": 0.4878282845020294
+    },
+    {
+      "qid": "p12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "I want to see every syscall a misbehaving binary issues.",
+      "answer": "Use `systemd-analyze syscall-filter` to list the actual list of system calls in each filter. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "enosys.1",
+        "systemd-analyze.1",
+        "systemd-analyze.1",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd-analyze.1"
+      ],
+      "top_score": 0.9936045408248901
+    },
+    {
+      "qid": "p13",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Do I still have room on /home?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemd-gpt-auto-generator.8",
+        "systemd-user.conf.5",
+        "systemd.exec.5",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8"
+      ],
+      "top_score": 0.16839955747127533
+    },
+    {
+      "qid": "a01.t",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tar exclude list of files",
+      "answer": "The tar command supports excluding files using various options. To exclude files matching a pattern, use the `--exclude=PATTERN` option, where PATTERN is a glob(3)-style wildcard pattern [4] or `--exclude-from=FILE` to exclude files listed in a file [6] (e.g., `--exclude-from=exclude.list`). Additionally, specific patterns can be applied to exclude version control directories or files with tags like CACHEDIR.TAG using `--exclude-vcs`, `--exclude-caches`, or `--exclude-tag=FILE` [1] and [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tar.1",
+        "dpkg-source.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "ptargrep.1",
+        "tar.1"
+      ],
+      "top_score": 0.9935917258262634,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4,
+        6,
+        1
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a01.n",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "make an archive but skip everything named in a list",
+      "answer": "-x [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "x86_64-linux-gnu-ar.1",
+        "x86_64-linux-gnu-ar.1",
+        "ar.1",
+        "x86_64-linux-gnu-ar.1",
+        "tar.1",
+        "7z.1",
+        "7zr.1",
+        "zipinfo.1"
+      ],
+      "top_score": 0.981065034866333,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a01.z",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how do i excldue files listed in a txt file from a tarbal",
+      "answer": "Use the --exclude-from=FILE option to exclude files matching patterns listed in a file. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "dpkg-source.1",
+        "ptargrep.1",
+        "gpgtar.1",
+        "tar.1"
+      ],
+      "top_score": 0.980160117149353,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a04.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "grep recursive subdirectories",
+      "answer": "-r, --recursive [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "grep.1",
+        "egrep.1",
+        "rgrep.1",
+        "fgrep.1",
+        "grep.1",
+        "egrep.1",
+        "rgrep.1",
+        "fgrep.1"
+      ],
+      "top_score": 0.9938481450080872,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a04.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "search for a string in every file under a directory",
+      "answer": "grep -r \"string\" /path/to/directory [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "fgrep.1",
+        "egrep.1",
+        "grep.1",
+        "rgrep.1",
+        "find.1",
+        "look.1",
+        "find.1",
+        "find.1"
+      ],
+      "top_score": 0.9673946499824524,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a04.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how do i serch recursivly through subfolders for text",
+      "answer": "Use `grep` with the `-r` option to search recursively through subfolders for text. For example: `grep -r \"pattern\" /path/to/search`. This will recursively search all files under the specified directory, looking for lines containing the given pattern. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "grep.1",
+        "rgrep.1",
+        "fgrep.1",
+        "egrep.1",
+        "rgrep.1",
+        "fgrep.1",
+        "localsearch-search.1"
+      ],
+      "top_score": 0.9542605876922607,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a09.t",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "find print0 xargs spaces",
+      "answer": "The `-print0` option in `find` prints the full file name followed by a null character (`\\0`) instead of a newline, which allows filenames containing spaces or newlines to be correctly handled. When used with `xargs`, the `-0` option tells `xargs` to interpret input items as being terminated by null characters, ensuring that filenames with spaces or newlines are processed correctly. This combination avoids issues that arise when filenames contain whitespace or newlines in shell pipelines or command-line arguments. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "find.1",
+        "xargs.1",
+        "xargs.1",
+        "xargs.1",
+        "git-filter-branch.1",
+        "xargs.1",
+        "find.1"
+      ],
+      "top_score": 0.999311089515686,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a09.n",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "hand results containing spaces to another command safely",
+      "answer": "Use the -0 option with xargs to handle results containing spaces safely. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "xargs.1",
+        "sudoers.5",
+        "xargs.1",
+        "x86_64-linux-gnu-strings.1",
+        "git-filter-branch.1",
+        "sed.1",
+        "less.1",
+        "xargs.1"
+      ],
+      "top_score": 0.9169939160346985,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a09.z",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "filenames with spaces brake my pipline whats the safe way",
+      "answer": "The safe way to handle filenames with spaces in a pipeline is to use `find -print0 | xargs -0`, which correctly processes filenames containing spaces or newlines by using null characters as delimiters [2] and [8] (see extract [2] and [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-filter-branch.1",
+        "find.1",
+        "git-filter-branch.1",
+        "xargs.1",
+        "unzip.1",
+        "find.1",
+        "unzip.1",
+        "xargs.1"
+      ],
+      "top_score": 0.9981759786605835,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        8
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a11.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "ls human readable sizes",
+      "answer": "The option to display sizes in human-readable format is `-h` as found in the busybox manual page [7] and also in ls(1) [2] and [5] where it is described as \"human readable sizes (1K 243M 2G)\". Since the question asks specifically about \"ls human readable sizes\", the correct flag is `-h`. [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "lslocks.8",
+        "ls.1",
+        "ipcs.1",
+        "lsblk.8",
+        "dir.1",
+        "vdir.1",
+        "busybox.1",
+        "lsof.8"
+      ],
+      "top_score": 0.9883649349212646,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        7,
+        2,
+        5
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a11.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "show file sizes in MB instead of raw bytes",
+      "answer": "-B, --block-size=1M [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "df.1",
+        "find.1",
+        "du.1",
+        "lzmainfo.1",
+        "free.1",
+        "findmnt.8",
+        "du.1",
+        "units.7"
+      ],
+      "top_score": 0.9697005748748779,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a11.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how to get human readble file sizes",
+      "answer": "Use the -h or --human-readable option. [1] (df), [3] (du), [5] (git-count-objects), [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "df.1",
+        "lsof.8",
+        "du.1",
+        "isosize.8",
+        "git-count-objects.1",
+        "findmnt.8",
+        "lsof.8",
+        "ipcs.1"
+      ],
+      "top_score": 0.9298442006111145,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a15.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "chmod recursive directory",
+      "answer": "-R, --recursive [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "chmod.1",
+        "chmod.1",
+        "osirrox.1",
+        "xorriso.1",
+        "busybox.1",
+        "cmake-commands.7",
+        "chmod.1",
+        "chmod.1"
+      ],
+      "top_score": 0.991370439529419,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a15.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "set permissions on everything inside a folder at once",
+      "answer": "Use the `-r` flag with `ntfssecaudit` to set permissions on all files and subdirectories in a directory. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ntfssecaudit.8",
+        "cmake-commands.7",
+        "setfacl.1",
+        "chcon.1",
+        "setfacl.1",
+        "cmake-commands.7",
+        "xorrisofs.1",
+        "setfacl.1"
+      ],
+      "top_score": 0.6677218079566956,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a15.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "chnage permisions on a folder and everythin inside",
+      "answer": "chacl -r pathname... [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "chacl.1",
+        "chacl.1",
+        "chacl.1",
+        "chown.1",
+        "chacl.1",
+        "chmod.1",
+        "chmod.1",
+        "chown.1"
+      ],
+      "top_score": 0.9914992451667786,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a21.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "sort numeric not alphabetical",
+      "answer": "-n, --numeric-sort [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sort.1",
+        "sort.1",
+        "nm.1",
+        "zipinfo.1",
+        "x86_64-linux-gnu-nm.1",
+        "deb-version.7",
+        "cmake-generator-expressions.7",
+        "busybox.1"
+      ],
+      "top_score": 0.9882495403289795,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a21.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "why does 10 come before 9 when I sort a list",
+      "answer": "Because the default sort behavior (string comparison) treats numbers lexicographically, not numerically. For example, \"10\" comes before \"9\" because '1' < '9' in ASCII order. This is the behavior of the STRING comparison in CMake and standard sort tools unless explicitly overridden with numeric sorting (e.g., `--numeric-sort` or `--version-sort`). [1] and [7] explain that without numeric sorting, strings are compared character by character, leading to \"10\" < \"9\" in string order. To get numerical sorting, use `--numeric-sort` or `--version-sort`. [7]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "cmake-generator-expressions.7",
+        "zipinfo.1",
+        "cmake-commands.7",
+        "ls.1",
+        "dir.1",
+        "vdir.1",
+        "sort.1",
+        "sort.1"
+      ],
+      "top_score": 0.9605950117111206,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        7
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a21.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "sort numericaly insted of alphabeticaly",
+      "answer": "-n, --numeric-sort [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sort.1",
+        "sort.1",
+        "nm.1",
+        "zipinfo.1",
+        "x86_64-linux-gnu-nm.1",
+        "ls.1",
+        "ps.1",
+        "busybox.1"
+      ],
+      "top_score": 0.9946640729904175,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a25.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "sed edit file in place",
+      "answer": "-i [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sed.1",
+        "busybox.1",
+        "sed.1",
+        "sed.1",
+        "pager.1",
+        "sed.1",
+        "sed.1",
+        "sed.1"
+      ],
+      "top_score": 0.9930103421211243,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a25.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "replace text inside a file without printing to the screen",
+      "answer": "Use the `-n` flag with `sed` to suppress automatic printing of the pattern space, and use the `-i` flag to edit files in-place. For example: `sed -i 's/old/new/g' filename`. This will replace text in the file without printing to the screen. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "pager.1",
+        "less.1",
+        "sed.1",
+        "sed.1",
+        "busybox.1",
+        "pager.1",
+        "pager.1",
+        "sed.1"
+      ],
+      "top_score": 0.9000051021575928,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a25.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "make sed writ back to the file itself",
+      "answer": "-i [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "busybox.1",
+        "sed.1"
+      ],
+      "top_score": 0.8293874859809875,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a27.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tail follow log",
+      "answer": "-f, --follow=name or -f, --follow=descriptor [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tail.1",
+        "tail.1",
+        "gh-codespace-logs.1",
+        "sudoreplay.8",
+        "journalctl.1",
+        "pager.1",
+        "less.1",
+        "sudoreplay.8"
+      ],
+      "top_score": 0.9896429181098938,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a27.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "watch a file as new lines are appended to it",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "cat.1",
+        "tail.1",
+        "wc.1",
+        "tee.1",
+        "pager.1",
+        "pager.1",
+        "pager.1",
+        "tail.1"
+      ],
+      "top_score": 0.21005411446094513,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true
+    },
+    {
+      "qid": "a27.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how do i wach a log file live as it groes",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "logrotate.8",
+        "logrotate.conf.5",
+        "logrotate.8",
+        "logrotate.8",
+        "logrotate.conf.5",
+        "logrotate.8",
+        "logrotate.conf.5",
+        "logrotate.8"
+      ],
+      "top_score": 0.9416379332542419,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a30.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "curl follow redirect",
+      "answer": "-L, --location [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "wcurl.1",
+        "curl.1"
+      ],
+      "top_score": 0.997161328792572,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a30.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "download a url that points somewhere else",
+      "answer": "The manual page extract for `wget(1)` describes that when downloading a file, if the file contains links to other files, and those files are downloaded, the links are converted to relative links. This ensures that local browsing works reliably. Specifically, if a downloaded file links to another file that has also been downloaded, the link is changed to a relative path (e.g., `../bar/img.gif`), making it work locally [3] and [6] \u2014 this behavior is relevant when a URL points to another location and you want to handle such links during download. Thus, the correct answer based on the provided extracts is the `--convert-links` option, which modifies links in the document to point to locally downloaded files when possible. This directly addresses the need to handle a URL that points somewhere else during download. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "wcurl.1",
+        "wget.1",
+        "lwp-download.1p",
+        "wcurl.1",
+        "wget.1",
+        "wget.1",
+        "wget.1"
+      ],
+      "top_score": 0.8346436619758606,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        3,
+        6
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a30.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "curl retuns nothing when the url redirets",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1"
+      ],
+      "top_score": 0.9957054853439331,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a35.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "systemctl start at boot",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "systemctl.1",
+        "systemctl.1",
+        "systemd.1",
+        "bootup.7",
+        "systemctl.1",
+        "bootup.7",
+        "systemctl.1",
+        "systemd.1"
+      ],
+      "top_score": 0.9962393045425415,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a35.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "make this daemon come up on its own after a reboot",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "start-stop-daemon.8",
+        "daemon.7",
+        "mailq.8",
+        "dbus-daemon.1",
+        "daemon.7"
+      ],
+      "top_score": 0.9669678807258606,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a35.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how do i enalbe a servce to start on boot",
+      "answer": "To enable a service to start on boot in systemd, add a symlink to the unit file in the `.wants/` directory of either `multi-user.target` or `graphical.target`, depending on the desired boot target. For example, place a symlink in `/etc/systemd/system/multi-user.target.wants/` or `/etc/systemd/system/graphical.target.wants/`. [8]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "boot.7",
+        "boot.7",
+        "systemd-rc-local-generator.8",
+        "daemon.7",
+        "rc-local.service.8",
+        "rc-local.service.8",
+        "systemd-debug-generator.8",
+        "daemon.7"
+      ],
+      "top_score": 0.9974418878555298,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        8
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a37.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "mount read only",
+      "answer": "The `mount` command can be used to mount a filesystem read-only using the `-o ro` option. Additionally, the `ro` option can be qualified with `vfs` or `fs` to specify where the read-only setting should be applied: `ro=vfs` applies it to the VFS mountpoint, and `ro=fs` applies it to the filesystem superblock. This is supported since version 2.41 of libmount [1] and is described in detail in [3] and [1] respectively. For example: `mount -o ro=vfs /dev/sdc1 /A` mounts the filesystem as read-write on the superblock level but sets the mountpoint as read-only [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "systemd.mount.5",
+        "apparmor.d.5",
+        "mount.8",
+        "mount.8"
+      ],
+      "top_score": 0.9987816214561462,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a37.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "attach a disk so that nothing can write to it",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "xorrecord.1",
+        "xorrecord.1",
+        "sfdisk.8",
+        "gnome-disk-image-mounter.1",
+        "chattr.1",
+        "xorrecord.1",
+        "xorriso.1",
+        "osirrox.1"
+      ],
+      "top_score": 0.5399264693260193,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false
+    },
+    {
+      "qid": "a37.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "mount a filesytem read-onyl",
+      "answer": "Use the `-o ro` option to mount a filesystem read-only. [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8"
+      ],
+      "top_score": 0.9995717406272888,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        6
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b03.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "cron run at boot",
+      "answer": "@reboot [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "crontab.5",
+        "cron.8",
+        "crontab.5",
+        "cron.8",
+        "crontab.5",
+        "cron.8",
+        "crontab.5"
+      ],
+      "top_score": 0.9907087087631226,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b03.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "schedule something to run each time the machine starts",
+      "answer": "@reboot [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "start-stop-daemon.8",
+        "git-maintenance.1",
+        "anacron.8",
+        "systemctl.1",
+        "git-maintenance.1",
+        "cron.8",
+        "cron.8"
+      ],
+      "top_score": 0.9633175730705261,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b03.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "run a job evrey time the mashine boots from cron",
+      "answer": "@reboot [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "crontab.5",
+        "anacron.8",
+        "crontab.5",
+        "cron.8"
+      ],
+      "top_score": 0.9956910014152527,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b05.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "sshd disable root login",
+      "answer": "Set `PermitRootLogin no` in `/etc/ssh/sshd_config`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sshd.8",
+        "sshd_config.5",
+        "authorized_keys.5",
+        "sshd.8",
+        "sshd_config.5",
+        "sshd.8",
+        "authorized_keys.5"
+      ],
+      "top_score": 0.9907726049423218,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b05.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "stop the superuser account signing in remotely",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "ssh-agent.1",
+        "ssh-keygen.1",
+        "authorized_keys.5",
+        "sshd.8",
+        "sshd_config.5",
+        "authorized_keys.5",
+        "ssh-keygen.1",
+        "sudoers.5"
+      ],
+      "top_score": 0.29365959763526917,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false
+    },
+    {
+      "qid": "b05.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "disalow root loging over ssh",
+      "answer": "Set `PermitRootLogin no` in `sshd_config(5)` [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sftp-server.8",
+        "ssh.1",
+        "sshd_config.5",
+        "ssh.1",
+        "ssh_config.5",
+        "sshd_config.5",
+        "ssh.1"
+      ],
+      "top_score": 0.9470305442810059,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b12.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "systemd restart on failure",
+      "answer": "The systemd restart on failure is configured using the `Restart=` option, which takes values such as `on-failure`, `on-abnormal`, `on-watchdog`, `on-abort`, or `always`. When set to `on-failure`, the service is restarted if it exits with a non-zero exit code, is terminated by a signal (excluding SIGHUP, SIGINT, SIGTERM, SIGPIPE), times out during an operation, or the watchdog timeout is triggered [2] and [7] . This is the recommended setting for long-running services to enable automatic recovery from errors [2] . For services that should not restart on clean exits, `on-abnormal` or `on-watchdog` may be used depending on the specific failure scenario [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.unit.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5"
+      ],
+      "top_score": 0.998547375202179,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        7,
+        4
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b12.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "bring a crashed background process back automatically",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemd.1",
+        "start-stop-daemon.8",
+        "bash.1",
+        "systemctl.1",
+        "bash.1",
+        "systemd.1",
+        "start-stop-daemon.8",
+        "systemctl.1"
+      ],
+      "top_score": 0.5369171500205994,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false
+    },
+    {
+      "qid": "b12.z",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how to make a servcie restart automaticaly if it crashs",
+      "answer": "Set `Restart=on-failure` in the service unit configuration. This will cause the service to be automatically restarted if it crashes (i.e., exits with a non-zero exit code, is terminated by a signal excluding SIGHUP, SIGINT, SIGTERM, SIGPIPE, or times out). [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5"
+      ],
+      "top_score": 0.9953705668449402,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c01.t",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "kill vs kill -9 difference",
+      "answer": "The difference between `kill` and `kill -9` is that `kill` without any signal specification sends the default signal `SIGTERM` (a graceful termination request), while `kill -9` sends the `SIGKILL` signal, which immediately terminates the process without allowing it to clean up or perform any shutdown procedures [1] and [4] (see also [5] and [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "kill.1",
+        "intro.1",
+        "kill.1",
+        "kill.1",
+        "builtins.7",
+        "bash-builtins.7",
+        "systemctl.1",
+        "bash.1"
+      ],
+      "top_score": 0.9936754107475281,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        5,
+        6
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c01.n",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "why does a process sometimes refuse to die",
+      "answer": "A process may refuse to die because it is designed to catch and handle termination signals (like SIGTERM), such as those sent during a system shutdown or service stop. If the process does not terminate after receiving SIGTERM, it may continue running because it has a signal handler that processes the signal and does not exit immediately. Additionally, if the process is in a zombie state or is waiting for a resource (e.g., disk I/O), it may not respond to signals until it completes its current operation. In some cases, the process may be stuck in a loop or waiting for a condition that never resolves. This behavior is especially common in applications that do not properly handle shutdown signals or have bugs in their signal handling code. [4] and [5] indicate that processes can be in states like \"Z (zombie)\" or \"D (disk sleep)\", which may prevent them from terminating promptly. [7] also notes that background processes are immune to keyboard-generated signals, which can affect their responsiveness to termination. If the process does not terminate after a timeout, systemd may send a final signal (like SIGKILL) to force termination, but if the process is not designed to handle such signals, it may still refuse to die. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.kill.5",
+        "systemd.kill.5",
+        "killall.1",
+        "proc_pid_status.5",
+        "proc_pid_stat.5",
+        "systemd.exec.5",
+        "bash.1",
+        "top.1"
+      ],
+      "top_score": 0.7818455696105957,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        4,
+        5,
+        7,
+        1
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c01.z",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "diference betwen kill and kill -9",
+      "answer": "The difference between `kill` and `kill -9` is that `kill` sends the default signal `SIGTERM` (a graceful termination request), while `kill -9` sends the `SIGKILL` signal, which immediately terminates the process without allowing it to clean up or perform any shutdown procedures [1] and [4] (see also [5] and [6]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "kill.1",
+        "intro.1",
+        "kill.1",
+        "kill.1",
+        "builtins.7",
+        "bash-builtins.7",
+        "skill.1",
+        "bash.1"
+      ],
+      "top_score": 0.9923610091209412,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        5,
+        6
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "u02.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "rsync delete extra files",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "uncompress.1",
+        "gzip.1",
+        "zcat.1",
+        "gunzip.1",
+        "shred.1",
+        "exiftool.1p",
+        "tmpfiles.d.5",
+        "git-clean.1"
+      ],
+      "top_score": 0.1870948225259781
+    },
+    {
+      "qid": "u02.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "rsyc two directorys and delet the extras",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "xorriso.1",
+        "tmpfiles.d.5",
+        "rmdir.1",
+        "xorriso.1",
+        "tmpfiles.d.5",
+        "xorriso.1",
+        "osirrox.1",
+        "rimraf.1"
+      ],
+      "top_score": 0.15621423721313477
+    },
+    {
+      "qid": "u03.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tmux detach reattach",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "org.freedesktop.portable1.5",
+        "org.freedesktop.portable1.5",
+        "org.freedesktop.portable1.5",
+        "systemd-run.1",
+        "loginctl.1",
+        "xterm.1",
+        "rview.1",
+        "view.1"
+      ],
+      "top_score": 0.01837923750281334
+    },
+    {
+      "qid": "u03.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how to detatch from a tmux sesion and get back later",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "sessreg.1",
+        "xsm.1",
+        "xsm.1",
+        "xsm.1",
+        "loginctl.1",
+        "telnet.1",
+        "loginctl.1",
+        "xsm.1"
+      ],
+      "top_score": 0.08567894250154495
+    },
+    {
+      "qid": "u06.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "strace syscalls of a process",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_pid_syscall.5",
+        "proc.5",
+        "systemd.exec.5",
+        "proc_pid_stat.5",
+        "proc_pid_syscall.5",
+        "systemd.exec.5",
+        "ps.1",
+        "systemd-analyze.1"
+      ],
+      "top_score": 0.9954840540885925
+    },
+    {
+      "qid": "u06.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "trase the sytem calls a program makes",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_pid_syscall.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5",
+        "systemd.exec.5"
+      ],
+      "top_score": 0.9554475545883179
+    },
+    {
+      "qid": "u14.t",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "iptables block ip",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "nft.8",
+        "nftables.8",
+        "nft.8",
+        "nft.8",
+        "nft.8",
+        "nft.8",
+        "nftables.8",
+        "nft.8"
+      ],
+      "top_score": 0.3320920765399933
+    },
+    {
+      "qid": "u14.z",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "blok a single ip adress with iptbales",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "nft.8",
+        "nft.8",
+        "nft.8",
+        "nftables.8",
+        "nft.8",
+        "ip-rule.8",
+        "nftables.8",
+        "nftables.8"
+      ],
+      "top_score": 0.41787564754486084
+    },
+    {
+      "qid": "u24.t",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "free space on /home",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "e2freefrag.8",
+        "e2freefrag.8",
+        "free.1",
+        "df.1",
+        "free.1",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8",
+        "systemd-gpt-auto-generator.8"
+      ],
+      "top_score": 0.4343460500240326
+    },
+    {
+      "qid": "u24.z",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how much spac is left on my hoem partition",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "cfdisk.8",
+        "xorriso.1",
+        "partx.8",
+        "xorriso.1",
+        "partx.8",
+        "fdisk.8",
+        "sfdisk.8",
+        "systemd-gpt-auto-generator.8"
+      ],
+      "top_score": 0.015433359891176224
+    }
+  ]
+}
