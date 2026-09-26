@@ -131,6 +131,15 @@ def main() -> int:
                     help="cap how many of the read hits may come from one doc_id, so "
                          "other documents' evidence is not crowded out (0 = off; "
                          "tsk_20260926_0967344e)")
+    ap.add_argument("--answer-mode", choices=("cite", "quote"), default="cite",
+                    help="phase 10: 'quote' requires each claim to open with an exact "
+                         "quotation from the extract it cites, verified after generation "
+                         "(grammar.verify_quotes); a failed quote converts the record to "
+                         "the refusal before scoring. 'cite' (default) reproduces existing "
+                         "runs exactly.")
+    ap.add_argument("--qids", default=None,
+                    help="path to a JSON list of qids; restricts rows to those qids, kept "
+                         "in the eval set's own order, applied after --limit")
     args = ap.parse_args()
     args.cache = args.cache or args.name
 
@@ -141,6 +150,9 @@ def main() -> int:
     rows = [json.loads(l) for l in (ROOT / args.eval).open(encoding="utf-8")]
     if args.limit:
         rows = rows[: args.limit]
+    if args.qids:
+        qid_set = set(json.loads(Path(args.qids).read_text()))
+        rows = [r for r in rows if r["qid"] in qid_set]
 
     # --- stage 1: retrieval only (embedder + reranker resident) ---
     if args.stage in ("retrieve", "both"):
@@ -216,8 +228,25 @@ def main() -> int:
         score = gate_score(gate_hits)
         gated = bool(args.gate) and score < args.gate
         hits = select_hits(hits, args.read_k, args.cap_per_doc)
-        text = grammar.REFUSAL if gated else gen.answer(row["question"], hits,
-                                                        cite_grammar=args.grammar)
+        if gated:
+            text = grammar.REFUSAL
+        elif args.answer_mode == "quote":
+            text = gen.answer(row["question"], hits, mode="quote")
+        else:
+            text = gen.answer(row["question"], hits, cite_grammar=args.grammar)
+
+        # Quote mode's verification has to run BEFORE correct/evidence scoring:
+        # a claim whose opening quote isn't actually in the extract it cites is
+        # converted to the refusal here, so `correct` below scores the refusal
+        # (i.e. False) rather than the ungrounded text (phase 10;
+        # blk_phase9_parametric_knowledge_failure).
+        quote_info, answer_raw = None, None
+        if not gated and args.answer_mode == "quote":
+            quote_info = grammar.verify_quotes(text, hits)
+            if quote_info["quote_failed"]:
+                answer_raw = text
+                text = grammar.REFUSAL
+
         rec = {
             "qid": row["qid"], "kind": row["kind"], "tags": row["tags"],
             "variant_kind": row.get("variant_kind"),
@@ -227,6 +256,10 @@ def main() -> int:
             "retrieved_docs": [h["doc_id"] for h in hits],
             "top_score": score,
         }
+        if answer_raw is not None:
+            rec["answer_raw"] = answer_raw
+        if quote_info is not None:
+            rec.update(quote_info)
         if row["kind"] == "answerable":
             toks = row["answer_contains"]
             rec["correct"] = gold.is_correct(text, toks, qid_aliases.get(row["qid"]))
@@ -304,7 +337,8 @@ def main() -> int:
                    "expand": args.expand, "db": args.db, "domain": args.domain,
                    "rewrites": args.rewrites, "aliases": not args.no_aliases,
                    "cache": args.cache, "read_k": args.read_k,
-                   "cap_per_doc": args.cap_per_doc},
+                   "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
+                   "qids": args.qids},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),

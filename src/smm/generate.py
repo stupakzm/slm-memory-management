@@ -22,6 +22,17 @@ extracts provided. Follow these rules exactly:
 - Cite the extract number you used, like [2].
 - Be brief. No preamble."""
 
+# Phase 10: the 30B reader gains correctness by answering from parametric
+# knowledge, not by reading (blk_phase9_parametric_knowledge_failure) - the
+# reranker gate cannot catch this, because a parametric answer still scores
+# 0.94-0.999 (blk_phase9_30b_gate_threshold_failure). Requiring each claim to
+# open with an exact quotation moves the check from the gate to the claim
+# itself: a quote that isn't actually in the extract is mechanically
+# detectable (smm.grammar.verify_quotes), the same way a bad citation is.
+QUOTE_SYSTEM = SYSTEM + """
+- Each claim must begin with an exact quotation, in double quotes, copied from the extract it cites.
+- If no extract contains a sentence supporting the answer, reply exactly: I don't know."""
+
 
 # Grammar for N alternative search-query rewrites, one per line, no numbering.
 # Same house idiom as smm.grammar.cited_answer: a GBNF template with the one
@@ -61,13 +72,13 @@ def build_rewrite_prompt(question: str, n: int) -> list[dict]:
     ]
 
 
-def build_prompt(question: str, chunks: list[dict]) -> list[dict]:
+def build_prompt(question: str, chunks: list[dict], system: str = SYSTEM) -> list[dict]:
     parts = []
     for i, c in enumerate(chunks, 1):
         parts.append(f"[{i}] {c['doc_id']}\n{c['prefix']}{c['text']}")
     context = "\n\n".join(parts) if parts else "(no extracts found)"
     return [
-        {"role": "system", "content": SYSTEM},
+        {"role": "system", "content": system},
         {"role": "user", "content": f"Manual page extracts:\n\n{context}\n\nQuestion: {question}"},
     ]
 
@@ -94,9 +105,19 @@ class Generator:
             out = json.load(r)
         return out["choices"][0]["message"]["content"].strip()
 
-    def answer(self, question: str, chunks: list[dict], cite_grammar: bool = False, **kw) -> str:
+    def answer(self, question: str, chunks: list[dict], cite_grammar: bool = False,
+               mode: str = "cite", **kw) -> str:
         """`cite_grammar` constrains decoding so every claim carries an in-range
-        citation - see smm.grammar for what that does and does not guarantee."""
+        citation - see smm.grammar for what that does and does not guarantee.
+
+        `mode="quote"` is the phase 10 opt-in: QUOTE_SYSTEM plus
+        grammar.quoted_answer, so every claim must also open with an exact
+        quotation from the extract it cites. Grammar is always on in quote
+        mode, independent of `cite_grammar`. `mode="cite"` (the default) is
+        exactly the pre-existing behaviour - same messages, same grammar."""
+        if mode == "quote":
+            g = grammar.quoted_answer(len(chunks))
+            return self.chat(build_prompt(question, chunks, system=QUOTE_SYSTEM), grammar=g, **kw)
         g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
         return self.chat(build_prompt(question, chunks), grammar=g, **kw)
 
