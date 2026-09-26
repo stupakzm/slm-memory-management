@@ -34,7 +34,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import grammar, lexical, store  # noqa: E402
+from smm import gold, grammar, lexical, store  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
@@ -99,7 +99,12 @@ def main() -> int:
     ap.add_argument("--gen-url", default="http://127.0.0.1:8080",
                     help="generator llama-server, used for --rewrites > 0 (stage "
                          "retrieve) and for answer generation itself (stage generate)")
+    ap.add_argument("--no-aliases", action="store_true",
+                     help="restore strict scoring: no gold-token aliases (tsk_20260926_a51d0707)")
     args = ap.parse_args()
+
+    qid_aliases = {} if args.no_aliases else gold.load_aliases(
+        ROOT / "data" / "eval" / "gold_aliases.json")
 
     cache = ROOT / "data" / "eval" / "results" / f"{args.name}-retrieved.json"
     rows = [json.loads(l) for l in (ROOT / args.eval).open(encoding="utf-8")]
@@ -190,7 +195,8 @@ def main() -> int:
         }
         if row["kind"] == "answerable":
             toks = row["answer_contains"]
-            rec["correct"] = all(t in text for t in toks)
+            rec["correct"] = gold.is_correct(text, toks, qid_aliases.get(row["qid"]))
+            rec["correct_strict"] = all(t in text for t in toks)
             rec["evidence_retrieved"] = any(all(t in h["text"] for t in toks) for h in hits)
             if not gated:
                 rec.update(grammar.verify_citations(text, hits, toks))
@@ -262,7 +268,7 @@ def main() -> int:
         "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
                    "grammar": args.grammar, "candidates": args.candidates,
                    "expand": args.expand, "db": args.db, "domain": args.domain,
-                   "rewrites": args.rewrites},
+                   "rewrites": args.rewrites, "aliases": not args.no_aliases},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),

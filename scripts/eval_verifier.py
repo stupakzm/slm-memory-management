@@ -40,9 +40,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import verify  # noqa: E402
+from smm import gold, verify  # noqa: E402
 
 RESULTS = ROOT / "data" / "eval" / "results"
+
+
+def _tokens_by_qid() -> dict:
+    """questions.jsonl -> {qid: answer_contains}, for --label aliased
+    (tsk_20260926_a51d0707): the answers file carries the model's text, not
+    the gold tokens, so recomputing 'correct' at replay time needs the
+    question set on disk."""
+    path = ROOT / "data" / "eval" / "questions.jsonl"
+    out = {}
+    if path.exists():
+        for line in path.open(encoding="utf-8"):
+            row = json.loads(line)
+            if row.get("kind") == "answerable":
+                out[row["qid"]] = row["answer_contains"]
+    return out
 
 
 def _load_eval_answers():
@@ -194,6 +209,17 @@ def stage_replay(args) -> int:
     records = ans["results"]
     verify_scores = json.loads(verify_path.read_text())
 
+    if args.label == "aliased":
+        # Recompute each answerable record's own 'correct' from its stored
+        # answer text with gold-token aliases (tsk_20260926_a51d0707), rather
+        # than trust whatever scoring mode produced the answers file.
+        tokens_by_qid = _tokens_by_qid()
+        qid_aliases = gold.load_aliases(ROOT / "data" / "eval" / "gold_aliases.json")
+        for r in records:
+            if r["kind"] == "answerable" and r["qid"] in tokens_by_qid:
+                r["correct"] = gold.is_correct(
+                    r["answer"], tokens_by_qid[r["qid"]], qid_aliases.get(r["qid"]))
+
     mechs = [args.mech] if args.mech else sorted(
         {m for v in verify_scores.values() for m in v})
 
@@ -273,7 +299,8 @@ def stage_replay(args) -> int:
         print(f"  answered with no evidence      {no_ev_answered}/{len(ans_recs)}")
         print(f"  no-opinion (None) coverage     {none_coverage}/{len(all_qids)}")
 
-    out = RESULTS / f"{args.run}-verify-replay.json"
+    suffix = "-aliased" if args.label == "aliased" else ""
+    out = RESULTS / f"{args.run}-verify-replay{suffix}.json"
     out.write_text(json.dumps(report, indent=2))
     print(f"\nwrote {out}")
     return 0
@@ -290,6 +317,11 @@ def main() -> int:
     ap.add_argument("--rerank-url", default=None, help="--mech xenc only")
     ap.add_argument("--gen-url", default=None, help="--mech judge only")
     ap.add_argument("--limit", type=int, default=0, help="smoke-test on the first N records")
+    ap.add_argument("--label", choices=("strict", "aliased"), default="strict",
+                     help="--stage replay: 'aliased' recomputes each answerable "
+                          "record's correctness with gold-token aliases "
+                          "(tsk_20260926_a51d0707) instead of the answers file's "
+                          "own label; default 'strict' reproduces existing replays")
     args = ap.parse_args()
 
     if args.stage == "score":
