@@ -1,0 +1,943 @@
+{
+  "name": "p9probe-ctx4b",
+  "k": 5,
+  "n": 29,
+  "config": {
+    "mode": "dense",
+    "rerank": false,
+    "gate": 0.0,
+    "grammar": true,
+    "candidates": 50,
+    "expand": 0,
+    "db": "/home/stupakzm/projects/slm-memory-management/data/index/main.db",
+    "domain": null,
+    "rewrites": 0,
+    "aliases": true,
+    "cache": "p8-k20",
+    "read_k": 5,
+    "cap_per_doc": 0
+  },
+  "answer_accuracy": 0.5517241379310345,
+  "accuracy_given_evidence": 0.5555555555555556,
+  "false_abstention_with_evidence": 0.037037037037037035,
+  "abstention_recall": 0.0,
+  "spoke_without_evidence": 1.0,
+  "unsupported_rate": 0.06896551724137931,
+  "results": [
+    {
+      "qid": "a18",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I check whether I have run out of inodes rather than out of space?",
+      "answer": "Use the `df -i` command to check inode usage. This shows the number of inodes used and available on each file system, allowing you to determine if you have run out of inodes rather than space [2] . The `--inodes` option in `df` lists inode information instead of block usage [2] . Additionally, you can check `/proc/sys/fs/inode-nr` for the current number of allocated and free inodes [1] . If `nr_free_inodes` is zero, you have run out of free inodes [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_sys_fs.5",
+        "df.1",
+        "proc_sys_fs.5",
+        "du.1",
+        "debugfs.8"
+      ],
+      "top_score": 0.9450876116752625,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a25",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I make sed rewrite the file itself instead of printing to the screen?",
+      "answer": "Use the `-i` or `--in-place` option to edit files in place [1] . If you want a backup of the original file, provide a suffix with `-iSUFFIX` [1] . For example, `sed -i.bak 's/old/new/g' file.txt` will edit the file and create a backup named `file.txt.bak`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1",
+        "sed.1"
+      ],
+      "top_score": 0.8914101123809814,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a27",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I watch a log file as new entries are appended?",
+      "answer": "Use the `tail -f` command to watch a log file as new entries are appended [3] . The `-f` option causes `tail` to continue outputting new lines as they are added to the file [3] . This is the standard way to monitor log files in real time. If the file is rotated, `tail -F` can be used to keep trying to open the file [3] . For systemd journal logs, use `journalctl -f` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tail.1",
+        "journalctl.1",
+        "busybox.1",
+        "less.1",
+        "wlog3.7"
+      ],
+      "top_score": 0.9222668409347534,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a29",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I copy an entire directory to a remote machine?",
+      "answer": "Use the `--recursive` flag (or `-r`) with `gh codespace cp` to copy an entire directory to a remote machine [5] . For example: `gh codespace cp -r ./local_dir/ remote:/path/to/destination/` [5] . The `--recursive` flag is required if any source is a directory [1] . The remote path must be prefixed with `remote:` [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "gh-codespace-cp.1",
+        "scp.1",
+        "scp.1",
+        "sftp.1",
+        "gh-codespace-cp.1"
+      ],
+      "top_score": 0.966433048248291,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        5,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a30",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "curl prints nothing useful when the URL redirects somewhere else.",
+      "answer": "Use the `-L, --location` option to make curl follow HTTP redirects and print the final output [2] . Without this option, curl may not show the redirected content, especially if the redirect is not handled automatically. If you want to see headers from all requests, use `-i, --include` or `--show-headers` [2] . Additionally, ensure you are not using `--silent` or `--no-progress-meter`, which suppress output [1] . If the redirect involves authentication or cookies, consider using `--location-trusted` to allow credentials to be sent to redirected hosts [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1"
+      ],
+      "top_score": 0.9790064096450806,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        1,
+        3
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a31",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I save a download under the filename the server uses?",
+      "answer": "Use the `-J, --remote-header-name` option with curl [1] or the `-s` option with lwp-download [2] to save a download under the filename the server specifies. For curl, this uses the server-specified Content-Disposition filename [1] or the filename from redirect URLs [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "lwp-download.1p",
+        "curl.1",
+        "curl.1",
+        "wget.1"
+      ],
+      "top_score": 0.9521645903587341,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a33",
+      "kind": "answerable",
+      "tags": [
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "dd just sits there silently. How do I see how far along it is?",
+      "answer": "Send a USR1 signal to the running 'dd' process to make it print I/O statistics to standard error [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dd.1",
+        "dd.1",
+        "busybox.1",
+        "dd.1",
+        "dd.1"
+      ],
+      "top_score": 0.4922429621219635,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a37",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I mount a filesystem so that nothing can write to it?",
+      "answer": "To mount a filesystem so that nothing can write to it, use the `ro` option with the `fs` argument to ensure the filesystem superblock is set to read-only, which prevents any writes at the filesystem level. For example, use the command: `mount -o ro=fs /dev/sdX /mountpoint` [5] . This setting applies the read-only attribute to the filesystem superblock, making it impossible to write to the filesystem, even through other mount points. The `ro=fs` option is supported since libmount v2.41 [5] . If you are using an older version, you may need to use `mount -o remount,ro` on the original mount point to achieve the same effect. Note that some filesystems (like ext3/ext4) may still write to the device due to journaling unless additional options like `noload` are used [1] . For maximum protection, consider also setting the block device to read-only using `blockdev(8)` [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8"
+      ],
+      "top_score": 0.9803413152694702,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        5,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a40",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "How do I list which ports something is listening on?",
+      "answer": "Use `ss -l` to list listening ports [1] or `ss -l -t` for TCP listening ports specifically [4] or `ss -l -u` for UDP listening ports [4] or `ss -l -a` to list all listening sockets including both TCP and UDP [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ss.8",
+        "ss.8",
+        "lsof.8",
+        "ss.8",
+        "lsof.8"
+      ],
+      "top_score": 0.7783148288726807,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        2
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b06",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "How do I make the ssh server listen on something other than 22?",
+      "answer": "Use the `Port` directive in the `sshd_config(5)` file to specify a different port. For example, to make the SSH server listen on port 2222, add the following line to `/etc/ssh/sshd_config` (or the appropriate configuration file path for your system): `Port 2222`. Multiple `Port` options are allowed [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd.8",
+        "sshd_config.5",
+        "authorized_keys.5",
+        "sshd_config.5",
+        "sshd_config.5"
+      ],
+      "top_score": 0.9718739986419678,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b07",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "My ssh sessions drop when they go idle. Which setting keeps them alive?",
+      "answer": "The setting that keeps SSH sessions alive when they go idle is `ServerAliveInterval` on the client side or `ClientAliveInterval` on the server side. These settings send periodic messages to keep the connection alive. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ssh_config.5",
+        "sshd_config.5",
+        "sshd_config.5",
+        "ssh_config.5",
+        "sshd_config.5"
+      ],
+      "top_score": 0.979539155960083,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b09",
+      "kind": "answerable",
+      "tags": [
+        "config"
+      ],
+      "variant_kind": null,
+      "question": "Where is password ageing information kept and what does each field mean?",
+      "answer": "Password ageing information is kept in the `/etc/shadow` file [1] and consists of the following fields, each with a specific meaning [2] and [5] (as per the manual page extracts provided, specifically shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5, extract 2 and 5, and the description of the fields in the shadow file format as detailed in the manual page extracts provided, particularly shadow.5",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "shadow.5",
+        "shadow.5",
+        "passwd.1",
+        "shadow.5",
+        "shadow.5"
+      ],
+      "top_score": 0.9990330338478088,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        2,
+        5
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b11",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I set which DNS server the machine uses?",
+      "answer": "To set which DNS server the machine uses, you can configure it through NetworkManager using `nmcli` or by editing configuration files. Here are the key methods based on the provided extracts [2] and [3] (nm-settings-nmcli.5 and nm-settings.5) and [4] (dnsmasq.8) for dnsmasq usage, and [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dnsmasq.8",
+        "nm-settings-nmcli.5",
+        "nm-settings.5",
+        "dnsmasq.8",
+        "systemd.network.5"
+      ],
+      "top_score": 0.5793906450271606,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "c12",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "cross-page",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "How do I cap the total memory a service and everything it spawns can use between them?",
+      "answer": "Use `MemoryMax=` to cap the total memory a service and all its spawned processes can use. This setting controls the \"memory.max\" control group attribute and enforces an absolute limit on memory usage, triggering the out-of-memory killer if exceeded [3] . It applies during normal runtime, and `StartupMemoryMax=` can be used for startup/shutdown phases [1] . The effective limit is reported as `EffectiveMemoryMax=` [1] . For best results, combine with `MemoryHigh=` for proactive memory management [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.exec.5"
+      ],
+      "top_score": 0.9323400259017944,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p02",
+      "kind": "answerable",
+      "tags": [
+        "flag"
+      ],
+      "variant_kind": null,
+      "question": "I need to look for a string across a whole source tree, not just one file.",
+      "answer": "Use `git grep` with the `--recursive` option (or `-r`) to search across the entire source tree. This is the default behavior, so simply run `git grep <pattern>` to search recursively in all tracked files in the working tree [1] . If you want to include untracked files, use `--untracked` [4] . To search in the index (staged files), use `--cached` [4] . For searching in submodules, use `--recurse-submodules` [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1",
+        "git-grep.1"
+      ],
+      "top_score": 0.9835938215255737,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        5
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p03",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "What stops a filename with a space in it from being split into two arguments?",
+      "answer": "Enclosing the filename in double quotes prevents it from being split into two arguments [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "bash.1",
+        "less.1",
+        "bash.1",
+        "bash.1",
+        "xargs.1"
+      ],
+      "top_score": 0.8801661133766174,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "p09",
+      "kind": "answerable",
+      "tags": [
+        "concept"
+      ],
+      "variant_kind": null,
+      "question": "Why does a process sometimes ignore kill but never ignore kill -9?",
+      "answer": "A process can ignore most signals, including SIGTERM, by explicitly handling or blocking them. However, SIGKILL (signal 9) cannot be ignored, caught, or blocked by a process. This is a fundamental property of the SIGKILL signal as defined by the operating system. Therefore, a process will always terminate when sent SIGKILL, regardless of its current state or signal handling configuration [2] and [4] (which confirms SIGKILL is used as a final termination signal). The `kill -9` command sends SIGKILL, which is why it cannot be ignored [2] and [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "fuser.1",
+        "kill.1",
+        "kill.1",
+        "systemd.kill.5",
+        "kill.1"
+      ],
+      "top_score": 0.29696574807167053,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2,
+        4,
+        5
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "p10",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "exact-token"
+      ],
+      "variant_kind": null,
+      "question": "Binding to a low-numbered port normally needs root. Is there another way to grant that?",
+      "answer": "Yes, using `SocketBindAllow=` in a systemd service unit can grant permission to bind to low-numbered ports without root, provided the rule explicitly allows it. For example, `SocketBindAllow=1234` allows binding to port 1234, even if it is a low-numbered port [2] . This overrides the default restriction that only root can bind to ports below 1024 [3] . However, this requires the service to be managed by systemd and configured with appropriate `SocketBindAllow=` rules [4] . Note that this does not apply to all systems or configurations, and compatibility may vary [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "services.5",
+        "systemd.resource-control.5",
+        "services.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5"
+      ],
+      "top_score": 0.9777914881706238,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "citations": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a01.n",
+      "kind": "answerable",
+      "tags": [
+        "exact-token",
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "make an archive but skip everything named in a list",
+      "answer": "Use the `-x` option with a list file to exclude files named in a list. For example, `tar -cf archive.tar --exclude-from=listfile .` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "7z.1",
+        "tar.1",
+        "tar.1",
+        "tar.1",
+        "7zr.1"
+      ],
+      "top_score": 0.9458178877830505,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a11.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "ls human readable sizes",
+      "answer": "The `ls` command uses the `-h` or `--human-readable` option to print sizes in human-readable format, such as 1K, 234M, 2G, etc. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ls.1",
+        "lslocks.8",
+        "ipcs.1",
+        "busybox.1",
+        "ls.1"
+      ],
+      "top_score": 0.9566031694412231,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a11.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "show file sizes in MB instead of raw bytes",
+      "answer": "Use the `-m` flag to show file sizes in megabytes (MiB) instead of raw bytes [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "du.1",
+        "df.1",
+        "find.1",
+        "du.1",
+        "od.1"
+      ],
+      "top_score": 0.5798972249031067,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a15.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "set permissions on everything inside a folder at once",
+      "answer": "Use `chmod -R` with the desired mode to set permissions recursively on everything inside a folder [2] . For example, `chmod -R 755 /path/to/folder` sets the mode to 755 for all files and subdirectories [2] . The `-R` option enables recursive operation [2] . If you want to use a reference file's permissions, use `--reference` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ntfssecaudit.8",
+        "chmod.1",
+        "setfacl.1",
+        "chmod.1",
+        "chmod.1"
+      ],
+      "top_score": 0.7511370778083801,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a15.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "chnage permisions on a folder and everythin inside",
+      "answer": "Use the `-R` option with `chmod` to change permissions on a folder and everything inside it [4] . For example: `chmod -R 755 /path/to/folder` [4] . The `-R` flag enables recursive operation [4] . The `--preserve-root` option is enabled by default, so `chmod` will not operate recursively on `/` [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "chown.1",
+        "chown.1",
+        "chmod.1",
+        "chmod.1",
+        "chmod.1"
+      ],
+      "top_score": 0.8658970594406128,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a27.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "watch a file as new lines are appended to it",
+      "answer": "Use the `F` command in `less` to watch a file as new lines are appended to it [3] . This behavior is similar to `tail -f` [2] . To stop waiting for more data, press the interrupt character (usually ^C) [2] . If the input is a pipe and `--exit-follow-on-close` is in effect, `less` will automatically stop when the input side of the pipe is closed [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tail.1",
+        "less.1",
+        "less.1",
+        "pager.1",
+        "pager.1"
+      ],
+      "top_score": 0.9376614093780518,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a30.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "curl retuns nothing when the url redirets",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1"
+      ],
+      "top_score": 0.9192086458206177,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a37.t",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "mount read only",
+      "answer": "To mount a filesystem read-only, use the `-o ro` option or the `-r` flag with the `mount` command. For example: `mount -o ro /dev/foo /mnt` or `mount -r /dev/foo /mnt`. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "apparmor.d.5",
+        "mount.8"
+      ],
+      "top_score": 0.9846754670143127,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "a37.z",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "mount a filesytem read-onyl",
+      "answer": "To mount a filesystem read-only, use the `-o ro` option with the `mount` command. For example: `mount -o ro /dev/sdX /mount/point` [4] . The `ro` option sets the filesystem to read-only, and it applies to both the VFS mountpoint and the filesystem superblock by default [5] . For more control, you can specify the layer using `ro=vfs` or `ro=fs` [5] . Note that some filesystems may still write to the device (e.g., ext3/ext4 journaling), so additional measures like `noload` or setting the block device to read-only may be needed [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8",
+        "mount.8"
+      ],
+      "top_score": 0.9848489761352539,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "b03.n",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "schedule something to run each time the machine starts",
+      "answer": "Use `OnStartupSec=` in a systemd timer unit to schedule something to run each time the machine starts [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "crontab.5",
+        "systemd.timer.5",
+        "cron.8",
+        "systemd.timer.5",
+        "cron.8"
+      ],
+      "top_score": 0.9075422286987305,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b12.t",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "systemd restart on failure",
+      "answer": "The `Restart=` option set to `on-failure` causes a service to be restarted when it exits with a non-zero exit code, is terminated by a signal (excluding SIGHUP, SIGINT, SIGTERM, and SIGPIPE), when an operation (such as reload) times out, or when the watchdog timeout is triggered [1] and [4] . This is the recommended setting for long-running services to increase reliability through automatic recovery [5] . Note that Type=oneshot services will not be restarted on a clean exit, even if `Restart=on-failure` is set [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5",
+        "systemd.service.5"
+      ],
+      "top_score": 0.9782669544219971,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "citations": [
+        1,
+        4,
+        5,
+        2
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    }
+  ]
+}
