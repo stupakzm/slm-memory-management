@@ -48,6 +48,32 @@ def cited_answer(n_extracts: int) -> str:
     return TEMPLATE.replace("REFS", refs).strip() + "\n"
 
 
+# Phase 10 (a 30B reader that stays grounded, not just cited): a claim that
+# opens with an exact quotation copied from the extract it names is harder to
+# fabricate than a bare citation - "[3]" costs nothing to type, but a quoted
+# span that isn't actually in extract 3 is mechanically checkable the same way
+# verify_citations checks tokens (see verify_quotes below). Same house idiom:
+# REFS filled by string replacement, never str.format.
+QUOTE_TEMPLATE = r'''
+root    ::= refusal | claims
+refusal ::= "I don't know."
+claims  ::= claim (" " claim){0,3}
+claim   ::= "\"" quote "\" " text " [" ref "]"
+ref     ::= REFS
+quote   ::= [^"\n]+
+text    ::= [^\[\]\n]+
+'''
+
+
+def quoted_answer(n_extracts: int) -> str:
+    """Grammar admitting only the refusal, or quote-opened claims citing
+    extracts 1..n. Mirrors cited_answer exactly, one grammar swapped for the
+    other."""
+    n = max(1, min(n_extracts, 9))
+    refs = " | ".join(f'"{i}"' for i in range(1, n + 1))
+    return QUOTE_TEMPLATE.replace("REFS", refs).strip() + "\n"
+
+
 CITE_RE = re.compile(r"\[([1-9])\]")
 
 
@@ -72,3 +98,40 @@ def verify_citations(answer: str, chunks: list[dict], tokens: list[str]) -> dict
     return {"citations": cites, "n_citations": len(cites),
             "uncited": not cites, "out_of_range": len(cites) - len(in_range),
             "cite_supported": supported}
+
+
+# Matches one quote-opened claim: "<quote>" <text> [<ref>]. Deliberately
+# permissive about what sits between the closing quote and the ref (that's
+# `text`, unconstrained here) - the grammar above is what makes the shape
+# exact; this regex only needs to recover (quote, ref) pairs from it.
+QUOTE_CLAIM_RE = re.compile(r'"([^"\n]+)"[^\[\]\n]*\[([1-9])\]')
+
+
+def verify_quotes(answer: str, chunks: list[dict]) -> dict:
+    """Is every claim's opening quotation actually in the extract it cites?
+
+    Mechanical, like verify_citations: whitespace-collapsed substring, not a
+    judged support call (blk_phase6_verifier_failure - the LLM-judge verifier
+    could not separate right answers from wrong, so this stays a check a
+    machine can decide). The refusal carries no claims and is neither
+    verified nor failed - it is the answer this whole mode exists to make
+    safe to fall back on.
+    """
+    if answer.strip() == REFUSAL:
+        return {"quote_verified": False, "quote_failed": False, "n_quotes": 0}
+
+    pairs = QUOTE_CLAIM_RE.findall(answer)
+    n = len(pairs)
+
+    def _claim_verified(quote: str, ref: str) -> bool:
+        r = int(ref)
+        if not (1 <= r <= len(chunks)):
+            return False
+        c = chunks[r - 1]
+        hay = " ".join(f"{c.get('prefix', '')}{c['text']}".split())
+        needle = " ".join(quote.split())
+        return needle in hay
+
+    quote_verified = n > 0 and all(_claim_verified(q, r) for q, r in pairs)
+    return {"quote_verified": quote_verified, "quote_failed": not quote_verified,
+            "n_quotes": n}
