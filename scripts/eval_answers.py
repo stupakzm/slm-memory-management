@@ -50,7 +50,27 @@ ABSTAIN_RE = re.compile(
 
 
 def abstained(text: str) -> bool:
-    return bool(ABSTAIN_RE.search(text))
+    """True iff EVERY sentence in `text` matches ABSTAIN_RE (empty text is not
+    an abstention). The 30B hedges: it appends "I don't know. [n]" after real,
+    cited claims, and ABSTAIN_RE.search(text) alone would call that a refusal
+    just because the phrase appears somewhere. A claim followed by "I don't
+    know" is still an answer - only a text with no speaking sentence at all is
+    a genuine abstention. Citation markers are stripped first so a trailing
+    `[n]` never affects where a sentence ends."""
+    stripped = re.sub(r"\s*\[\d\]\s*", " ", text)
+    sentences = [s for s in re.split(r"(?<=[.!?])\s+", stripped) if s.strip()]
+    return bool(sentences) and all(ABSTAIN_RE.search(s) for s in sentences)
+
+
+def evidence_in(hits: list, toks: list, token_aliases) -> tuple:
+    """(aliased, strict): `aliased` matches how `correct` is scored (via
+    gold.is_correct, so an alias found in a hit counts); `strict` is the
+    original substring-only check, kept so the two can be compared. With
+    --no-aliases the caller passes an effectively empty token_aliases, so
+    aliased == strict automatically."""
+    aliased = any(gold.is_correct(h["text"], toks, token_aliases) for h in hits)
+    strict = any(all(t in h["text"] for t in toks) for h in hits)
+    return aliased, strict
 
 
 def cache_entry(hits: list, gate_hits: list, rewrites: int) -> object:
@@ -264,7 +284,9 @@ def main() -> int:
             toks = row["answer_contains"]
             rec["correct"] = gold.is_correct(text, toks, qid_aliases.get(row["qid"]))
             rec["correct_strict"] = all(t in text for t in toks)
-            rec["evidence_retrieved"] = any(all(t in h["text"] for t in toks) for h in hits)
+            aliased_ev, strict_ev = evidence_in(hits, toks, qid_aliases.get(row["qid"]))
+            rec["evidence_retrieved"] = aliased_ev
+            rec["evidence_retrieved_strict"] = strict_ev
             if not gated:
                 rec.update(grammar.verify_citations(text, hits, toks))
         results.append(rec)
@@ -338,7 +360,8 @@ def main() -> int:
                    "rewrites": args.rewrites, "aliases": not args.no_aliases,
                    "cache": args.cache, "read_k": args.read_k,
                    "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
-                   "qids": args.qids},
+                   "qids": args.qids, "abstain_rule": "all-sentences",
+                   "evidence_rule": "aliased"},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),
