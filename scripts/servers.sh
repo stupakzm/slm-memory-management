@@ -17,15 +17,19 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LLAMA="${LLAMA_CPP:-$HOME/opt/llama.cpp/build/bin}"
-MODELS="$ROOT/models"
-# SMM_RUN/SMM_*_PORT let tests (tests/test_cli.py) point this at a scratch
-# directory and scratch ports instead of the real pidfiles/ports this machine
-# may already have servers running on - same idea as LLAMA_CPP above. Unset,
-# behaviour is exactly what it always was.
+MODELS="${SMM_MODELS:-$ROOT/models}"
+# SMM_RUN/SMM_*_PORT/SMM_MODELS let tests (tests/test_cli.py,
+# tests/test_rerank_select.py) point this at a scratch directory, scratch
+# ports, and a scratch models/ instead of the real pidfiles/ports/weights this
+# machine may already have servers running on - same idea as LLAMA_CPP above.
+# SMM_RERANK_MODEL picks which reranker weight `start_reranker` loads, e.g.
+# SMM_RERANK_MODEL=qwen3-reranker-4b-q4_k_m.gguf for the 4B conversion. All
+# unset, behaviour is exactly what it always was.
 RUN="${SMM_RUN:-$ROOT/.run}"
 EMBED_PORT="${SMM_EMBED_PORT:-8081}"
 RERANK_PORT="${SMM_RERANK_PORT:-8082}"
 GEN_PORT="${SMM_GEN_PORT:-8080}"
+RERANK_MODEL="${SMM_RERANK_MODEL:-qwen3-reranker-0.6b-q8_0.gguf}"
 mkdir -p "$RUN"
 
 start_embedder() {
@@ -57,8 +61,15 @@ start_generator() {
 # that or llama-server rejects the request outright rather than splitting it.
 start_reranker() {
   local ctx=${1:-8192} batch=${2:-2048} par=${3:-4}
+  local model_path="$MODELS/$RERANK_MODEL"
+  # Only enforced when SMM_RERANK_MODEL picks a non-default model: unset,
+  # behaviour must stay byte-for-byte what it was (see comment block above).
+  if [ -n "${SMM_RERANK_MODEL:-}" ] && [ ! -f "$model_path" ]; then
+    echo "reranker model not found: $model_path (set SMM_RERANK_MODEL to an existing file, or fetch it: scripts/fetch_models.py)" >&2
+    return 1
+  fi
   "$LLAMA/llama-server" \
-    -m "$MODELS/qwen3-reranker-0.6b-q8_0.gguf" \
+    -m "$model_path" \
     --reranking -c "$ctx" -ngl 99 \
     -b "$batch" -ub "$batch" --parallel "$par" \
     --host 127.0.0.1 --port "$RERANK_PORT" \
