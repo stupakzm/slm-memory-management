@@ -53,6 +53,26 @@ def abstained(text: str) -> bool:
     return bool(ABSTAIN_RE.search(text))
 
 
+def cache_entry(hits: list, gate_hits: list, rewrites: int) -> object:
+    """Shape of one cached-retrieval entry. `rewrites == 0` returns `hits`
+    unchanged - today's exact format, so `--rewrites 0` reproduces existing
+    runs byte-for-byte. `rewrites > 0` returns a dict carrying both the fused
+    `hits` and the original question's own `gate_hits` (see
+    blk_fusion_gate_semantic_slip: the gate must never read the fused list's
+    own top-1)."""
+    if rewrites == 0:
+        return hits
+    return {"hits": hits, "gate_hits": gate_hits}
+
+
+def unpack_entry(entry: object) -> tuple:
+    """Inverse of `cache_entry`. A plain list (legacy cache, or --rewrites 0)
+    gives `(entry, entry)`; the dict form gives both lists back out."""
+    if isinstance(entry, dict):
+        return entry["hits"], entry["gate_hits"]
+    return entry, entry
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", default="data/index/phase2.db")
@@ -73,6 +93,11 @@ def main() -> int:
                     help="refuse before generation below this top-1 score (0 = no gate)")
     ap.add_argument("--grammar", action="store_true", help="GBNF-enforced citations")
     ap.add_argument("--stage", choices=("retrieve", "generate", "both"), default="both")
+    ap.add_argument("--rewrites", type=int, default=0,
+                    help="fuse each question with N model rewrites, each retrieved and "
+                         "reranked separately; 0 reproduces existing runs exactly")
+    ap.add_argument("--gen-url", default="http://127.0.0.1:8080",
+                    help="generator llama-server, used only when --rewrites > 0")
     args = ap.parse_args()
 
     cache = ROOT / "data" / "eval" / "results" / f"{args.name}-retrieved.json"
@@ -94,6 +119,13 @@ def main() -> int:
             if not rr.health():
                 print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
                 return 2
+        rewrite_gen = None
+        if args.rewrites:
+            rewrite_gen = Generator(args.gen_url)
+            if not rewrite_gen.health():
+                print(f"no generator at {args.gen_url}: "
+                      f"./scripts/servers.sh start generator", file=sys.stderr)
+                return 2
         db = store.connect(ROOT / args.db)
         if args.mode in ("bm25", "hybrid") and not lexical.has_index(db):
             print(f"{args.db} has no chunks_fts", file=sys.stderr)
@@ -102,11 +134,20 @@ def main() -> int:
                       candidates=args.candidates, domain=args.domain)
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
-            hits = r.retrieve(row["question"], k=args.k)
+            if args.rewrites:
+                rewrites = rewrite_gen.rewrites(row["question"], n=args.rewrites)
+                hits, _winner, _variants, gate_hits = r.retrieve_fused(
+                    row["question"], rewrites=rewrites, k=args.k)
+            else:
+                hits = r.retrieve(row["question"], k=args.k)
+                gate_hits = hits
             # Expansion changes what the model reads, not how anything ranked, so it
             # belongs here rather than inside the retriever - and `evidence_retrieved`
             # below then means what it says: the answer was in front of the model.
-            retrieved[row["qid"]] = expand(db, hits, span=args.expand) if args.expand else hits
+            # It applies only to the fused hits the generator will read; gate_hits
+            # is never shown to the model, so it is never expanded.
+            hits = expand(db, hits, span=args.expand) if args.expand else hits
+            retrieved[row["qid"]] = cache_entry(hits, gate_hits, args.rewrites)
             if sys.stdout.isatty():
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
@@ -130,8 +171,8 @@ def main() -> int:
 
     results, t0 = [], time.time()
     for i, row in enumerate(rows, 1):
-        hits = retrieved[row["qid"]]
-        score = gate_score(hits)
+        hits, gate_hits = unpack_entry(retrieved[row["qid"]])
+        score = gate_score(gate_hits)
         # The gate is architectural: below threshold the model is never invoked, so
         # there is no opportunity to speculate. That is the whole of Finding 04.
         gated = bool(args.gate) and score < args.gate
@@ -219,7 +260,8 @@ def main() -> int:
         "name": args.name, "k": args.k, "n": len(results),
         "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
                    "grammar": args.grammar, "candidates": args.candidates,
-                   "expand": args.expand, "db": args.db, "domain": args.domain},
+                   "expand": args.expand, "db": args.db, "domain": args.domain,
+                   "rewrites": args.rewrites},
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),
