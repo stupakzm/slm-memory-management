@@ -1,0 +1,182 @@
+{
+  "run": "fusion-rw1",
+  "mechanisms": {
+    "judge": {
+      "in_sample": {
+        "threshold": "off",
+        "counts": {
+          "kept_good": 76,
+          "removed_good": 0,
+          "kept_bad": 33,
+          "removed_bad": 0
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 33,
+            "removed_good": 0,
+            "kept_bad": 18,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 43,
+            "removed_good": 0,
+            "kept_bad": 15,
+            "removed_bad": 0
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 76,
+        "removed_good": 0,
+        "kept_bad": 33,
+        "removed_bad": 0
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          76,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          36,
+          39
+        ],
+        "answered_with_no_evidence": [
+          22,
+          127
+        ],
+        "none_coverage": [
+          0,
+          109
+        ]
+      }
+    },
+    "lexical": {
+      "in_sample": {
+        "threshold": "off",
+        "counts": {
+          "kept_good": 76,
+          "removed_good": 0,
+          "kept_bad": 33,
+          "removed_bad": 0
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 33,
+            "removed_good": 0,
+            "kept_bad": 18,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 43,
+            "removed_good": 0,
+            "kept_bad": 15,
+            "removed_bad": 0
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 76,
+        "removed_good": 0,
+        "kept_bad": 33,
+        "removed_bad": 0
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          76,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          36,
+          39
+        ],
+        "answered_with_no_evidence": [
+          22,
+          127
+        ],
+        "none_coverage": [
+          25,
+          109
+        ]
+      }
+    },
+    "xenc": {
+      "in_sample": {
+        "threshold": 0.00036569515941664577,
+        "counts": {
+          "kept_good": 76,
+          "removed_good": 0,
+          "kept_bad": 32,
+          "removed_bad": 1
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": 0.00036569515941664577,
+          "held_out_counts": {
+            "kept_good": 33,
+            "removed_good": 0,
+            "kept_bad": 18,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 43,
+            "removed_good": 0,
+            "kept_bad": 15,
+            "removed_bad": 0
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 76,
+        "removed_good": 0,
+        "kept_bad": 33,
+        "removed_bad": 0
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          76,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          36,
+          39
+        ],
+        "answered_with_no_evidence": [
+          22,
+          127
+        ],
+        "none_coverage": [
+          0,
+          109
+        ]
+      }
+    }
+  }
+}

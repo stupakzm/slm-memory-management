@@ -1,0 +1,646 @@
+{
+ "a01": {
+  "--exclude-from": [
+   {
+    "alias": "-X",
+    "line": "-X, --exclude-from=FILE",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Local file selection"
+   }
+  ]
+ },
+ "a01.n": {
+  "--exclude-from": [
+   {
+    "alias": "-X",
+    "line": "-X, --exclude-from=FILE",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Local file selection"
+   }
+  ]
+ },
+ "a01.t": {
+  "--exclude-from": [
+   {
+    "alias": "-X",
+    "line": "-X, --exclude-from=FILE",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Local file selection"
+   }
+  ]
+ },
+ "a01.z": {
+  "--exclude-from": [
+   {
+    "alias": "-X",
+    "line": "-X, --exclude-from=FILE",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Local file selection"
+   }
+  ]
+ },
+ "a02": {
+  "--gzip": [
+   {
+    "alias": "-z",
+    "line": "-z, --gzip, --gunzip, --ungzip",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Compression options"
+   },
+   {
+    "alias": "--gunzip",
+    "line": "-z, --gzip, --gunzip, --ungzip",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Compression options"
+   },
+   {
+    "alias": "--ungzip",
+    "line": "-z, --gzip, --gunzip, --ungzip",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Compression options"
+   }
+  ]
+ },
+ "a03": {
+  "--context": [
+   {
+    "alias": "-C",
+    "line": "-C NUM, -NUM, --context=NUM",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/Context Line Control"
+   },
+   {
+    "alias": "-NUM",
+    "line": "-C NUM, -NUM, --context=NUM",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/Context Line Control"
+   }
+  ]
+ },
+ "a04": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, --recursive",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+   }
+  ]
+ },
+ "a04.n": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, --recursive",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+   }
+  ]
+ },
+ "a04.t": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, --recursive",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+   }
+  ]
+ },
+ "a04.z": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, --recursive",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+   }
+  ]
+ },
+ "a05": {
+  "--files-with-matches": [
+   {
+    "alias": "-l",
+    "line": "-l, --files-with-matches",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/General Output Control"
+   }
+  ]
+ },
+ "a06": {
+  "--invert-match": [
+   {
+    "alias": "-v",
+    "line": "-v, --invert-match",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/Matching Control"
+   }
+  ]
+ },
+ "a07": {
+  "Delete files": [
+   {
+    "alias": "-delete",
+    "line": "-delete",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ },
+ "a09": {
+  "null character": [
+   {
+    "alias": "-print0",
+    "line": "-print0",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ },
+ "a09.n": {
+  "null character": [
+   {
+    "alias": "-print0",
+    "line": "-print0",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ },
+ "a09.t": {
+  "null character": [
+   {
+    "alias": "-print0",
+    "line": "-print0",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ },
+ "a09.z": {
+  "null character": [
+   {
+    "alias": "-print0",
+    "line": "-print0",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ },
+ "a10": {
+  "sort by time": [
+   {
+    "alias": "-t",
+    "line": "-t     sort by time, newest first; see --time",
+    "rule": "description",
+    "sec_id": "ls.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a11": {
+  "--human-readable": [
+   {
+    "alias": "-h",
+    "line": "-h, --human-readable",
+    "rule": "synonym",
+    "sec_id": "ls.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a11.n": {
+  "--human-readable": [
+   {
+    "alias": "-h",
+    "line": "-h, --human-readable",
+    "rule": "synonym",
+    "sec_id": "ls.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a11.t": {
+  "--human-readable": [
+   {
+    "alias": "-h",
+    "line": "-h, --human-readable",
+    "rule": "synonym",
+    "sec_id": "ls.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a11.z": {
+  "--human-readable": [
+   {
+    "alias": "-h",
+    "line": "-h, --human-readable",
+    "rule": "synonym",
+    "sec_id": "ls.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a13": {
+  "--no-clobber": [
+   {
+    "alias": "-n",
+    "line": "-n, --no-clobber",
+    "rule": "synonym",
+    "sec_id": "cp.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a14": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, -R, --recursive",
+    "rule": "synonym",
+    "sec_id": "rm.1#OPTIONS"
+   },
+   {
+    "alias": "-R",
+    "line": "-r, -R, --recursive",
+    "rule": "synonym",
+    "sec_id": "rm.1#OPTIONS"
+   }
+  ]
+ },
+ "a15": {
+  "--recursive": [
+   {
+    "alias": "-R",
+    "line": "-R, --recursive",
+    "rule": "synonym",
+    "sec_id": "chmod.1#OPTIONS"
+   }
+  ]
+ },
+ "a15.n": {
+  "--recursive": [
+   {
+    "alias": "-R",
+    "line": "-R, --recursive",
+    "rule": "synonym",
+    "sec_id": "chmod.1#OPTIONS"
+   }
+  ]
+ },
+ "a15.t": {
+  "--recursive": [
+   {
+    "alias": "-R",
+    "line": "-R, --recursive",
+    "rule": "synonym",
+    "sec_id": "chmod.1#OPTIONS"
+   }
+  ]
+ },
+ "a15.z": {
+  "--recursive": [
+   {
+    "alias": "-R",
+    "line": "-R, --recursive",
+    "rule": "synonym",
+    "sec_id": "chmod.1#OPTIONS"
+   }
+  ]
+ },
+ "a16": {
+  "--recursive": [
+   {
+    "alias": "-R",
+    "line": "-R, --recursive",
+    "rule": "synonym",
+    "sec_id": "chown.1#OPTIONS"
+   }
+  ]
+ },
+ "a17": {
+  "--summarize": [
+   {
+    "alias": "-s",
+    "line": "-s, --summarize",
+    "rule": "synonym",
+    "sec_id": "du.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a18": {
+  "--inodes": [
+   {
+    "alias": "-i",
+    "line": "-i, --inodes",
+    "rule": "synonym",
+    "sec_id": "df.1#OPTIONS"
+   }
+  ]
+ },
+ "a19": {
+  "Select all processes": [
+   {
+    "alias": "-A",
+    "line": "-A     Select all processes.  Identical to -e.",
+    "rule": "description",
+    "sec_id": "ps.1#SIMPLE PROCESS SELECTION"
+   },
+   {
+    "alias": "-e",
+    "line": "-e     Select all processes.  Identical to -A.",
+    "rule": "description",
+    "sec_id": "ps.1#SIMPLE PROCESS SELECTION"
+   }
+  ]
+ },
+ "a20": {
+  "--list": [
+   {
+    "alias": "-l",
+    "line": "-l, --list [signal]",
+    "rule": "synonym",
+    "sec_id": "kill.1#OPTIONS"
+   }
+  ]
+ },
+ "a21": {
+  "--numeric-sort": [
+   {
+    "alias": "-n",
+    "line": "-n, --numeric-sort",
+    "rule": "synonym",
+    "sec_id": "sort.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a21.n": {
+  "--numeric-sort": [
+   {
+    "alias": "-n",
+    "line": "-n, --numeric-sort",
+    "rule": "synonym",
+    "sec_id": "sort.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a21.t": {
+  "--numeric-sort": [
+   {
+    "alias": "-n",
+    "line": "-n, --numeric-sort",
+    "rule": "synonym",
+    "sec_id": "sort.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a21.z": {
+  "--numeric-sort": [
+   {
+    "alias": "-n",
+    "line": "-n, --numeric-sort",
+    "rule": "synonym",
+    "sec_id": "sort.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a22": {
+  "--unique": [
+   {
+    "alias": "-u",
+    "line": "-u, --unique",
+    "rule": "synonym",
+    "sec_id": "sort.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a23": {
+  "--count": [
+   {
+    "alias": "-c",
+    "line": "-c, --count",
+    "rule": "synonym",
+    "sec_id": "uniq.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a24": {
+  "--delimiter": [
+   {
+    "alias": "-d",
+    "line": "-d, --delimiter=DELIM",
+    "rule": "synonym",
+    "sec_id": "cut.1#DESCRIPTION"
+   }
+  ],
+  "--fields": [
+   {
+    "alias": "-f",
+    "line": "-f, --fields=LIST",
+    "rule": "synonym",
+    "sec_id": "cut.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a26": {
+  "--lines": [
+   {
+    "alias": "-l",
+    "line": "-l, --lines",
+    "rule": "synonym",
+    "sec_id": "wc.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a28": {
+  "identity_file": [
+   {
+    "alias": "-i",
+    "line": "-i identity_file",
+    "rule": "argument",
+    "sec_id": "ssh.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a29": {
+  "Recursively copy": [
+   {
+    "alias": "-r",
+    "line": "-r      Recursively copy entire directories.  Note that scp follows symbolic links",
+    "rule": "description",
+    "sec_id": "scp.1#DESCRIPTION"
+   }
+  ]
+ },
+ "a30": {
+  "--location": [
+   {
+    "alias": "-L",
+    "line": "-L, --location",
+    "rule": "synonym",
+    "sec_id": "curl.1#ALL OPTIONS"
+   }
+  ]
+ },
+ "a30.n": {
+  "--location": [
+   {
+    "alias": "-L",
+    "line": "-L, --location",
+    "rule": "synonym",
+    "sec_id": "curl.1#ALL OPTIONS"
+   }
+  ]
+ },
+ "a30.t": {
+  "--location": [
+   {
+    "alias": "-L",
+    "line": "-L, --location",
+    "rule": "synonym",
+    "sec_id": "curl.1#ALL OPTIONS"
+   }
+  ]
+ },
+ "a30.z": {
+  "--location": [
+   {
+    "alias": "-L",
+    "line": "-L, --location",
+    "rule": "synonym",
+    "sec_id": "curl.1#ALL OPTIONS"
+   }
+  ]
+ },
+ "a31": {
+  "--remote-name": [
+   {
+    "alias": "-O",
+    "line": "-O, --remote-name",
+    "rule": "synonym",
+    "sec_id": "curl.1#ALL OPTIONS"
+   }
+  ]
+ },
+ "a34": {
+  "--null": [
+   {
+    "alias": "-0",
+    "line": "-0, --null",
+    "rule": "synonym",
+    "sec_id": "xargs.1#OPTIONS"
+   }
+  ]
+ },
+ "a37": {
+  "--read-only": [
+   {
+    "alias": "-r",
+    "line": "-r, --read-only",
+    "rule": "synonym",
+    "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+   }
+  ]
+ },
+ "a37.n": {
+  "--read-only": [
+   {
+    "alias": "-r",
+    "line": "-r, --read-only",
+    "rule": "synonym",
+    "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+   }
+  ]
+ },
+ "a37.t": {
+  "--read-only": [
+   {
+    "alias": "-r",
+    "line": "-r, --read-only",
+    "rule": "synonym",
+    "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+   }
+  ]
+ },
+ "a37.z": {
+  "--read-only": [
+   {
+    "alias": "-r",
+    "line": "-r, --read-only",
+    "rule": "synonym",
+    "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+   }
+  ]
+ },
+ "a38": {
+  "new-volume-label": [
+   {
+    "alias": "-L",
+    "line": "-L new-volume-label",
+    "rule": "argument",
+    "sec_id": "mke2fs.8#OPTIONS"
+   },
+   {
+    "alias": "-L",
+    "line": "-L new-volume-label",
+    "rule": "description",
+    "sec_id": "mke2fs.8#OPTIONS"
+   }
+  ]
+ },
+ "a39": {
+  "--create-home": [
+   {
+    "alias": "-m",
+    "line": "-m, --create-home",
+    "rule": "synonym",
+    "sec_id": "useradd.8#OPTIONS"
+   }
+  ]
+ },
+ "a40": {
+  "--listening": [
+   {
+    "alias": "-l",
+    "line": "-l, --listening",
+    "rule": "synonym",
+    "sec_id": "ss.8#OPTIONS"
+   }
+  ]
+ },
+ "a41": {
+  "--symbolic": [
+   {
+    "alias": "-s",
+    "line": "-s, --symbolic",
+    "rule": "synonym",
+    "sec_id": "ln.1#DESCRIPTION"
+   }
+  ]
+ },
+ "p01": {
+  "--exclude-from": [
+   {
+    "alias": "-X",
+    "line": "-X, --exclude-from=FILE",
+    "rule": "synonym",
+    "sec_id": "tar.1#OPTIONS/Local file selection"
+   }
+  ]
+ },
+ "p02": {
+  "--recursive": [
+   {
+    "alias": "-r",
+    "line": "-r, --recursive",
+    "rule": "synonym",
+    "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+   }
+  ]
+ },
+ "p03": {
+  "null character": [
+   {
+    "alias": "-print0",
+    "line": "-print0",
+    "rule": "description",
+    "sec_id": "find.1#EXPRESSION/ACTIONS"
+   }
+  ]
+ }
+}

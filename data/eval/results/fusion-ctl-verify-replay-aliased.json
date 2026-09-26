@@ -1,0 +1,182 @@
+{
+  "run": "fusion-ctl",
+  "mechanisms": {
+    "judge": {
+      "in_sample": {
+        "threshold": "off",
+        "counts": {
+          "kept_good": 81,
+          "removed_good": 0,
+          "kept_bad": 28,
+          "removed_bad": 0
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 37,
+            "removed_good": 0,
+            "kept_bad": 13,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 44,
+            "removed_good": 0,
+            "kept_bad": 15,
+            "removed_bad": 0
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 81,
+        "removed_good": 0,
+        "kept_bad": 28,
+        "removed_bad": 0
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          81,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          38,
+          39
+        ],
+        "answered_with_no_evidence": [
+          23,
+          127
+        ],
+        "none_coverage": [
+          0,
+          109
+        ]
+      }
+    },
+    "lexical": {
+      "in_sample": {
+        "threshold": "off",
+        "counts": {
+          "kept_good": 81,
+          "removed_good": 0,
+          "kept_bad": 28,
+          "removed_bad": 0
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 37,
+            "removed_good": 0,
+            "kept_bad": 13,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": "off",
+          "held_out_counts": {
+            "kept_good": 44,
+            "removed_good": 0,
+            "kept_bad": 15,
+            "removed_bad": 0
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 81,
+        "removed_good": 0,
+        "kept_bad": 28,
+        "removed_bad": 0
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          81,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          38,
+          39
+        ],
+        "answered_with_no_evidence": [
+          23,
+          127
+        ],
+        "none_coverage": [
+          24,
+          109
+        ]
+      }
+    },
+    "xenc": {
+      "in_sample": {
+        "threshold": 0.0008243180345743895,
+        "counts": {
+          "kept_good": 79,
+          "removed_good": 2,
+          "kept_bad": 25,
+          "removed_bad": 3
+        }
+      },
+      "folds": {
+        "0": {
+          "trained_on_fold": 0,
+          "applied_to_fold": 1,
+          "threshold": 0.0008243180345743895,
+          "held_out_counts": {
+            "kept_good": 36,
+            "removed_good": 1,
+            "kept_bad": 13,
+            "removed_bad": 0
+          }
+        },
+        "1": {
+          "trained_on_fold": 1,
+          "applied_to_fold": 0,
+          "threshold": 0.002085841028019786,
+          "held_out_counts": {
+            "kept_good": 38,
+            "removed_good": 6,
+            "kept_bad": 12,
+            "removed_bad": 3
+          }
+        }
+      },
+      "held_out_sum": {
+        "kept_good": 74,
+        "removed_good": 7,
+        "kept_bad": 25,
+        "removed_bad": 3
+      },
+      "end_to_end": {
+        "correct_over_answerable": [
+          74,
+          127
+        ],
+        "unanswerable_correctly_abstained": [
+          38,
+          39
+        ],
+        "answered_with_no_evidence": [
+          20,
+          127
+        ],
+        "none_coverage": [
+          0,
+          109
+        ]
+      }
+    }
+  }
+}
