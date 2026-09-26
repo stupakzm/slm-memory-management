@@ -97,7 +97,8 @@ def main() -> int:
                     help="fuse each question with N model rewrites, each retrieved and "
                          "reranked separately; 0 reproduces existing runs exactly")
     ap.add_argument("--gen-url", default="http://127.0.0.1:8080",
-                    help="generator llama-server, used only when --rewrites > 0")
+                    help="generator llama-server, used for --rewrites > 0 (stage "
+                         "retrieve) and for answer generation itself (stage generate)")
     args = ap.parse_args()
 
     cache = ROOT / "data" / "eval" / "results" / f"{args.name}-retrieved.json"
@@ -160,7 +161,7 @@ def main() -> int:
             return 0
 
     # --- stage 2: generation only (generator resident) ---
-    gen = Generator()
+    gen = Generator(args.gen_url)
     if not gen.health():
         print("generator not running: ./scripts/servers.sh start generator", file=sys.stderr)
         return 2

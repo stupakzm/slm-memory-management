@@ -39,6 +39,17 @@ def _rewrite_grammar(n: int) -> str:
     return REWRITE_TEMPLATE.replace("REPS", f"{n - 1},{n - 1}").strip() + "\n"
 
 
+# Grammar for the verifier's judge call (smm.verify.JudgeScorer): exactly one of
+# two literal tokens, same house idiom as REWRITE_TEMPLATE/_rewrite_grammar
+# above, just with no free parameter to fill in.
+JUDGE_GRAMMAR = 'root ::= "yes" | "no"\n'
+
+JUDGE_SYSTEM = """You check whether a manual-page extract explicitly supports a claim.
+Answer with exactly one word: yes or no. Say yes only if the extract itself
+states what the claim says - not because it sounds plausible or is true in
+general."""
+
+
 def build_rewrite_prompt(question: str, n: int) -> list[dict]:
     system = (f"Rewrite the user's request as {n} alternative search queries for a "
               "Linux manual-page search engine. Each on its own line, no numbering, "
@@ -101,6 +112,17 @@ class Generator:
         text = self.chat(build_rewrite_prompt(question, n), max_tokens=max_tokens,
                          temperature=0.0, grammar=_rewrite_grammar(n))
         return [l.strip() for l in text.splitlines() if l.strip()][:n]
+
+    def judge(self, claim: str, extract: str) -> float:
+        """Does `extract` explicitly support `claim`? Grammar-constrained to
+        exactly `yes` or `no` at temperature 0, so the verifier's judge
+        mechanism (smm.verify.JudgeScorer) gets a clean 1.0/0.0 every time."""
+        messages = [
+            {"role": "system", "content": JUDGE_SYSTEM},
+            {"role": "user", "content": f"Extract:\n{extract}\n\nClaim:\n{claim}"},
+        ]
+        text = self.chat(messages, max_tokens=5, temperature=0.0, grammar=JUDGE_GRAMMAR)
+        return 1.0 if text.strip().lower() == "yes" else 0.0
 
     def health(self) -> bool:
         try:
