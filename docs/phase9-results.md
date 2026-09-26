@@ -278,16 +278,265 @@ already flip favorably on the pre-registration set alone).
 
 ## Per-arm results
 
-RESULTS PENDING
+Re-derived directly from the answer JSONs — `data/eval/results/p7-A-answers.json`
+(A), `data/eval/results/p8-B4g-answers.json` (B), and the orchestrator's
+`p9-C-answers.json` / `p9-D-answers.json` (C, D), read from
+`/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p9-out/`
+(not tracked in this worktree):
+
+```
+$ python3 -c "
+import json
+files = {
+    'A': 'data/eval/results/p7-A-answers.json',
+    'B': 'data/eval/results/p8-B4g-answers.json',
+    'C': '.../p9-out/p9-C-answers.json',
+    'D': '.../p9-out/p9-D-answers.json',
+}
+for name, path in files.items():
+    d = json.load(open(path))
+    recs = d['results']
+    ans = [r for r in recs if r['kind'] == 'answerable']
+    una = [r for r in recs if r['kind'] != 'answerable']
+    correct = sum(1 for r in ans if r['correct'])
+    correct_strict = sum(1 for r in ans if r['correct_strict'])
+    ev = [r for r in ans if r['evidence_retrieved']]
+    correct_given_ev = sum(1 for r in ev if r['correct'])
+    abst = sum(1 for r in una if r['abstained'])
+    no_ev = [r for r in ans if not r['evidence_retrieved']]
+    answered_no_ev = sum(1 for r in no_ev if not r['abstained'])
+    una_answered = sum(1 for r in una if not r['abstained'])
+    unsupported = answered_no_ev + una_answered
+    print(f'{name}: {correct}/127 ({correct_strict} strict) | {correct_given_ev}/{len(ev)} given evidence | '
+          f'{abst}/39 unanswerable abstained | {answered_no_ev}/{len(no_ev)} answered w/o evidence | '
+          f'{unsupported}/166 unsupported')
+"
+A: 81/127 (63 strict) | 76/90 given evidence | 38/39 unanswerable abstained | 23/37 answered w/o evidence | 24/166 unsupported
+B: 82/127 (66 strict) | 78/104 given evidence | 37/39 unanswerable abstained | 14/23 answered w/o evidence | 16/166 unsupported
+C: 91/127 (72 strict) | 79/90 given evidence | 35/39 unanswerable abstained | 28/37 answered w/o evidence | 32/166 unsupported
+D: 89/127 (66 strict) | 83/104 given evidence | 33/39 unanswerable abstained | 17/23 answered w/o evidence | 23/166 unsupported
+```
+
+| arm | correct/127 (strict) | correct given evidence | unanswerable abstained/39 | answered w/o evidence / answerable-w/o-evidence | unsupported/166 |
+|---|---|---|---|---|---|
+| A | 81 (63) | 76/90 | 38 | 23/37 | 24 |
+| B | 82 (66) | 78/104 | 37 | 14/23 | 16 |
+| C | 91 (72) | 79/90 | 35 | 28/37 | 32 |
+| D | 89 (66) | 83/104 | 33 | 17/23 | 23 |
+
+**Sign tests** (discordant answerable questions only, exact two-sided sign
+test, same protocol as phases 7 and 8):
+
+```
+$ python3 -c "
+import json, math
+def index(path):
+    d = json.load(open(path))
+    return {r['qid']: r for r in d['results'] if r['kind'] == 'answerable'}
+def sign_test(up, down):
+    n = up + down
+    k = min(up, down)
+    p = sum(math.comb(n, i) for i in range(k + 1)) * (0.5 ** n) * 2
+    return min(p, 1.0)
+def compare(ra, rb, label):
+    up = down = 0
+    for qid in ra:
+        ca, cb = ra[qid]['correct'], rb[qid]['correct']
+        if cb and not ca: up += 1
+        elif ca and not cb: down += 1
+    print(f'{label}: +{up}/-{down}, p={sign_test(up, down):.4f}')
+A = index('data/eval/results/p7-A-answers.json')
+B = index('data/eval/results/p8-B4g-answers.json')
+C = index('.../p9-out/p9-C-answers.json')
+D = index('.../p9-out/p9-D-answers.json')
+compare(A, C, 'C vs A')
+compare(A, D, 'D vs A')
+compare(C, D, 'D vs C')
+"
+C vs A: +13/-3, p=0.0213
+D vs A: +14/-6, p=0.1153
+D vs C: +8/-10, p=0.8145
+```
+
+**VERDICT under the pre-registered rule (§5).**
+
+- **PRIMARY: NULL.** C passes condition (a) — sign test p=0.0213 < 0.05 —
+  and condition (c) — the win is not strict-label-only; strict correctness
+  also rises, 63→72/127. But C **fails condition (b)**: unanswerable
+  abstained falls to 35/39 against the pre-registered bar of ≥37/39 (A's
+  38/39 − 1). The rule is an AND over (a), (b), (c); one failing condition
+  is enough. **The primary is null and nothing ships**, even though the
+  accuracy gain (81→91/127, sign test p=0.0213) is itself statistically
+  significant. The gain is real by the test that measures it and is still
+  not a win, because §5's rule was written so that accuracy cannot be
+  bought with abstention — and here it was: of C's 4 unanswerable questions
+  answered instead of abstained, 3 are newly lost relative to A (u13, u06.t,
+  u06.z; A already answered u19), and all 4 are the tool-not-installed/
+  out-of-corpus cases "Reader vs finder" documents below.
+- **Secondary, reported and not a ship criterion on its own:** D vs A is not
+  significant (p=0.1153); D vs C is not significant (p=0.8145) — the 4B
+  reranker does not pay off even once paired with the stronger 30B reader,
+  echoing phase 8's finding with the 4B reader.
 
 ## Reader vs finder
 
-RESULTS PENDING
+C's 13 gains over A (`a02, a11, a18, a25, a29, b07, p08, p09, a01.n, a15.n,
+a21.n, a37.z, b12.t`): 6 had evidence in context (`a25, a29, b07, p09,
+a15.n, a37.z`); 7 did **not** (`a02, a11, a18, p08, a01.n, a21.n, b12.t`) —
+confirmed against each record's `evidence_retrieved` field:
+
+```
+$ python3 -c "
+import json
+C = {r['qid']: r for r in json.load(open('.../p9-out/p9-C-answers.json'))['results']}
+gains = ['a02','a11','a18','a25','a29','b07','p08','p09','a01.n','a15.n','a21.n','a37.z','b12.t']
+with_ev = [q for q in gains if C[q]['evidence_retrieved']]
+no_ev = [q for q in gains if not C[q]['evidence_retrieved']]
+print('with evidence:', len(with_ev), with_ev)
+print('without evidence:', len(no_ev), no_ev)
+"
+with evidence: 6 ['a25', 'a29', 'b07', 'p09', 'a15.n', 'a37.z']
+without evidence: 7 ['a02', 'a11', 'a18', 'p08', 'a01.n', 'a21.n', 'b12.t']
+```
+
+C's 3 losses (`a27, a30, c07`) are all answered wrong, not newly-abstained:
+
+```
+$ python3 -c "
+import json
+C = {r['qid']: r for r in json.load(open('.../p9-out/p9-C-answers.json'))['results']}
+for q in ('a27','a30','c07'):
+    print(q, 'abstained=', C[q]['abstained'], 'correct=', C[q]['correct'])
+"
+a27 abstained= False correct= False
+a30 abstained= False correct= False
+c07 abstained= False correct= False
+```
+
+Correct **without** evidence in context, over the 37 answerable questions
+where no evidence reached the model:
+
+```
+$ python3 -c "
+import json
+def no_ev_correct(path):
+    recs = json.load(open(path))['results']
+    ans = [r for r in recs if r['kind']=='answerable']
+    no_ev = [r for r in ans if not r['evidence_retrieved']]
+    return sum(1 for r in no_ev if r['correct']), len(no_ev)
+print('A:', no_ev_correct('data/eval/results/p7-A-answers.json'))
+print('C:', no_ev_correct('.../p9-out/p9-C-answers.json'))
+"
+A: (5, 37)
+C: (12, 37)
+```
+
+A 5/37 vs C 12/37 — more than half of C's net gain over A (13 discordant-up
+questions) is getting answers right with nothing to read: the 30B's own
+parametric knowledge of Linux, not better reading.
+
+The four unanswerable questions C answers instead of abstaining are all
+tool-not-installed or out-of-corpus cases, the 30B answering from its own
+knowledge of Linux rather than the local corpus:
+
+```
+$ python3 -c "
+import json
+C = json.load(open('.../p9-out/p9-C-answers.json'))['results']
+for r in C:
+    if r['kind'] != 'answerable' and not r['abstained']:
+        print(r['qid'], r['kind'], r['tags'], r['question'][:80])
+"
+u13 unanswerable ['tool-not-installed'] How do I sort processes by memory usage inside htop?
+u19 unanswerable ['out-of-corpus'] How do I format a floating point number with printf in C?
+u06.t unanswerable ['tool-not-installed', 'variant-terse'] strace syscalls of a process
+u06.z unanswerable ['tool-not-installed', 'variant-typo'] trase the sytem calls a program makes
+```
+
+So more than half of C's raw gain is parametric (ungrounded), not grounded
+— exactly what the pre-registered abstention bar guards against, and it
+shows up in the unsupported rate too: 24→32/166 for C even as raw accuracy
+rises.
+
+The grounded part of the gain is real but small: correct given evidence
+rises 76/90→79/90 for C vs A, and 78/104→83/104 for D vs B ("Per-arm
+results" above) — a few points, not the ~10-point raw gain.
+
+**Premise-gate cross-check.** §3's 29-question probe found the 30B right in
+both contexts 11/29 with only 9/29 flipping between contexts, versus the
+4B's 0/29 right-in-both and 17/29 flips — consistent with a more stable
+reader on that adversarial subset. But on the full 166-question run the
+grounded gain (correct-given-evidence) is small, and most of the raw gain
+traces to parametric answers rather than better reading of retrieved
+evidence.
 
 ## Cost: latency and memory
 
-RESULTS PENDING
+**Wall time** (orchestrator-reported, `p9-arms.log`; not independently
+re-timed — no per-question timing is stored in the answer JSONs):
+
+```
+$ cat /tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p9-out/p9-arms.log
+arm C (cache p7-k20 gate 0.65) exit=0 1383s
+arm D (cache p8-k20 gate 0.7631053338514099) exit=0 1354s
+```
+
+```
+$ python3 -c "print(1383/166, 1354/166)"
+8.331325301204819 8.156626506024097
+```
+
+166 questions each: ~8.3 s/question for C, ~8.2 s/question for D — call it
+~8.3 s/question for the 30B-A3B generator.
+
+The corresponding figure for the shipped 4B generator is **not measured in
+this phase**: docs/phase7-results.md and docs/phase8-results.md's cost
+sections instrument reranker/retrieval latency (`docs/phase8-results.md`,
+"Cost: latency and memory" — 0.6B vs 4B *reranker* seconds/question) but
+none of phases 6-8's docs record the 4B *generator's* own seconds/question,
+so no like-for-like comparison is available from prior phases; this is a
+gap in this phase's own instrumentation, not a claim of parity or speedup.
+
+**Memory** (as configured in §2, not independently re-measured here): the
+30B-A3B Q4_K_M model is 18,556,686,752 bytes (~18.6 GB, §2) and, served with
+`--cpu-moe`, sits in system RAM rather than VRAM; only attention and
+non-expert tensors go to the GPU, at roughly 1.5 GB VRAM — cheap enough to
+coexist with the embedder and reranker already resident (§2). System RAM on
+this machine is 31 GB total, so an 18.6 GB model leaves headroom for the OS,
+embedder, and reranker, but not a large margin beyond that.
 
 ## What this changes
 
-RESULTS PENDING
+**Null, and nothing ships.** Phase 9 separates two things a single
+"correct" number had merged: a stronger reader is right more often
+(81→91/127, sign test p=0.0213; strict also up, 63→72), but "Reader vs
+finder" above shows more than half of that gain — 7 of 13 discordant-up
+questions, plus 4 previously-abstained unanswerable questions now answered
+— is the 30B answering from its own knowledge of Linux rather than from the
+retrieved extracts, including answers about tools (`htop`, `strace`) not
+installed on this machine. For a system whose stated requirement is "answer
+from the manual on this machine, or abstain," that is a regression in the
+property the system exists to have, not a gain — even though the top-line
+accuracy number rose and is itself statistically significant. The
+pre-registered rule (§5) exists to catch exactly this failure mode —
+accuracy bought with reduced abstention — and condition (b) (abstained
+≥37/39) does its job here: C falls to 35/39, so the primary is null.
+
+Secondary comparisons do not change the picture: D vs A is not significant
+(p=0.1153) and D vs C is not significant (p=0.8145) — the 4B reranker does
+not pay off even once paired with the stronger 30B reader, echoing phase
+8's finding that the reranker upgrade alone does not move end-to-end
+correctness.
+
+**Open questions**, named here and not designed in this phase:
+- A gate or abstention policy recalibrated for the 30B specifically — §4
+  ("The gate thresholds stay tied to their reranker...") marked a gate
+  re-sweep for the new generator out of scope for this phase; it may be
+  what is needed to let a stronger reader's grounded gains through without
+  also letting its parametric guesses through.
+- Prompting or grammar changes that forbid ungrounded answers outright, so
+  a stronger model's broader knowledge cannot substitute for missing
+  evidence in context.
+
+Neither is designed here; either would need its own pre-registration before
+a future phase could act on it.

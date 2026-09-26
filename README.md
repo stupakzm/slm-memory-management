@@ -46,6 +46,7 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 | 6 | Independent verifier: claims re-read against cited extracts | **done, null** — all three mechanisms (lexical, cross-encoder, self-judge) fail the pre-registered win test; AUC 0.44–0.56, chance range; still null under corrected label; see `docs/phase6-results.md` |
 | 7 | Evidence depth: read more extracts, or cap per document | **done, null** — no arm beats the pre-registered win test: k=8 (B) 85/127 aliased vs 81/127 control, p=0.454; cap=2 (C) 81/127, p=1.000; both (D) 83/127, p=0.791; evidence-in-context rises with k (90→101/127) but correct-given-evidence falls (84.4%→80.2%), reading loses what finding gains; see `docs/phase7-results.md` |
 | 8 | Stronger reranker (Qwen3-Reranker-4B) | **done, null** — evidence in context 90→104/127 at the same k=5, correct 81→82/127, sign test p=1.0, no win under the pre-registered rule; 3.1× slower retrieval; see `docs/phase8-results.md` |
+| 9 | Stronger reader (Qwen3-30B-A3B-2507) | **done, null** — correct 81→91/127 (p=0.021) but abstention 38→35/39 fails the pre-registered bar; 7 of 13 gains have no evidence in context; see `docs/phase9-results.md` |
 
 **Label correction (2026-09-26).** The answer-accuracy figures in the rows
 above use the strict gold-token label (an answer must contain the token
