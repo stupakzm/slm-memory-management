@@ -299,16 +299,285 @@ arm is genuinely better.
 
 ## Per-arm results
 
-RESULTS PENDING
+Re-derived from the four arm answer files (untracked eval artifacts, produced
+by `scripts/eval_answers.py --stage generate --cache p7-k20 --read-k K
+--cap-per-doc C --gate 0.65 --grammar` off one shared `--stage retrieve -k
+20` run; read here from the orchestrator's scratchpad at
+`/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p7-out/p7-{A,B,C,D}-answers.json`):
+
+```
+$ python3 -c "
+import json, math
+BASE = '/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p7-out/p7-{}-answers.json'
+def load(arm): return json.load(open(BASE.format(arm)))
+arms = {a: load(a) for a in 'ABCD'}
+
+def sign_test(up, down):
+    n = up + down
+    k = min(up, down)
+    p = sum(math.comb(n, i) for i in range(k + 1)) * (0.5 ** n) * 2
+    return min(p, 1.0)
+
+def stats(d):
+    ans = [r for r in d['results'] if r['kind'] == 'answerable']
+    una = [r for r in d['results'] if r['kind'] == 'unanswerable']
+    with_ev = [r for r in ans if r['evidence_retrieved']]
+    no_ev = [r for r in ans if not r['evidence_retrieved']]
+    return dict(
+        correct=sum(1 for r in ans if r['correct']),
+        strict=sum(1 for r in ans if r['correct_strict']),
+        n_ev=len(with_ev), correct_ev=sum(1 for r in with_ev if r['correct']),
+        abstain=sum(1 for r in una if r['abstained']), n_una=len(una),
+        blind=sum(1 for r in no_ev if not r['abstained']), n_noev=len(no_ev),
+        ans={r['qid']: r for r in ans})
+
+S = {a: stats(arms[a]) for a in 'ABCD'}
+for a in 'ABCD':
+    s = S[a]
+    line = (f\"{a}: {s['correct']} ({s['strict']}) | {s['n_ev']} | \"
+            f\"{s['correct_ev']}/{s['n_ev']} {100*s['correct_ev']/s['n_ev']:.1f}% | \"
+            f\"{s['abstain']}/{s['n_una']} | {s['blind']}/{s['n_noev']}\")
+    if a == 'A':
+        print(line, '| —')
+        continue
+    up = down = 0
+    for qid, ra in S['A']['ans'].items():
+        rb = s['ans'][qid]
+        if ra['correct'] and not rb['correct']: down += 1
+        elif rb['correct'] and not ra['correct']: up += 1
+    p = sign_test(up, down)
+    print(line, f'| +{up}/-{down}, p={p:.3f}')
+"
+A: 81 (63) | 90 | 76/90 84.4% | 38/39 | 23/37 | —
+B: 85 (67) | 101 | 81/101 80.2% | 36/39 | 16/26 | +10/-6, p=0.454
+C: 81 (60) | 87 | 73/87 83.9% | 37/39 | 27/40 | +3/-3, p=1.000
+D: 83 (63) | 97 | 77/97 79.4% | 35/39 | 20/30 | +8/-6, p=0.791
+```
+
+Arm A reproduces `fusion-ctl-answers.json` exactly — same script confirms
+166/166 identical answers (same `answer`, `abstained`, `gated`) and the
+k=20 cache's top-5 chunks match the control's actual k=5 retrieval on
+166/166 questions, so A is a valid stand-in for the control under the
+shared pool.
+
+| arm | aliased correct/127 (strict) | evidence in context | correct given evidence | unanswerable abstained/39 | answered blind / no-evidence | discordant vs A | (a) sign test p<0.05 | (b) abstain ≥37/39 |
+|---|---|---|---|---|---|---|---|---|
+| A k=5 (reference) | 81 (63) | 90/127 | 76/90 (84.4%) | 38/39 | 23/37 | — | — | pass (38) |
+| B k=8 | 85 (67) | 101/127 | 81/101 (80.2%) | 36/39 | 16/26 | +10/−6, p=0.454 | fail | fail (36) |
+| C k=5, cap=2 | 81 (60) | 87/127 | 73/87 (83.9%) | 37/39 | 27/40 | +3/−3, p=1.000 | fail | pass (37) |
+| D k=8, cap=2 | 83 (63) | 97/127 | 77/97 (79.4%) | 35/39 | 20/30 | +8/−6, p=0.791 | fail | fail (35) |
+
+**Verdict, per §5**: every arm is null. None of B, C or D clears (a) — the
+sign test needs 13–3 or better at 16 discordant (B/D's scale) to reach
+p < 0.05, and B/D land at 10–6/8–6 while C has only 3–3 discordant, nowhere
+close. B and D also fail (b) outright (36/39 and 35/39 against the ≥37/39
+bar), so they lose on two independent grounds, not one. C alone clears (b)
+(37/39) but that is moot once (a) fails. (c) does not come into play for
+any arm — no arm shows a strict-label-only improvement to disqualify.
+Nothing ships.
 
 ## Reading vs finding
 
-RESULTS PENDING
+Correct given evidence (from the table above): A 76/90 (84.4%), B 81/101
+(80.2%), C 73/87 (83.9%), D 77/97 (79.4%). Finding (evidence in context)
+rises with k; reading (correct given the model was actually shown the
+evidence) falls with k. The two move in opposite directions and roughly
+cancel in the aliased-correct total.
+
+**B's 16 discordant questions against A**, split by whether the gold
+evidence's presence in context changed between k=5 and k=8:
+
+```
+$ python3 -c "
+import json
+def load(arm):
+    return json.load(open(f'/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p7-out/p7-{arm}-answers.json'))
+A = {r['qid']: r for r in load('A')['results'] if r['kind'] == 'answerable'}
+B = {r['qid']: r for r in load('B')['results'] if r['kind'] == 'answerable'}
+up = [q for q in A if not A[q]['correct'] and B[q]['correct']]
+down = [q for q in A if A[q]['correct'] and not B[q]['correct']]
+def tag(q):
+    ea, eb = A[q]['evidence_retrieved'], B[q]['evidence_retrieved']
+    return 'newly-in-context' if (not ea and eb) else 'same evidence status'
+print('gains (A wrong -> B right):', len(up))
+for q in up: print(' ', q, tag(q))
+print('losses (A right -> B wrong):', len(down))
+for q in down: print(' ', q, 'no evidence in A either' if not A[q]['evidence_retrieved'] else 'evidence present in both A and B')
+"
+gains (A wrong -> B right): 10
+  a04 newly-in-context
+  a11 newly-in-context
+  a18 newly-in-context
+  a29 same evidence status
+  a40 newly-in-context
+  b07 same evidence status
+  b09 same evidence status
+  a11.t same evidence status
+  a21.n newly-in-context
+  b12.t newly-in-context
+losses (A right -> B wrong): 6
+  a19 no evidence in A either
+  a30 evidence present in both A and B
+  b06 evidence present in both A and B
+  p04 evidence present in both A and B
+  a09.n evidence present in both A and B
+  a25.t evidence present in both A and B
+```
+
+So of B's 10 gains, 6 are a genuine finding win — the gold evidence was
+absent from A's 5-chunk context and present once k widened to 8 (a04, a11,
+a18, a40, a21.n, b12.t); the other 4 (a29, b07, b09, a11.t) had the same
+evidence status in both arms, so the flip is a reading effect, not a
+finding one. Of the 6 losses, 5 (a30, b06, p04, a09.n, a25.t) already had
+the gold evidence in A's 5-chunk context and kept it in B's 8-chunk
+context (`evidence_retrieved` is `True` in both) — B still got these wrong,
+so the extra 3 extracts did not remove the evidence, they degraded the
+model's use of it. The sixth, a19, had no evidence in either arm and was
+right in A anyway (a guess or partial match A got away with, that the
+noisier B context did not). B also newly answers 2 previously-abstained
+unanswerable questions instead of abstaining (u18, p12) — both flip from
+`abstained: true` in A to an answer in B.
+
+**D's discordant questions**, same split (D shares B's k=8 but adds
+cap=2):
+
+```
+$ python3 -c "
+import json
+def load(arm):
+    return json.load(open(f'/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p7-out/p7-{arm}-answers.json'))
+A = {r['qid']: r for r in load('A')['results'] if r['kind'] == 'answerable'}
+D = {r['qid']: r for r in load('D')['results'] if r['kind'] == 'answerable'}
+up = [q for q in A if not A[q]['correct'] and D[q]['correct']]
+down = [q for q in A if A[q]['correct'] and not D[q]['correct']]
+print('gains:', len(up))
+for q in up:
+    ea, ed = A[q]['evidence_retrieved'], D[q]['evidence_retrieved']
+    print(' ', q, 'newly-in-context' if (not ea and ed) else 'same evidence status')
+print('losses:', len(down))
+for q in down:
+    ea, ed = A[q]['evidence_retrieved'], D[q]['evidence_retrieved']
+    print(' ', q, 'evidence lost (cap)' if (ea and not ed) else ('evidence present in both' if ea and ed else 'no evidence either'))
+"
+gains: 8
+  a11 newly-in-context
+  a18 newly-in-context
+  a37 same evidence status
+  a40 newly-in-context
+  b07 same evidence status
+  p08 same evidence status
+  a11.t same evidence status
+  a21.n newly-in-context
+losses: 6
+  a30 evidence present in both
+  a43 evidence present in both
+  b06 evidence present in both
+  p04 evidence present in both
+  a01.t evidence lost (cap)
+  a25.t evidence present in both
+```
+
+D's pattern matches B's for the k-driven gains (4 newly-in-context, 4 same
+evidence status), but one of D's losses (a01.t) is a genuine cap-driven
+evidence loss on top of the reading-degradation pattern the other 5 share
+— cap=2 removes evidence k=8 alone would have kept (§"Ablation" below has
+the same qid on cap's own casualty list, a01.t, confirming it is the cap,
+not the k, that cost this one). D newly answers 3 previously-abstained
+unanswerable questions (u13, u18, p12), one more than B (u13 only flips in
+D).
+
+**Net reading-vs-finding effect**: widening k finds strictly more evidence
+(90→101 for B, 90→97 for D) but the model reads that longer, noisier
+context worse (84.4%→80.2% correct-given-evidence for B, 84.4%→79.4% for
+D) — the two effects roughly cancel in the aliased-correct total (81→85
+for B, +4; 81→83 for D, +2), and neither reaches significance against A.
 
 ## Ablation: k and cap separately
 
-RESULTS PENDING
+**k alone (B, k=8, no cap)**: evidence in context rises 90→101/127, but
+correct-given-evidence falls 84.4%→80.2%; aliased correct rises 81→85
+(+10/−6, p=0.454, not significant); unanswerable abstention falls 38→36/39
+(fails the ≥37/39 bar). Widening k finds more, reads worse, nets a small
+and non-significant gain, and gives back coverage on unanswerable
+questions (§"Reading vs finding").
+
+**Cap alone (C, k=5, cap=2)**: evidence in context falls 90→87/127 (the
+cap actively removes evidence the uncapped k=5 context had), yet
+correct-given-evidence is nearly flat (84.4%→83.9%) and aliased correct is
+unchanged at 81 (+3/−3, p=1.000, only 3 discordant pairs, no power).
+Unanswerable abstention rises 38→37/39, the only arm that clears the (b)
+bar — but with (a) failing outright there is nothing to combine it with.
+
+**Both (D, k=8, cap=2)**: combines k's finding gain with the cap's own
+losses. Evidence rises 90→97/127 (less than B's 90→101, because the cap
+removes some of what the wider k would otherwise have added),
+correct-given-evidence falls furthest of the three arms (84.4%→79.4%),
+aliased correct rises 81→83 (+8/−6, p=0.791), and abstention falls to
+35/39, the worst of the four arms. D inherits both k's reading penalty and
+the cap's evidence removal (a01.t below is lost to the cap in D just as it
+is in C); it does not compound their gains.
+
+**The cap mechanism**: C loses evidence, relative to A, on exactly 6
+questions, and in every one of them the crowding document A already
+concentrated in its top 5 is the one the cap starves:
+
+```
+$ python3 -c "
+import json, collections
+def load(arm):
+    return json.load(open(f'/tmp/claude-1000/-home-stupakzm-projects-slm-memory-management/c8ea9a11-ce22-4155-8f41-1fa70f61f461/scratchpad/p7-out/p7-{arm}-answers.json'))
+A = {r['qid']: r for r in load('A')['results'] if r['kind'] == 'answerable'}
+C = {r['qid']: r for r in load('C')['results'] if r['kind'] == 'answerable'}
+lost = [q for q in A if A[q]['evidence_retrieved'] and not C[q]['evidence_retrieved']]
+print('C loses evidence on', len(lost), 'questions:', lost)
+for q in lost:
+    docs = A[q]['retrieved_docs']
+    doc, n = collections.Counter(docs).most_common(1)[0]
+    print(' ', q, 'A top-5 docs:', docs, '-> crowding doc', doc, f'({n}/5)')
+"
+C loses evidence on 6 questions: ['a25', 'b12', 'p01', 'a01.t', 'a37.z', 'b12.z']
+  a25 A top-5 docs: ['sed.1', 'pager.1', 'sed.1', 'busybox.1', 'sed.1'] -> crowding doc sed.1 (3/5)
+  b12 A top-5 docs: ['systemd.service.5', 'systemd.service.5', 'systemd.service.5', 'systemd.service.5', 'systemd.1'] -> crowding doc systemd.service.5 (4/5)
+  p01 A top-5 docs: ['tar.1', 'dpkg-source.1', 'tar.1', 'tar.1', 'tar.1'] -> crowding doc tar.1 (4/5)
+  a01.t A top-5 docs: ['tar.1', 'dpkg-source.1', 'tar.1', 'tar.1', 'tar.1'] -> crowding doc tar.1 (4/5)
+  a37.z A top-5 docs: ['mount.8', 'mount.8', 'mount.8', 'mount.8', 'mount.8'] -> crowding doc mount.8 (5/5)
+  b12.z A top-5 docs: ['systemd.service.5', 'systemd.service.5', 'systemd.service.5', 'systemd.service.5', 'systemd.service.5'] -> crowding doc systemd.service.5 (5/5)
+```
+
+All 6 crowding documents hold at least 3 of A's 5 retrieved chunks (3, 4,
+4, 4, 5, 5). Same-document crowding is mostly the *right* document, not
+noise: the cap's premise — that forcing distinct documents into view helps
+— is backwards here, because the document dominating the top 5 is usually
+dominating it because it is the relevant one. Capping removes evidence
+more often than it frees a useful slot for a different, correct document.
 
 ## What this changes
 
-RESULTS PENDING
+Every arm is null (§"Per-arm results"). Nothing ships — no separate task to
+wire k or a cap into `scripts/ask.py`.
+
+The corrected-label error budget this phase set out to move is the
+control's 28 answered-and-wrong questions (`docs/phase6-results.md`; §1
+above): 18 no-evidence, 9 wrong-with-evidence, 1 unanswerable-answered
+(re-derived in §1, matching that count exactly). This phase targeted the
+18 no-evidence questions specifically — the ones the gate cannot catch
+(§1's AUC 0.428). Depth does put more of that evidence in front of the
+model: §2 already showed 14 of the 18 have their first relevant chunk
+somewhere in the top 20 (7 by k=8, another 7 only by k=20), and B (k=8)
+does raise evidence-in-context on the full answerable set from 90 to
+101/127. But the 4B model reads a longer, noisier context worse, not
+better: correct-given-evidence drops from 84.4% to 80.2% under B and to
+79.4% under D (§"Reading vs finding"), enough to erase almost all of the
+gain finding produced. The budget is not movable by retrieval depth alone,
+because the reading side degrades in step with the finding side.
+
+The binding constraint this phase locates is reading capacity at a longer
+context, not finding capacity — the two do not fail for the same reason,
+and only one of them responds to a bigger k. 4 of the 18 no-evidence
+misses (a35, c03, p06, a35.z; §2) are not in the top 20 at all, so no k
+this phase tested (or could test, short of reworking retrieval itself)
+reaches them — a ceiling on what depth alone can do even before the
+reading regression is counted.
+
+Open question, not designed here: how to give the model more evidence
+without more distraction.
