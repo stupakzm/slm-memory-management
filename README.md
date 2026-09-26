@@ -38,12 +38,22 @@ like `NULL [3]`, pointing at an extract that says nothing of the kind.
 |---|---|---|
 | Corpus | Structured extraction from installed man pages | **done** — 4,147 pages; a phase 4 fix recovered cross-reference tags on 1,084 of them |
 | 0 | Evaluation set, before any system exists | **done** — 166 questions, 24% unanswerable, all verified |
-| 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6%, prefix ablation run; see `docs/phase1-results.md` |
+| 1 | Deliberately boring flat baseline | **done** — recall@5 63.5%, answer 47.6% (strict label; see note), prefix ablation run; see `docs/phase1-results.md` |
 | 2 | Precision layer: reranker + abstention gate + GBNF citations | **done** — recall@5 71.4%, abstention 92.5%, uncited claims 0%; BM25 measured and rejected; see `docs/phase2-results.md` |
 | 3 | Structure-aware chunking | **done, reverted** — +8 questions, −8 questions, net zero; and cleaner chunks made the abstention gate *worse*; see `docs/phase3-results.md` |
 | 4 | Gated tool use | **done** — zero unconfirmed executions across 480 requests; GBNF takes valid calls from 17.5% to 100%; see `docs/phase4-results.md` |
 | 5 | User-fed knowledge loop | **done** — 41% of the index is user-fed and the Linux numbers are bit-identical; dilution tracks proximity, not volume; see `docs/phase5-results.md` |
-| 6 | Independent verifier: claims re-read against cited extracts | **done, null** — all three mechanisms (lexical, cross-encoder, self-judge) fail the pre-registered win test; AUC 0.44–0.56, chance range; see `docs/phase6-results.md` |
+| 6 | Independent verifier: claims re-read against cited extracts | **done, null** — all three mechanisms (lexical, cross-encoder, self-judge) fail the pre-registered win test; AUC 0.44–0.56, chance range; still null under corrected label; see `docs/phase6-results.md` |
+
+**Label correction (2026-09-26).** The answer-accuracy figures in the rows
+above use the strict gold-token label (an answer must contain the token
+verbatim), which under-credits short-form options (`cp -n` for
+`--no-clobber`, `wc -l` for `--lines`) that documented aliases would also
+count — 16–19 more correct answers per run once aliased, out of 126–127
+answerable questions. See `docs/phase6-results.md#correction-2026-09-26` for
+the derivation, the rejected aliases, the full rescore table, and what
+changes and doesn't in the phase 6 verdict; the rescore figures themselves
+are in `data/eval/results/gold-aliases-rescore.json`.
 
 ## From a fresh clone
 

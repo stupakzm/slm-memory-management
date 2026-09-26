@@ -465,3 +465,209 @@ found in `tsk_20260926_7d90f5d1`: the flag reached the rewrite generator
 (`--rewrites > 0`) but not the main answer-generation stage, which
 instantiated its own `Generator()` regardless of what was passed on the
 command line.
+
+## Correction (2026-09-26)
+
+**What was wrong with the label.** Answer correctness has always been
+`all(t in answer for t in row["answer_contains"])` — plain substring
+matching against the gold tokens in `data/eval/questions.jsonl`
+(`scripts/eval_answers.py`). Those gold tokens are mostly whichever form a
+man page lists first, usually the long-form option (`--no-clobber`,
+`--lines`, `identity_file` as an argument placeholder), so a correct answer
+written in the documented short form (`cp -n`, `wc -l`, `ssh -i`) was scored
+wrong. That noise sits under every answer-accuracy figure quoted anywhere in
+this repo, including every number in §2 and §5 above, and this section
+supersedes none of the *retrieval* numbers, only the answer-accuracy ones.
+
+**The derivation.** `scripts/derive_gold_aliases.py` (`tsk_20260926_a51d0707`,
+commits `c83be63`, `06ab7b4`) reads only `data/corpus/man.jsonl` and
+`data/eval/questions.jsonl` — never an answer, never a result — and for each
+answerable question's gold token searches the gold doc's own option lines
+for three kinds of match (`scripts/derive_gold_aliases.py:12-33`):
+
+- **synonym** — the token is itself one of the options on an option line
+  (`--no-clobber` on `-n, --no-clobber`); the line's other options become its
+  aliases.
+- **argument** — the token is the argument placeholder on an option line
+  (`identity_file` on `-i identity_file`); that line's options become its
+  aliases.
+- **description** — the token is a *phrase* (does not start with `-`) that
+  occurs verbatim in an option entry's description text (`sort by time`
+  under `-t`); that entry's options become its aliases. A flag token never
+  gets a description alias, because man pages routinely cross-reference
+  other flags by name in prose and that is not a synonym.
+
+Every alias is recorded with the rule, section and option line that produced
+it, so any alias traces back to one man-page sentence, and every alias,
+regardless of rule, must itself be a flag (start with `-`) or it is dropped.
+`src/smm/gold.py` applies the aliases at scoring time: originals keep
+substring matching unchanged; aliases match on option-token boundaries
+(`(?<![\w-])alias(?![\w-])`), so `-r` matches `scp -r dir` but not inside
+`--recursive` or `-rf` (`src/smm/gold.py:28-40`).
+
+**The over-generation caught at review.** The first derivation pass
+over-generated on two real corpus defects, both fixed before any rescoring
+(second commit, `06ab7b4`):
+
+- the description rule fired on flag tokens too (a flag's own description
+  mentioning another flag's long form made that long form an alias of the
+  first flag, and vice versa) — 139 bogus aliases from this alone, closed by
+  restricting the description rule to phrase tokens only.
+- an option line's inline description (`-t     sort by time, newest first`,
+  description on the same physical line) was fed whole into the comma/space
+  option parser, producing bogus "options" like `newest` — closed by
+  splitting the line at the first run of 2+ spaces or a tab before parsing.
+
+**The 10 rejected aliases.** The final derivation gave 79 aliases; the user
+reviewed the full list and rejected 12 alias entries (10 distinct alias
+strings), leaving 67 over 31 distinct gold-token strings
+(re-derived directly from the reviewed `gold_aliases.json`: `python3 -c
+"import json; d=json.load(open('gold_aliases.json')); print(sum(len(v) for
+p in d.values() for v in p.values()))"` → `67`). The rejections:
+
+- `-print0` → `-fprint0` (qids a09, its `.n`/`.t`/`.z` variants, p03): a
+  `description` match — `-print0`'s own man-page description happens to
+  mention `-fprint0` — but `-fprint0` writes to a *file*, not stdout; it is
+  not an equivalent way to answer the question.
+- `"Select all processes"` → `-a`, `-d`, `--deselect`, `-N` (a19): these
+  option lines' descriptions are "select all processes **EXCEPT** ...", the
+  opposite of what the question asks. `-A` and `-e` (literally "Select all
+  processes. Identical to -A/-e") are kept.
+- `list-unit-files` → `-a`, `--all`, `--with-dependencies` (a44): the gold
+  token is a systemctl *command*, not an option; these option entries merely
+  mention the command name in their description text. `gold_aliases.json`
+  now carries no entries for a44 at all — every candidate alias for that
+  question's token was rejected.
+
+Two accepted aliases worth noting rather than rejecting: a38's `-L`
+(mke2fs) is also matched via `mkntfs -L` by the `argument`/`description`
+rules on the same option line, which is correct for the question as posed;
+grep's `-NUM` alias is a literal placeholder token in the man page and is
+harmless.
+
+**The rescore table**, re-derived with `python3` against `src/smm/gold.py`'s
+`is_correct`, joining each `*-answers.json` run's `results` back to
+`data/eval/questions.jsonl` for `answer_contains` (every figure below
+reproduces the orchestrator's numbers exactly; commands and full script
+available on request):
+
+| run | strict correct / answerable | aliased correct / answerable | gain |
+|---|---|---|---|
+| fusion-ctl | 63/127 (49.6%) | 81/127 (63.8%) | +18 |
+| fusion-rw1 | 58/127 (45.7%) | 76/127 (59.8%) | +18 |
+| phase1-prefix | 60/126 (47.6%) | 76/126 (60.3%) | +16 |
+| phase2-full | 61/126 (48.4%) | 80/126 (63.5%) | +19 |
+| phase2-rerank | 63/126 (50.0%) | 80/126 (63.5%) | +17 |
+| phase2-rerank-gate | 56/126 (44.4%) | 73/126 (57.9%) | +17 |
+| phase2-rerank-grammar | 63/126 (50.0%) | 82/126 (65.1%) | +19 |
+| phase3-expand | 59/126 (46.8%) | 77/126 (61.1%) | +18 |
+| phase3-expand-ungated | 66/126 (52.4%) | 84/126 (66.7%) | +18 |
+| phase3-noexpand | 57/126 (45.2%) | 75/126 (59.5%) | +18 |
+
+Zero answers flip from right to wrong under aliasing, on any run (checked
+directly: no qid's strict-correct answer becomes aliased-incorrect anywhere
+above). Every run gains 16–19 correct answers out of 126–127 answerable
+questions — a near-uniform shift, so between-phase *comparisons* mostly hold,
+but every absolute answer-accuracy figure reported anywhere before this
+correction was about 13–15 points low.
+
+**The phase 6 replay under the aliased label.** Re-scoring `fusion-ctl` and
+`fusion-rw1` as "good" (`kind == answerable and aliased-correct`) and
+re-running the same 2-fold held-out threshold search from §4 changes which
+answers are "bad" (28 on control, down from 46; 33 on fused, down from 51)
+and, for lexical and judge, removes the modest signal §5's table found under
+the strict label entirely:
+
+| mechanism | control held-out sum (rb vs rg) | fused held-out sum (rb vs rg) |
+|---|---|---|
+| lexical | **0 vs 0** (threshold "off" both folds) | **0 vs 0** (threshold "off" both folds) |
+| judge | **0 vs 0** (threshold "off" both folds, as before) | **0 vs 0** (threshold "off" both folds) |
+| xenc | **3 vs 7** (wrong direction) | **0 vs 0** (threshold "off" both folds) |
+
+rb/rg = removed_bad/removed_good, held out. Under the strict label, lexical's
+control held-out sum was 18 bad vs 14 good — the right direction, though not
+significant (p = 0.597). Under the corrected label, that signal is gone: with
+fewer, more genuinely "bad" answers left to separate, no lexical threshold on
+either training fold nets more bad removed than good, so "off" (remove
+nothing) wins on both folds. xenc still goes the wrong direction on control
+(removed_bad 3 < removed_good 7, same qualitative failure as strict-label's
+8-vs-13), and both its removed_good (7) and removed_bad-vs-good direction
+still fail §5(a) and (c) outright. Judge removes nothing under either label,
+for the same reason as before (§4's threshold search never finds a candidate
+that beats "remove nothing").
+
+Against §5(a)–(c): lexical and judge have nothing for a sign test to test (a
+fails by construction); xenc fails (a) on direction and fails (c) on budget
+(7 > 3 good lost) even setting direction aside; (b) is moot for all three
+since (a) already fails on control. **The verdict stays null on all three
+mechanisms, under the corrected label, exactly as under the strict one** —
+the correction changes *why* two of the three mechanisms fail (lexical no
+longer even clears a nominal, non-significant signal) but not the outcome.
+
+**The AUCs** (aliased label, `P(score_good > score_bad)` over all pairs, ties
+0.5, re-derived from `*-verify.json` joined to the aliased label, restricted
+to the 109 answered questions per run):
+
+| mechanism | control AUC | fused AUC |
+|---|---|---|
+| lexical | 0.626 (n_good=62, n_bad=23) | 0.523 (n_good=58, n_bad=26) |
+| xenc | 0.528 (n_good=81, n_bad=28) | 0.435 (n_good=76, n_bad=33) |
+| judge | 0.612 (n_good=81, n_bad=28) | 0.560 (n_good=76, n_bad=33) |
+
+Compare to the strict-label AUCs in the Ablation table above (0.560/0.474,
+0.530/0.436, 0.539/0.488): lexical's control AUC moves from 0.560 to 0.626
+and judge's from 0.539 to 0.612 — both now sit modestly above chance on the
+control run — but neither replicates on the fused run (lexical 0.523, judge
+0.560, both back near chance), and xenc barely moves (0.528, 0.530). This is
+a control-run-only signal, not a replicated one: a mechanism that only
+separates good from bad on one of two runs meant to agree in direction is not
+a win under §5(b) regardless of AUC.
+
+**Refined diagnosis.** Under the aliased label, of the 109 answered
+questions per run:
+
+- **control**: 28 wrong (down from 46 strict) — 18 had no evidence retrieved
+  at all, 9 were wrong despite evidence being retrieved, 1 was an
+  unanswerable question answered anyway. (81 good.)
+- **fused**: 33 wrong (down from 51 strict) — 17 no-evidence, 13
+  wrong-with-evidence, 3 unanswerable-answered. (76 good.)
+
+Fully lexically grounded (every anchor verbatim in the cited extract, among
+answers where lexical had an opinion at all):
+
+- control: bad 10/23 (43%) vs good 42/62 (68%).
+- fused: bad 13/26 (50%) vs good 31/58 (53%).
+
+**Which "What this changes" conclusions stand, and which are superseded.**
+The headline verdict stands: null on all three mechanisms, confirmed again
+under the corrected label (above). The **grounding is not the discriminator**
+conclusion mostly stands too — the AUCs are still in the 0.44–0.63 range
+(not the 0.7+ that would make any mechanism usable), and control-only,
+non-replicating gains do not change that. But one specific claim is
+**superseded**: §"Why: grounded-but-wrong" reported, under the strict label,
+that on control "bad answers are *not* less grounded [than good], if
+anything the reverse" (54% bad grounded vs 68% good grounded). Under the
+corrected label that reverses again — control bad-grounded drops to 43% while
+good-grounded stays 68%, so bad answers *are* somewhat less grounded than
+good ones on control, in the intuitive direction. That earlier reversal was
+an artefact of the label: many of the "grounded but labelled wrong" answers
+on control were answers using a short-form option, genuinely grounded *and*
+genuinely correct, mislabelled bad. Once those are relabelled good, the
+remaining bad-on-control answers look, on average, somewhat less grounded
+than good ones — a small, control-only, non-replicating effect (fused stays
+indistinguishable, 50% vs 53%), not a rehabilitation of any mechanism.
+
+**What it implies.** Across both runs, the largest single wrong-answer
+category under the corrected label is still "no evidence retrieved" (18/28
+on control, 17/33 on fused) — questions the gate let through to generation
+despite nothing relevant having been retrieved, not the model misreading
+evidence it had. "Wrong with evidence" (9/28 control, 13/33 fused) is smaller
+and is where a grounding-only verifier could in principle help, but it is a
+minority of the remaining errors, and none of the three mechanisms measured
+here separates it from the good answers regardless. The biggest remaining
+error class points back at the gate and retrieval, not at a claim-vs-extract
+verifier: a verifier that only checks "does the cited extract support the
+claim" cannot catch an answer generated with no supporting evidence in the
+first place — the gate is supposed to prevent that case, and 18-and-17 out of
+28-and-33 says it still doesn't, often enough to be the majority failure
+mode.
