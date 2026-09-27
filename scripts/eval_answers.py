@@ -74,24 +74,40 @@ def evidence_in(hits: list, toks: list, token_aliases) -> tuple:
     return aliased, strict
 
 
-def cache_entry(hits: list, gate_hits: list, rewrites: int) -> object:
-    """Shape of one cached-retrieval entry. `rewrites == 0` returns `hits`
-    unchanged - today's exact format, so `--rewrites 0` reproduces existing
-    runs byte-for-byte. `rewrites > 0` returns a dict carrying both the fused
-    `hits` and the original question's own `gate_hits` (see
-    blk_fusion_gate_semantic_slip: the gate must never read the fused list's
-    own top-1)."""
-    if rewrites == 0:
+def cache_entry(hits: list, gate_hits: list, rewrites: int, corrected: str | None = None) -> object:
+    """Shape of one cached-retrieval entry. `rewrites == 0` and no `corrected`
+    text returns `hits` unchanged - today's exact format, so `--rewrites 0`
+    (with --llm-correct off) reproduces existing runs byte-for-byte.
+    Otherwise returns a dict carrying the (possibly fused) `hits`, the
+    original question's own `gate_hits` (see blk_fusion_gate_semantic_slip:
+    the gate must never read the fused list's own top-1), and - only under
+    --llm-correct - `question_corrected`, so the generate stage can reuse the
+    SAME corrected text `correct_text` cached it with, rather than asking the
+    model again."""
+    if rewrites == 0 and corrected is None:
         return hits
-    return {"hits": hits, "gate_hits": gate_hits}
+    entry = {"hits": hits, "gate_hits": gate_hits}
+    if corrected is not None:
+        entry["question_corrected"] = corrected
+    return entry
 
 
 def unpack_entry(entry: object) -> tuple:
-    """Inverse of `cache_entry`. A plain list (legacy cache, or --rewrites 0)
-    gives `(entry, entry)`; the dict form gives both lists back out."""
+    """Inverse of `cache_entry`'s hits/gate_hits half. A plain list (legacy
+    cache, or --rewrites 0 with --llm-correct off) gives `(entry, entry)`;
+    the dict form gives both lists back out. See `correct_text` for the
+    (optional) cached corrected question, which this does not return -
+    every existing 2-tuple call site stays exactly as it was."""
     if isinstance(entry, dict):
         return entry["hits"], entry["gate_hits"]
     return entry, entry
+
+
+def correct_text(entry: object) -> str | None:
+    """The cached --llm-correct question text for one retrieval entry, or
+    None if --llm-correct was off for this run (legacy/plain-list entries,
+    and dict entries with no question_corrected key)."""
+    return entry.get("question_corrected") if isinstance(entry, dict) else None
 
 
 def select_hits(hits: list, read_k: int, cap: int) -> list:
@@ -168,6 +184,17 @@ def main() -> int:
     ap.add_argument("--vocab-cache", default=None,
                     help="override path for --normalize spell's vocab cache (default: "
                          "<db>.vocab.json next to --db)")
+    ap.add_argument("--rewrite-style", choices=("man", "docs"), default="man",
+                    help="phase 11 R4b: 'docs' asks the rewriter for documentation's "
+                         "own terminology (manual pages and the GNU Emacs manuals) "
+                         "instead of everyday words; only meaningful with --rewrites > "
+                         "0. 'man' (default) reproduces every existing run exactly.")
+    ap.add_argument("--llm-correct", action="store_true",
+                    help="phase 11 R4a': ask the 4B generator itself to fix spelling "
+                         "in the question (Generator.correct) before retrieval AND "
+                         "generation, reusing the SAME corrected text at both stages; "
+                         "composes with --normalize (normalize runs first). Default off "
+                         "reproduces every existing run byte-for-byte.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
 
@@ -212,7 +239,7 @@ def main() -> int:
                 print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
                 return 2
         rewrite_gen = None
-        if args.rewrites:
+        if args.rewrites or args.llm_correct:
             rewrite_gen = Generator(args.gen_url)
             if not rewrite_gen.health():
                 print(f"no generator at {args.gen_url}: "
@@ -227,8 +254,16 @@ def main() -> int:
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
             qtext = query_text(row)
+            # --llm-correct composes with --normalize: normalize (above) runs
+            # first, then the model correction, on the already-normalized text
+            # (blk_normalize_spell_api's wiring pattern, extended). Cached here
+            # so the generate stage reuses this SAME corrected text rather than
+            # asking the model again (phase 11 R4a').
+            corrected = rewrite_gen.correct(qtext) if args.llm_correct else None
+            if corrected is not None:
+                qtext = corrected
             if args.rewrites:
-                rewrites = rewrite_gen.rewrites(qtext, n=args.rewrites)
+                rewrites = rewrite_gen.rewrites(qtext, n=args.rewrites, style=args.rewrite_style)
                 hits, _winner, _variants, gate_hits = r.retrieve_fused(
                     qtext, rewrites=rewrites, k=args.k)
             else:
@@ -240,7 +275,7 @@ def main() -> int:
             # It applies only to the fused hits the generator will read; gate_hits
             # is never shown to the model, so it is never expanded.
             hits = expand(db, hits, span=args.expand) if args.expand else hits
-            retrieved[row["qid"]] = cache_entry(hits, gate_hits, args.rewrites)
+            retrieved[row["qid"]] = cache_entry(hits, gate_hits, args.rewrites, corrected=corrected)
             if sys.stdout.isatty():
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
@@ -264,7 +299,8 @@ def main() -> int:
 
     results, t0 = [], time.time()
     for i, row in enumerate(rows, 1):
-        hits, gate_hits = unpack_entry(retrieved[row["qid"]])
+        entry = retrieved[row["qid"]]
+        hits, gate_hits = unpack_entry(entry)
         # The gate is architectural: below threshold the model is never invoked, so
         # there is no opportunity to speculate. That is the whole of Finding 04.
         # It reads gate_hits exactly as before select_hits ever runs - never the
@@ -272,7 +308,12 @@ def main() -> int:
         score = gate_score(gate_hits)
         gated = bool(args.gate) and score < args.gate
         hits = select_hits(hits, args.read_k, args.cap_per_doc)
-        qtext = query_text(row)
+        # --llm-correct: reuse the SAME corrected text the retrieve stage cached
+        # (correct_text), never re-ask the model here - see the cache-time
+        # comment above. Falls back to query_text(row) (normalize, or the raw
+        # question) when --llm-correct is off, or for a legacy cache.
+        question_corrected = correct_text(entry)
+        qtext = question_corrected if question_corrected is not None else query_text(row)
         if gated:
             text = grammar.REFUSAL
         elif args.answer_mode == "quote":
@@ -309,6 +350,8 @@ def main() -> int:
             norm_text, norm_edits = normalized[row["qid"]]
             rec["question_normalized"] = norm_text
             rec["normalize_edits"] = norm_edits
+        if args.llm_correct:
+            rec["question_corrected"] = qtext
         if row["kind"] == "answerable":
             toks = row["answer_contains"]
             # tsk_20260927_typos: a typo/paraphrase variant (row["qid"] like
@@ -399,6 +442,12 @@ def main() -> int:
     # byte-identical to every run made before this flag existed.
     if args.normalize == "spell":
         config["normalize"] = args.normalize
+    # Same convention for R4b/R4a': only added when non-default, so every
+    # existing run's config (and defaults off) stays byte-for-byte unchanged.
+    if args.rewrite_style != "man":
+        config["rewrite_style"] = args.rewrite_style
+    if args.llm_correct:
+        config["llm_correct"] = True
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
