@@ -91,6 +91,27 @@ def load_pool(paths: list) -> dict:
     return pool
 
 
+def apply_overlay(results: list, overlay_results: list) -> list:
+    """R4a (tsk_20260927_spellnorm): `results` (from --answers) with every
+    qid that also appears in `overlay_results` REPLACED by the overlay's own
+    row for that qid - rows not in the overlay are returned unchanged, in
+    `results`' own order and count. Every overlay qid must already be a
+    qid in `results`; SystemExit otherwise (an overlay is a replacement for
+    known rows, not a way to inject new ones), as must a duplicate qid
+    within the overlay itself."""
+    by_qid = {r["qid"]: r for r in results}
+    seen = set()
+    for r in overlay_results:
+        qid = r["qid"]
+        if qid in seen:
+            raise SystemExit(f"duplicate qid in --overlay: {qid!r}")
+        seen.add(qid)
+        if qid not in by_qid:
+            raise SystemExit(f"--overlay qid {qid!r} not found in --answers")
+        by_qid[qid] = r
+    return [by_qid[r["qid"]] for r in results]
+
+
 def mcnemar_p(lost: int, gained: int) -> float:
     """Exact two-sided McNemar p on the discordant pairs (lost, gained)
     under the binomial(n, 0.5) null, n = lost + gained. 1.0 when there are
@@ -257,12 +278,20 @@ def main() -> int:
                      help="jsonl question files the run drew from")
     ap.add_argument("--out", required=True, help="where to write the JSON report")
     ap.add_argument("--aliases", default=str(ROOT / "data" / "eval" / "gold_aliases.json"))
+    ap.add_argument("--overlay", default=None,
+                     help="an eval_answers.py output whose results REPLACE the --answers "
+                          "results with the same qid (phase 11 R4a, tsk_20260927_spellnorm) "
+                          "- every overlay qid must already exist in --answers. Without "
+                          "--overlay the output is unchanged (byte-identical).")
     args = ap.parse_args()
 
     pool = load_pool(args.pool)
     aliases = gold.load_aliases(args.aliases)
     data = json.loads(Path(args.answers).read_text(encoding="utf-8"))
     results = data["results"]
+    if args.overlay:
+        overlay_data = json.loads(Path(args.overlay).read_text(encoding="utf-8"))
+        results = apply_overlay(results, overlay_data["results"])
 
     report = build_report(pool, results, aliases)
     report = {
@@ -272,6 +301,8 @@ def main() -> int:
         "n_results": len(results),
         "kinds": report["kinds"],
     }
+    if args.overlay:
+        report["overlay"] = args.overlay
 
     print_table(report)
 

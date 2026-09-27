@@ -51,6 +51,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from smm import grammar, store, tools  # noqa: E402
+from smm import normalize as qnorm  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
@@ -95,10 +96,26 @@ def main() -> int:
                          "retrieved and reranked separately (default 1; 0 under "
                          "--retrieve-only unless passed explicitly). --rewrites 0 "
                          "reproduces the single-query path exactly.")
+    ap.add_argument("--normalize", choices=("off", "spell"), default="off",
+                    help="phase 11 R4a: 'spell' corrects the question against the "
+                         "index's own vocabulary (smm.normalize) before retrieval AND "
+                         "generation; 'off' (default) reproduces today's behaviour "
+                         "exactly")
+    ap.add_argument("--vocab-cache", default=None,
+                    help="override path for --normalize spell's vocab cache (default: "
+                         "<db>.vocab.json next to --db)")
     args = ap.parse_args()
     question = " ".join(args.question)
     if args.rewrites is None:
         args.rewrites = 0 if args.retrieve_only else 1
+
+    if args.normalize == "spell":
+        vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
+        normalized_question, _normalize_edits = qnorm.normalize_query(
+            question, "spell", vocab)
+        if normalized_question != question:
+            print(f'(read as: "{normalized_question}")')
+        question = normalized_question
 
     rewrite_texts: list[str] = []
     interpreted_idx = 0
