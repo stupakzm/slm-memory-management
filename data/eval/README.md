@@ -157,7 +157,12 @@ regions/kill ring, undo, keyboard macros, registers/bookmarks, dired,
 customisation, major/minor modes, help, version control, org (agenda/TODO/export),
 tramp, eglot, use-package, eshell, ediff, calc and flymake. Each is phrased to ask
 for one form — a key sequence, a command name, or a variable — so `answer_contains`
-names the one literal string a correct answer cannot avoid.
+names the one literal string a correct answer cannot avoid, and every answerable
+row has exactly one; where that token alone would match more than one plausible
+section, the extra context needed to locate the *right* one lives in a
+`gold_hint` list instead — `gold_hint` is required when resolving `gold_sec_ids`
+but is never scored and never leak-checked, because `answer_contains` is also
+what `eval_answers`/`gold.is_correct` grades a model's answer against.
 
 The 18 `tool-not-installed` questions name a third-party package that is
 genuinely absent from the converted manuals (`projectile`, `lsp-mode`,

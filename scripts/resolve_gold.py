@@ -6,6 +6,12 @@ its answer tokens appear; every "tool not installed" question must name a tool
 that genuinely has no page. This is what stops the eval set from encoding the
 author's recall instead of what is actually on the machine.
 
+A row may also carry "gold_hint": a list of strings that narrow which section
+counts as gold (useful when the real answer token alone matches many sections)
+without inflating what eval_answers/gold.is_correct requires of a model's
+answer. gold_hint strings are required alongside answer_contains tokens when
+locating the gold section, but are never scored and never leak-checked.
+
 Usage: resolve_gold.py [--write]
        resolve_gold.py [--corpus PATH] [--eval PATH] [--write]
        resolve_gold.py --md-corpus DIR --domain D [--eval PATH] [--write]
@@ -83,13 +89,15 @@ def main() -> int:
                 errors.append(f"{r['qid']}: no such doc {r['doc']!r}")
                 continue
             toks = r["answer_contains"]
-            matches = [s["sec_id"] for s in doc["sections"] if all(t in s["text"] for t in toks)]
+            hints = r.get("gold_hint") or []
+            needed = toks + hints
+            matches = [s["sec_id"] for s in doc["sections"] if all(t in s["text"] for t in needed)]
             if not matches:
                 near = [t for t in toks if not any(t in s["text"] for s in doc["sections"])]
-                errors.append(f"{r['qid']}: no section of {r['doc']} holds all of {toks} (missing: {near})")
+                errors.append(f"{r['qid']}: no section of {r['doc']} holds all of {needed} (missing: {near})")
                 continue
             if len(matches) > 5:
-                warnings.append(f"{r['qid']}: {len(matches)} sections match {toks} - tokens too generic")
+                warnings.append(f"{r['qid']}: {len(matches)} sections match {needed} - tokens too generic")
             r["gold_sec_ids"] = matches
             # The primary is the section a reader would be sent to: an options or
             # command reference before prose, shortest before longest.

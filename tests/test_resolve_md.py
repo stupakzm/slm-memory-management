@@ -144,6 +144,49 @@ def test_leak_warning():
               f"expected a leak warning, got:\n{out}")
 
 
+def test_gold_hint_narrows_and_is_not_leak_checked():
+    """gold_hint requires extra strings alongside answer_contains when
+    locating the gold section (tsk_20260927_emacsq attempt 2: answer_contains
+    is also what eval_answers/gold.is_correct scores a model's answer
+    against, so a prose disambiguator belongs in gold_hint, not
+    answer_contains). A row with no gold_hint still matches every section
+    that has the token; adding gold_hint narrows that set; and a hint string
+    may appear verbatim in its own question without triggering the leak
+    warning, because only answer_contains tokens are leak-checked."""
+    with tempfile.TemporaryDirectory() as td:
+        tmp = Path(td)
+        md_dir = tmp / "corpus"
+        md_dir.mkdir()
+        _write(md_dir / "foo.md",
+               "## Basics\n\nEnable widget-mode for everyday editing.\n\n"
+               "## Advanced\n\nEnable widget-mode plus the strict formatting profile.\n")
+        eval_path = _write_jsonl(tmp / "eval.jsonl", [
+            _answerable_row("h1", "Which minor mode turns on the widget UI?",
+                             "foo.testdom", ["widget-mode"]),
+            {**_answerable_row(
+                "h2",
+                "Which minor mode turns on the widget UI under the strict "
+                "formatting profile?",
+                "foo.testdom", ["widget-mode"]),
+             "gold_hint": ["strict formatting profile"]},
+        ])
+
+        rc, out = _run(["--md-corpus", str(md_dir), "--domain", "testdom",
+                         "--eval", str(eval_path), "--write"])
+        check(rc == 0, f"expected exit 0, got {rc}\n{out}")
+        check("h2: question leaks" not in out,
+              f"a gold_hint string must not be leak-checked, got:\n{out}")
+
+        rows = {r["qid"]: r for r in
+                (json.loads(l) for l in eval_path.open(encoding="utf-8"))}
+        check(sorted(rows["h1"]["gold_sec_ids"]) ==
+              ["foo.testdom#advanced", "foo.testdom#basics"],
+              f"without gold_hint both sections should match, got {rows['h1']}")
+        check(rows["h2"]["gold_sec_ids"] == ["foo.testdom#advanced"],
+              f"gold_hint should narrow to the one section holding both the "
+              f"token and the hint, got {rows['h2']}")
+
+
 def test_default_corpus_and_eval_flags():
     """--corpus/--eval point resolve_gold at a fixture man.jsonl and a
     fixture questions.jsonl instead of the real ones - the same code path
