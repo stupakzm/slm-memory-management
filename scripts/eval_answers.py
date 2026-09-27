@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from smm import gold, grammar, lexical, store  # noqa: E402
+from smm import normalize as qnorm  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
@@ -160,6 +161,13 @@ def main() -> int:
     ap.add_argument("--qids", default=None,
                     help="path to a JSON list of qids; restricts rows to those qids, kept "
                          "in the eval set's own order, applied after --limit")
+    ap.add_argument("--normalize", choices=("off", "spell"), default="off",
+                    help="phase 11 R4a: 'spell' corrects the question against the index's "
+                         "own vocabulary (smm.normalize) before retrieval AND generation; "
+                         "'off' (default) reproduces every existing run byte-for-byte")
+    ap.add_argument("--vocab-cache", default=None,
+                    help="override path for --normalize spell's vocab cache (default: "
+                         "<db>.vocab.json next to --db)")
     args = ap.parse_args()
     args.cache = args.cache or args.name
 
@@ -173,6 +181,21 @@ def main() -> int:
     if args.qids:
         qid_set = set(json.loads(Path(args.qids).read_text()))
         rows = [r for r in rows if r["qid"] in qid_set]
+
+    # Normalised once, here, so retrieval (including rewrites/fusion) and
+    # generation read the SAME corrected text in every stage of this run -
+    # each of --stage retrieve/generate/both re-derives it identically
+    # since both build_vocab (cached next to --db) and normalize() are pure
+    # functions of --db's own content. `off` leaves `normalized` empty and
+    # every downstream use falls back to `row["question"]` unchanged.
+    normalized: dict = {}
+    if args.normalize == "spell":
+        vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
+        for row in rows:
+            normalized[row["qid"]] = qnorm.normalize_query(row["question"], "spell", vocab)
+
+    def query_text(row: dict) -> str:
+        return normalized[row["qid"]][0] if args.normalize == "spell" else row["question"]
 
     # --- stage 1: retrieval only (embedder + reranker resident) ---
     if args.stage in ("retrieve", "both"):
@@ -203,12 +226,13 @@ def main() -> int:
                       candidates=args.candidates, domain=args.domain)
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
+            qtext = query_text(row)
             if args.rewrites:
-                rewrites = rewrite_gen.rewrites(row["question"], n=args.rewrites)
+                rewrites = rewrite_gen.rewrites(qtext, n=args.rewrites)
                 hits, _winner, _variants, gate_hits = r.retrieve_fused(
-                    row["question"], rewrites=rewrites, k=args.k)
+                    qtext, rewrites=rewrites, k=args.k)
             else:
-                hits = r.retrieve(row["question"], k=args.k)
+                hits = r.retrieve(qtext, k=args.k)
                 gate_hits = hits
             # Expansion changes what the model reads, not how anything ranked, so it
             # belongs here rather than inside the retriever - and `evidence_retrieved`
@@ -248,12 +272,13 @@ def main() -> int:
         score = gate_score(gate_hits)
         gated = bool(args.gate) and score < args.gate
         hits = select_hits(hits, args.read_k, args.cap_per_doc)
+        qtext = query_text(row)
         if gated:
             text = grammar.REFUSAL
         elif args.answer_mode == "quote":
-            text = gen.answer(row["question"], hits, mode="quote")
+            text = gen.answer(qtext, hits, mode="quote")
         else:
-            text = gen.answer(row["question"], hits, cite_grammar=args.grammar)
+            text = gen.answer(qtext, hits, cite_grammar=args.grammar)
 
         # Quote mode's verification has to run BEFORE correct/evidence scoring:
         # a claim whose opening quote isn't actually in the extract it cites is
@@ -280,6 +305,10 @@ def main() -> int:
             rec["answer_raw"] = answer_raw
         if quote_info is not None:
             rec.update(quote_info)
+        if args.normalize == "spell":
+            norm_text, norm_edits = normalized[row["qid"]]
+            rec["question_normalized"] = norm_text
+            rec["normalize_edits"] = norm_edits
         if row["kind"] == "answerable":
             toks = row["answer_contains"]
             # tsk_20260927_typos: a typo/paraphrase variant (row["qid"] like
@@ -358,16 +387,21 @@ def main() -> int:
     outdir = ROOT / "data" / "eval" / "results"
     outdir.mkdir(parents=True, exist_ok=True)
     out = outdir / f"{args.name}-answers.json"
+    config = {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
+              "grammar": args.grammar, "candidates": args.candidates,
+              "expand": args.expand, "db": args.db, "domain": args.domain,
+              "rewrites": args.rewrites, "aliases": not args.no_aliases,
+              "cache": args.cache, "read_k": args.read_k,
+              "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
+              "qids": args.qids, "abstain_rule": "all-sentences",
+              "evidence_rule": "aliased"}
+    # Only added under --normalize spell, so --normalize off's output stays
+    # byte-identical to every run made before this flag existed.
+    if args.normalize == "spell":
+        config["normalize"] = args.normalize
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
-        "config": {"mode": args.mode, "rerank": args.rerank, "gate": args.gate,
-                   "grammar": args.grammar, "candidates": args.candidates,
-                   "expand": args.expand, "db": args.db, "domain": args.domain,
-                   "rewrites": args.rewrites, "aliases": not args.no_aliases,
-                   "cache": args.cache, "read_k": args.read_k,
-                   "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
-                   "qids": args.qids, "abstain_rule": "all-sentences",
-                   "evidence_rule": "aliased"},
+        "config": config,
         "answer_accuracy": correct / max(len(ans), 1),
         "accuracy_given_evidence": correct_given_ev / max(len(with_ev), 1),
         "false_abstention_with_evidence": wrong_abstain / max(len(with_ev), 1),
