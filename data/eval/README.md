@@ -198,8 +198,44 @@ without them having a manual of their own.
 
 This run produced zero warnings and zero errors.
 
-## Scoring
+## Scoring: key ⇄ command aliases (R1, tsk_20260927_keyalias)
 
-This set is scored strict: there is no `gold_aliases.json` entry for any `e*`,
-`ep*`, or `u*` qid, so a hit requires the literal `answer_contains` token, not an
-alias.
+The first Emacs eval scored several answers wrong that were actually correct:
+the question asks "which command ...", `answer_contains` names the command
+(`kill-buffer`), and the model answered with the key the manual documents next
+to it (`C-x k`) — or the reverse for a "what key ..." question. `scripts/
+derive_gold_aliases.py --md-corpus data/corpus/domains/emacs --eval
+data/eval/emacs_questions.jsonl` adds a `keybinding` rule for this, applied
+only within each answerable row's own `gold_sec_ids`, never from an answer:
+
+- **inline pair** — `‘KEY’ (‘COMMAND’)` close together in the prose (same
+  sentence, at most a few words, or one line break), e.g. emacs.emacs#key-help:
+  "‘C-h k’ (‘describe-key’)".
+- **definition list** — one or more header lines that are exactly `‘...’` at
+  column 0, followed by an indented description whose first `(‘COMMAND’)`
+  names the entry's command; every header is a key of that command, e.g.
+  emacs.emacs#marks-vs-flags: "‘% m REGEXP <RET>’" / "‘* % REGEXP <RET>’" both
+  alias `dired-mark-files-regexp`.
+
+A key is normalised by stripping trailing placeholders (`REGEXP`, `BUFFER`,
+`<RET>`, ...) and is only accepted if it carries a modifier (`C-`, `M-`, `s-`,
+`H-`, `A-`), is a function key (`<F3>`), or starts with a prefix character
+(`%`, `*`) — never a bare single character or a plain word, so the rule can
+never inflate what counts correct the way it would for e.g. `k`. `--check`
+validates the invariants (sec_id inside `gold_sec_ids`, token/alias/line all
+verbatim in that section, key/command shape) and `--merge` folds the result
+into `data/eval/gold_aliases.json`, touching only this eval's qids.
+
+This produced 36 aliases across 28 of the 60 answerable rows, hand-reviewed
+against the source text. The p11 arms' strict → aliased correctness: scoped
+35/60 → 51/60 (16 flips), open 36/60 → 48/60 (12 flips); every flip is a
+genuine key-for-command or command-for-key answer, never the reverse (aliasing
+only widens what counts correct, and `scripts/rescore_answers.py` asserts no
+right → wrong flip).
+
+The 18 unanswerable qids were renamed `u01`–`u18` → `eu01`–`eu18` in this set
+(and the matching `qid` fields in `data/eval/results/p11-emacs-{scoped,open}
+-answers.json`) because they collided with `questions.jsonl`'s own `u01`–`u18`
+— two different questions could share a qid across the two sets, which broke
+anything that merges or looks results up by qid alone (`gold_aliases.json`
+among them).

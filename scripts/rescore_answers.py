@@ -10,10 +10,16 @@ aliasing only widens what counts as correct, so a strict-correct answer can
 never become aliased-wrong). The reverse is asserted empty as well as
 reported, so a bug in gold.is_correct fails this script loudly rather than
 silently shipping a worse label.
+
+R1 (tsk_20260927_keyalias): tokens come from every --eval passed (repeatable),
+defaulting to both data/eval/questions.jsonl (man pages) and
+data/eval/emacs_questions.jsonl (Emacs) - so the p11 Emacs runs are scored
+too, not silently skipped for having no tokens.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -24,12 +30,18 @@ sys.path.insert(0, str(ROOT / "src"))
 from smm import gold  # noqa: E402
 
 RESULTS = ROOT / "data" / "eval" / "results"
+DEFAULT_EVALS = [
+    "data/eval/questions.jsonl",
+    "data/eval/emacs_questions.jsonl",
+]
 
 
-def _tokens_by_qid() -> dict:
-    path = ROOT / "data" / "eval" / "questions.jsonl"
+def _tokens_by_qid(eval_paths: list[str]) -> dict:
     out = {}
-    if path.exists():
+    for rel in eval_paths:
+        path = ROOT / rel
+        if not path.exists():
+            continue
         for line in path.open(encoding="utf-8"):
             row = json.loads(line)
             if row.get("kind") == "answerable":
@@ -70,8 +82,15 @@ def rescore_run(data: dict, tokens_by_qid: dict, aliases: dict) -> dict:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--eval", action="append", default=None,
+                     help="questions jsonl to pull answerable tokens from "
+                          "(repeatable; default: both man and Emacs sets)")
+    args = ap.parse_args()
+    eval_paths = args.eval or DEFAULT_EVALS
+
     aliases = gold.load_aliases(ROOT / "data" / "eval" / "gold_aliases.json")
-    tokens_by_qid = _tokens_by_qid()
+    tokens_by_qid = _tokens_by_qid(eval_paths)
 
     out = {}
     for path in sorted(RESULTS.glob("*-answers.json")):
