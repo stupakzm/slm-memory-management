@@ -282,9 +282,15 @@ def main() -> int:
             rec.update(quote_info)
         if row["kind"] == "answerable":
             toks = row["answer_contains"]
-            rec["correct"] = gold.is_correct(text, toks, qid_aliases.get(row["qid"]))
+            # tsk_20260927_typos: a typo/paraphrase variant (row["qid"] like
+            # "a01.y1") has no alias entry of its own; gold.aliases_for
+            # falls back to its base's (row["variant_of"]/"paraphrase_of"),
+            # a no-op for every qid that already has its own entry.
+            row_aliases = gold.aliases_for(
+                qid_aliases, row["qid"], row.get("variant_of") or row.get("paraphrase_of"))
+            rec["correct"] = gold.is_correct(text, toks, row_aliases)
             rec["correct_strict"] = all(t in text for t in toks)
-            aliased_ev, strict_ev = evidence_in(hits, toks, qid_aliases.get(row["qid"]))
+            aliased_ev, strict_ev = evidence_in(hits, toks, row_aliases)
             rec["evidence_retrieved"] = aliased_ev
             rec["evidence_retrieved_strict"] = strict_ev
             if not gated:
