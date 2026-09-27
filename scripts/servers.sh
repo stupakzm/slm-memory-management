@@ -25,11 +25,18 @@ MODELS="${SMM_MODELS:-$ROOT/models}"
 # SMM_RERANK_MODEL picks which reranker weight `start_reranker` loads, e.g.
 # SMM_RERANK_MODEL=qwen3-reranker-4b-q4_k_m.gguf for the 4B conversion. All
 # unset, behaviour is exactly what it always was.
+# SMM_GEN_MODEL picks which generator weight `start_generator` loads, e.g.
+# SMM_GEN_MODEL=Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf for the 30B reader.
+# SMM_GEN_ARGS adds extra llama-server args (word-split, appended), e.g.
+# SMM_GEN_ARGS="--cpu-moe -t 12" for that same 30B run. Both unset, behaviour
+# is exactly what it always was.
 RUN="${SMM_RUN:-$ROOT/.run}"
 EMBED_PORT="${SMM_EMBED_PORT:-8081}"
 RERANK_PORT="${SMM_RERANK_PORT:-8082}"
 GEN_PORT="${SMM_GEN_PORT:-8080}"
 RERANK_MODEL="${SMM_RERANK_MODEL:-qwen3-reranker-0.6b-q8_0.gguf}"
+GEN_MODEL="${SMM_GEN_MODEL:-Qwen3-4B-Instruct-2507-Q4_K_M.gguf}"
+GEN_ARGS="${SMM_GEN_ARGS:-}"
 mkdir -p "$RUN"
 
 start_embedder() {
@@ -48,10 +55,18 @@ start_embedder() {
 # that 8192 was reserving back to the other two models.
 start_generator() {
   local ctx=${1:-8192}
+  local model_path="$MODELS/$GEN_MODEL"
+  # Only enforced when SMM_GEN_MODEL picks a non-default model: unset,
+  # behaviour must stay byte-for-byte what it was (see comment block above).
+  if [ -n "${SMM_GEN_MODEL:-}" ] && [ ! -f "$model_path" ]; then
+    echo "generator model not found: $model_path (set SMM_GEN_MODEL to an existing file, or fetch it: scripts/fetch_models.py)" >&2
+    return 1
+  fi
   "$LLAMA/llama-server" \
-    -m "$MODELS/Qwen3-4B-Instruct-2507-Q4_K_M.gguf" \
+    -m "$model_path" \
     -c "$ctx" -ngl 99 --temp 0.0 \
     --host 127.0.0.1 --port "$GEN_PORT" \
+    $GEN_ARGS \
     > "$RUN/generator.log" 2>&1 &
   echo $! > "$RUN/generator.pid"
   echo "generator starting (pid $(cat "$RUN/generator.pid")) -> $RUN/generator.log"
