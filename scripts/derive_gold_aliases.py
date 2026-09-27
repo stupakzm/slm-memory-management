@@ -44,9 +44,33 @@ Two real-corpus defects fixed here (attempt 2):
     `-t`, and vice versa), which is backwards - see the `description` rule
     above.
 
+R1 (tsk_20260927_keyalias) adds a second, independent mode for the Emacs
+md-corpus eval set: a "keybinding" rule that pairs a documented key
+sequence with the command it runs, from the corpus text of the row's own
+gold section(s) alone - never from an answer. Two shapes license a pair:
+
+  inline pair       'KEY' (‘COMMAND’), close together (same sentence, at
+                     most a few words, or one line break) - e.g. "typing
+                     ‘C-M-w’ (‘append-next-kill’) right beforehand".
+  definition list    one or more header lines that are exactly ‘...’ at
+                     column 0, followed by an indented description whose
+                     first (‘COMMAND’) names the entry's command - every
+                     header is a key of that command - e.g. "‘% m REGEXP
+                     <RET>’\\n‘* % REGEXP <RET>’\\n     Mark ... REGEXP
+                     (‘dired-mark-files-regexp’)."
+
+Direction follows the row's own token: a command token's aliases are its
+keys; a key token's alias is the command. Keys are normalised (trailing
+ALL-CAPS placeholder words and `<RET>` stripped) and must carry a
+modifier (C-/M-/s-/H-/A-), be a function key (`<F3>`), or start with a
+prefix character (`%`, `*`) - a bare single character or plain word is
+never accepted as a key, so it can never inflate what counts correct.
+
 Usage: derive_gold_aliases.py [--corpus data/corpus/man.jsonl]
                                [--eval data/eval/questions.jsonl]
                                [--out data/eval/gold_aliases.json]
+       derive_gold_aliases.py --md-corpus DIR --eval EVAL.jsonl
+                               [--merge] [--check] [--out data/eval/gold_aliases.json]
 """
 
 from __future__ import annotations
@@ -251,22 +275,326 @@ def derive(corpus_path: Path, eval_path: Path) -> tuple[dict, dict]:
     return aliases, stats
 
 
+# --- R1 (tsk_20260927_keyalias): keybinding rule for the Emacs md-corpus set ---
+
+LQ = "‘"  # ‘
+RQ = "’"  # ’
+
+_HEADER_RE = re.compile(rf"^{LQ}([^{LQ}{RQ}]+){RQ}$")
+_COMMAND_SHAPE = r"[a-z0-9]+(?:-[a-z0-9]+)+"
+_COMMAND_SHAPE_RE = re.compile(rf"^{_COMMAND_SHAPE}$")
+_CMD_PARENS_RE = re.compile(rf"\({LQ}({_COMMAND_SHAPE}){RQ}\)")
+_INLINE_PAIR_RE = re.compile(
+    rf"{LQ}([^{LQ}{RQ}]{{1,40}}){RQ}"       # ‘KEY’
+    rf"([^{LQ}{RQ}]{{0,60}})"                # short gap, no other quotes crossed
+    rf"\({LQ}({_COMMAND_SHAPE}){RQ}\)"        # (‘COMMAND’)
+)
+_PLACEHOLDER_WORD_RE = re.compile(r"^[A-Z][A-Z0-9]*$")
+_MODIFIER_RE = re.compile(r"(?:^|\s)(?:C|M|s|H|A)-")
+_FUNCKEY_RE = re.compile(r"^<[A-Za-z][A-Za-z0-9]*>$")
+_INLINE_GAP_MAX_WORDS = 4
+
+
+def normalize_key(raw: str) -> str:
+    """Strip trailing argument placeholders: ALL-CAPS words (REGEXP, BUFFER,
+    KEY, R) and the literal `<RET>`. "C-x k BUFFER <RET>" -> "C-x k"."""
+    toks = raw.split()
+    while toks:
+        last = toks[-1]
+        if last == "<RET>" or _PLACEHOLDER_WORD_RE.match(last):
+            toks.pop()
+            continue
+        break
+    return " ".join(toks)
+
+
+def is_key_shaped(key: str) -> bool:
+    """A modifier (C-/M-/s-/H-/A-), a function key (<F3>), or a prefix
+    character (%, *) - never a bare single character or a plain word.
+    `M-x <command-name>` is Emacs' "run this command by name" prefix, not a
+    modifier keystroke, and is never a key even though it starts with `M-`."""
+    if not key or len(key) <= 1:
+        return False  # a bare single character (including a bare '%' or '*')
+    if key == "M-x" or key.startswith("M-x "):
+        return False
+    if _MODIFIER_RE.search(key):
+        return True
+    if _FUNCKEY_RE.match(key):
+        return True
+    if key[0] in "%*":
+        return True
+    return False
+
+
+def find_definition_groups(text: str) -> list[dict]:
+    """One or more consecutive column-0 lines that are exactly ‘...’,
+    followed by the indented (or blank) description up to the next
+    column-0 non-blank line. Each header maps to the FIRST (‘command’)
+    found anywhere in that description block."""
+    lines = text.split("\n")
+    i, n = 0, len(lines)
+    out: list[dict] = []
+    while i < n:
+        line = lines[i]
+        stripped = line.strip()
+        if stripped and _indent(line) == 0 and _HEADER_RE.match(stripped):
+            headers: list[tuple[str, str]] = []
+            while i < n:
+                s2 = lines[i].strip()
+                if s2 and _indent(lines[i]) == 0 and _HEADER_RE.match(s2):
+                    headers.append((_HEADER_RE.match(s2).group(1), s2))
+                    i += 1
+                else:
+                    break
+            # The description block is indented relative to the header (0);
+            # a plain prose paragraph elsewhere in the section is *also*
+            # indented (this corpus wraps body text at 3 spaces) but less
+            # than a definition's own description (5 spaces here) - so the
+            # block's own indent, fixed from its first non-blank line, is
+            # the boundary: a shallower non-blank line ends the block even
+            # though its indent is still > 0.
+            block: list[str] = []
+            desc_indent: int | None = None
+            while i < n:
+                nxt = lines[i]
+                if not nxt.strip():
+                    block.append(nxt)
+                    i += 1
+                    continue
+                nxt_indent = _indent(nxt)
+                if nxt_indent == 0:
+                    break
+                if desc_indent is None:
+                    desc_indent = nxt_indent
+                if nxt_indent < desc_indent:
+                    break
+                block.append(nxt)
+                i += 1
+            block_text = "\n".join(block)
+            m = _CMD_PARENS_RE.search(block_text)
+            if m:
+                command = m.group(1)
+                cmd_line = next(
+                    (bl.strip() for bl in block if _CMD_PARENS_RE.search(bl)), ""
+                )
+                for key_raw, header_line in headers:
+                    out.append({
+                        "key_raw": key_raw, "command": command,
+                        "key_line": header_line, "cmd_line": cmd_line,
+                    })
+        else:
+            i += 1
+    return out
+
+
+def find_inline_pairs(text: str) -> list[dict]:
+    """‘KEY’ (‘COMMAND’), separated by at most a few words and at most one
+    line break."""
+    out: list[dict] = []
+    for m in _INLINE_PAIR_RE.finditer(text):
+        key_raw, gap, command = m.group(1), m.group(2), m.group(3)
+        if len(gap.split()) > _INLINE_GAP_MAX_WORDS or gap.count("\n") > 1:
+            continue
+        line = m.group(0).strip()
+        out.append({"key_raw": key_raw, "command": command,
+                     "key_line": line, "cmd_line": line})
+    return out
+
+
+def keybinding_pairs_in_section(text: str) -> list[dict]:
+    return find_definition_groups(text) + find_inline_pairs(text)
+
+
+def keybinding_matches_for_row(sections: dict, row: dict) -> dict:
+    """{token: [alias-dict, ...]} for `row`'s answer_contains tokens, using
+    only the corpus text of `row`'s own gold_sec_ids."""
+    per_token: dict[str, list] = {}
+    for sec_id in row.get("gold_sec_ids", []):
+        text = sections.get(sec_id)
+        if text is None:
+            continue
+        pairs = []
+        for p in keybinding_pairs_in_section(text):
+            pairs.append({
+                "key": normalize_key(p["key_raw"]), "command": p["command"],
+                "key_line": p["key_line"], "cmd_line": p["cmd_line"],
+            })
+        for token in row.get("answer_contains", []):
+            for p in pairs:
+                if token == p["command"] and is_key_shaped(p["key"]):
+                    per_token.setdefault(token, []).append({
+                        "alias": p["key"], "rule": "keybinding",
+                        "sec_id": sec_id, "line": p["key_line"],
+                    })
+                elif token == p["key"] and _COMMAND_SHAPE_RE.match(p["command"]):
+                    per_token.setdefault(token, []).append({
+                        "alias": p["command"], "rule": "keybinding",
+                        "sec_id": sec_id, "line": p["cmd_line"],
+                    })
+    for token, entries in per_token.items():
+        seen = set()
+        deduped = []
+        for e in entries:
+            key = (e["alias"], e["sec_id"])
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(e)
+        per_token[token] = deduped
+    return per_token
+
+
+def load_md_corpus(md_dir: Path) -> dict:
+    """{doc_id: {"doc": doc-dict, "sections": {sec_id: text}}} for every
+    *.md in md_dir, converted the way the Emacs eval set's docs were:
+    smm.ingest.from_file(Path(f), 'emacs')."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from smm import ingest  # noqa: E402
+
+    docs = {}
+    for f in sorted(Path(md_dir).glob("*.md")):
+        d = ingest.from_file(f, "emacs")
+        docs[d["doc_id"]] = {
+            "doc": d,
+            "sections": {s["sec_id"]: s["text"] for s in d["sections"]},
+        }
+    return docs
+
+
+def derive_keybinding(docs: dict, rows: list[dict]) -> tuple[dict, dict]:
+    """Returns (aliases, stats), same shape as derive()."""
+    aliases: dict[str, dict] = {}
+    per_rule = {"keybinding": 0}
+    touched: set[str] = set()
+
+    for row in rows:
+        if row.get("kind") != "answerable":
+            continue
+        doc = docs.get(row.get("doc"))
+        if doc is None:
+            continue
+        qid = row["qid"]
+        per_token = keybinding_matches_for_row(doc["sections"], row)
+        if per_token:
+            touched.add(qid)
+            for entries in per_token.values():
+                per_rule["keybinding"] += len(entries)
+        aliases[qid] = per_token
+
+    stats = {"per_rule": per_rule, "questions_touched": len(touched)}
+    return aliases, stats
+
+
+def check_keybinding(aliases: dict, docs: dict, rows: list[dict]) -> list[str]:
+    """Every violation of the invariants R1 promises. Empty means --check
+    passes."""
+    rows_by_qid = {r["qid"]: r for r in rows}
+    violations: list[str] = []
+    for qid, per_token in aliases.items():
+        row = rows_by_qid.get(qid)
+        if row is None:
+            violations.append(f"{qid}: not a row in this --eval")
+            continue
+        gold_secs = set(row.get("gold_sec_ids", []))
+        doc = docs.get(row.get("doc"), {})
+        sections = doc.get("sections", {})
+        for token, entries in per_token.items():
+            for e in entries:
+                if e.get("rule") != "keybinding":
+                    continue
+                alias, sec_id, line = e["alias"], e["sec_id"], e.get("line", "")
+                if sec_id not in gold_secs:
+                    violations.append(
+                        f"{qid}/{token}: sec_id {sec_id!r} not in gold_sec_ids")
+                    continue
+                text = sections.get(sec_id)
+                if text is None:
+                    violations.append(f"{qid}/{token}: no such section {sec_id!r}")
+                    continue
+                if token not in text:
+                    violations.append(
+                        f"{qid}/{token}: token not found in section {sec_id!r}")
+                if alias not in text:
+                    violations.append(
+                        f"{qid}/{token}: alias {alias!r} not found in section {sec_id!r}")
+                if line and line not in text:
+                    violations.append(
+                        f"{qid}/{token}: line {line!r} not verbatim in section {sec_id!r}")
+                if _COMMAND_SHAPE_RE.match(token):
+                    # command token -> alias is the key
+                    if not is_key_shaped(alias):
+                        violations.append(
+                            f"{qid}/{token}: alias {alias!r} is not key-shaped")
+                else:
+                    # key token -> alias is the command
+                    if not _COMMAND_SHAPE_RE.match(alias):
+                        violations.append(
+                            f"{qid}/{token}: alias {alias!r} is not command-shaped")
+    return violations
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default="data/corpus/man.jsonl")
     ap.add_argument("--eval", default="data/eval/questions.jsonl")
     ap.add_argument("--out", default="data/eval/gold_aliases.json")
+    ap.add_argument("--md-corpus", default=None,
+                     help="directory of Emacs manual .md files (keybinding rule mode)")
+    ap.add_argument("--merge", action="store_true",
+                     help="merge into --out, replacing only this --eval's qids, "
+                          "leaving every other qid byte-identical (--md-corpus only)")
+    ap.add_argument("--check", action="store_true",
+                     help="validate derived keybinding aliases; exit 1 on any "
+                          "violation (--md-corpus only)")
     args = ap.parse_args()
 
-    corpus_path = ROOT / args.corpus
     eval_path = ROOT / args.eval
     out_path = ROOT / args.out
 
-    if not corpus_path.exists():
-        print(f"no corpus at {corpus_path}", file=sys.stderr)
-        return 2
     if not eval_path.exists():
         print(f"no eval set at {eval_path}", file=sys.stderr)
+        return 2
+
+    if args.md_corpus:
+        md_dir = ROOT / args.md_corpus
+        if not md_dir.exists():
+            print(f"no md corpus at {md_dir}", file=sys.stderr)
+            return 2
+        docs = load_md_corpus(md_dir)
+        rows = load_questions(eval_path)
+        aliases, stats = derive_keybinding(docs, rows)
+
+        if args.check:
+            violations = check_keybinding(aliases, docs, rows)
+            for v in violations:
+                print("VIOLATION: " + v)
+            if violations:
+                print(f"\n{len(violations)} violation(s)")
+                return 1
+            print(f"check OK: {stats['per_rule']['keybinding']} keybinding "
+                  f"aliases, {stats['questions_touched']} questions, 0 violations")
+            return 0
+
+        print(f"keybinding aliases derived: {stats['per_rule']['keybinding']}")
+        print(f"questions touched: {stats['questions_touched']}")
+
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if args.merge:
+            existing = json.loads(out_path.read_text()) if out_path.exists() else {}
+            eval_qids = {r["qid"] for r in rows}
+            merged = {k: v for k, v in existing.items() if k not in eval_qids}
+            merged.update(aliases)
+            out_path.write_text(json.dumps(merged, indent=2, sort_keys=True))
+            print(f"merged into {out_path}")
+        else:
+            out_path.write_text(json.dumps(aliases, indent=2, sort_keys=True))
+            print(f"wrote {out_path}")
+        return 0
+
+    corpus_path = ROOT / args.corpus
+
+    if not corpus_path.exists():
+        print(f"no corpus at {corpus_path}", file=sys.stderr)
         return 2
 
     aliases, stats = derive(corpus_path, eval_path)
