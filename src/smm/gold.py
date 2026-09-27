@@ -46,3 +46,25 @@ def is_correct(text: str, tokens, qid_aliases) -> bool:
     `all(t in text for t in tokens)`."""
     qid_aliases = qid_aliases or {}
     return all(token_ok(text, t, qid_aliases.get(t)) for t in tokens)
+
+
+def aliases_for(aliases: dict, qid: str, base_qid: str | None = None) -> dict:
+    """Per-qid alias entry (tsk_20260927_typos), with fallback for variants.
+
+    `aliases` is keyed by qid (load_aliases' shape), so a typo/paraphrase
+    variant like `a01.y1` has no entry of its own even though its base
+    `a01` does - scoring it straight would silently lose every alias its
+    base earned. Returns `aliases[qid]` if that key is present (including
+    an explicit empty dict - only a *missing* key falls back, never an
+    empty-but-present one); otherwise `aliases.get(base_qid, {})` if
+    `base_qid` is given; otherwise `{}`.
+
+    On today's data every qid that is itself missing also has a missing (or
+    no) base entry, so this is an exact no-op there - see
+    scripts/rescore_answers.py and scripts/eval_answers.py, its two call
+    sites."""
+    if qid in aliases:
+        return aliases[qid]
+    if base_qid:
+        return aliases.get(base_qid, {})
+    return {}

@@ -239,3 +239,70 @@ The 18 unanswerable qids were renamed `u01`–`u18` → `eu01`–`eu18` in this 
 — two different questions could share a qid across the two sets, which broke
 anything that merges or looks results up by qid alone (`gold_aliases.json`
 among them).
+
+## Variation pool: typos (R2a, tsk_20260927_typos)
+
+`data/eval/variations_typo.jsonl` — 320 rows, generated (never hand-written)
+by `scripts/make_variants.py --typos`. For every CLEAN base row (no
+`variant_of`, no `paraphrase_of`) of `questions.jsonl` then
+`emacs_questions.jsonl`, in file order — 160 rows, 116 answerable/44
+unanswerable, 62 domain `emacs` — it emits two variants:
+
+| qid suffix | `variant_kind` | edits |
+|---|---|---|
+| `.y1` | `typo1` | exactly 1 |
+| `.y3` | `typo3` | exactly 3, in 3 distinct words |
+
+giving 320 rows: 160 `typo1`, 160 `typo3`, 232 answerable, 88 unanswerable,
+124 domain `emacs`.
+
+Each edit is one of four ops, weighted like real typing errors (substitution
+and transposition most common, 0.35 each; deletion and doubling 0.15 each):
+
+- **substitution** — one letter swapped for a QWERTY-adjacent one
+  (`mistake` → `mostake`: `i` → `o`)
+- **deletion** — one letter dropped
+- **doubling** — one letter repeated
+- **transposition** — two adjacent letters swapped
+
+A word's first letter is never touched, only letters in words of >= 4
+letters are eligible, and a word is never edited if it overlaps the row's
+own `answer_contains` tokens or `gold_hint` strings (a word is "overlapping"
+if it is, case-insensitively, one of the alphabetic sub-words of any such
+token or string — `--exclude-from` protects both "exclude" and "from").
+Case of the edited letter is preserved. Two real base rows (`u07`, `u22`)
+have fewer than 3 words that qualify at >= 4 letters once protected words
+are excluded; for those rows only, and only for `typo3`, the length floor
+relaxes to >= 3 then >= 2 letters just far enough to reach 3 candidates —
+the protected-word and first-letter rules never relax. Every row records its
+edits as `{"word_index", "op", "before", "after"}`, sufficient to replay the
+base question into the variant exactly.
+
+Every other field (`kind`, `doc`, `domain`, `answer_contains`,
+`gold_sec_ids`, `gold_primary`, `gold_hint`, `unanswerable_reason/detail`,
+`tags`) is copied from the base row unchanged; `tags` gets `variant-typo1`
+or `variant-typo3` appended, and `variant_of` names the base qid.
+
+**Determinism.** `seed = int(sha256(f"{qid}|{kind}").hexdigest(), 16)` where
+`kind` is `typo1`/`typo3` and `qid` is the base row's own qid — never the
+row's position in the file — so regenerating is byte-identical and
+independent of row order.
+
+**Scoring.** A variant's qid (`a01.y1`) has no entry of its own in
+`data/eval/gold_aliases.json`; `smm.gold.aliases_for` falls back to its
+base's (`a01`'s) aliases, used by both `scripts/eval_answers.py` and
+`scripts/rescore_answers.py`.
+
+**Regenerate and validate:**
+
+```bash
+.venv/bin/python scripts/make_variants.py --typos --out data/eval/variations_typo.jsonl
+.venv/bin/python scripts/make_variants.py --check data/eval/variations_typo.jsonl
+```
+
+`--check` exits 1, printing every violation, unless: each row's recorded
+`edits` replay the base question into the row's question exactly; `.y1` has
+1 edit and `.y3` has 3 in distinct words; every edited word is >= 4 letters
+(or the documented fallback) with its first letter untouched; no edited word
+overlaps an answer token or `gold_hint` string; every copied field equals
+the base's; and qids are unique, with none colliding with either base file.

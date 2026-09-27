@@ -33,23 +33,28 @@ RESULTS = ROOT / "data" / "eval" / "results"
 DEFAULT_EVALS = [
     "data/eval/questions.jsonl",
     "data/eval/emacs_questions.jsonl",
+    "data/eval/variations_typo.jsonl",
 ]
 
 
-def _tokens_by_qid(eval_paths: list[str]) -> dict:
-    out = {}
+def _tokens_by_qid(eval_paths: list[str]) -> tuple[dict, dict]:
+    """(tokens_by_qid, base_by_qid): tokens_by_qid holds answerable rows'
+    answer_contains; base_by_qid holds every row's variant_of/paraphrase_of
+    (tsk_20260927_typos), used for the gold.aliases_for fallback below."""
+    tokens, base = {}, {}
     for rel in eval_paths:
         path = ROOT / rel
         if not path.exists():
             continue
         for line in path.open(encoding="utf-8"):
             row = json.loads(line)
+            base[row["qid"]] = row.get("variant_of") or row.get("paraphrase_of")
             if row.get("kind") == "answerable":
-                out[row["qid"]] = row["answer_contains"]
-    return out
+                tokens[row["qid"]] = row["answer_contains"]
+    return tokens, base
 
 
-def rescore_run(data: dict, tokens_by_qid: dict, aliases: dict) -> dict:
+def rescore_run(data: dict, tokens_by_qid: dict, aliases: dict, base_by_qid: dict) -> dict:
     ans = [r for r in data.get("results", []) if r["kind"] == "answerable"]
     strict_correct = aliased_correct = n = 0
     flipped_wrong_to_right: list[str] = []
@@ -60,7 +65,8 @@ def rescore_run(data: dict, tokens_by_qid: dict, aliases: dict) -> dict:
             continue
         n += 1
         strict = gold.is_correct(r["answer"], toks, {})
-        aliased = gold.is_correct(r["answer"], toks, aliases.get(r["qid"]))
+        row_aliases = gold.aliases_for(aliases, r["qid"], base_by_qid.get(r["qid"]))
+        aliased = gold.is_correct(r["answer"], toks, row_aliases)
         strict_correct += strict
         aliased_correct += aliased
         if aliased and not strict:
@@ -85,19 +91,20 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--eval", action="append", default=None,
                      help="questions jsonl to pull answerable tokens from "
-                          "(repeatable; default: both man and Emacs sets)")
+                          "(repeatable; default: man, Emacs and the typo "
+                          "variant pool)")
     args = ap.parse_args()
     eval_paths = args.eval or DEFAULT_EVALS
 
     aliases = gold.load_aliases(ROOT / "data" / "eval" / "gold_aliases.json")
-    tokens_by_qid = _tokens_by_qid(eval_paths)
+    tokens_by_qid, base_by_qid = _tokens_by_qid(eval_paths)
 
     out = {}
     for path in sorted(RESULTS.glob("*-answers.json")):
         data = json.loads(path.read_text())
         if "results" not in data:
             continue
-        out[path.stem] = rescore_run(data, tokens_by_qid, aliases)
+        out[path.stem] = rescore_run(data, tokens_by_qid, aliases, base_by_qid)
 
     out_path = RESULTS / "gold-aliases-rescore.json"
     out_path.write_text(json.dumps(out, indent=2))
