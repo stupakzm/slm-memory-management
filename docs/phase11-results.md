@@ -204,3 +204,44 @@ Retrieval uses the full reranker profile, as in R3.
 
 Failing 2 or 3 means it does not ship, whatever 1 says. Passing 1 with p ≥ 0.05 is reported as
 "direction only".
+
+## R4b pre-registration: rewriting the question into documentation vocabulary (written 2026-09-27, before any R4b run)
+
+**A correction to R3's framing, found while writing this.** R3's "shipped configuration" is the
+eval baseline that phases 7-9 used (`--rewrites 0`). The interactive command itself
+(`scripts/ask.py`, `asq`) defaults to `--rewrites 1` with the man-page-style rewrite prompt
+(`ask.py`: `args.rewrites = 0 if args.retrieve_only else 1`). So R3 measured the eval
+baseline, not `asq` exactly. R4b therefore compares three settings, not two.
+
+**Mechanism.** One 4B rewrite of the question, fused with the original for retrieval
+(`retrieve_fused`, unchanged; the gate still reads the original question's own top-1). The
+reader sees the original question. Two prompts:
+- `man`: today's `asq` prompt ("...for a Linux manual-page search engine... name the likely
+  command...").
+- `docs`: the new prompt ("...software documentation (Linux manual pages and the GNU Emacs
+  manuals). Use the terminology that documentation itself would use... Keep any program,
+  package or command name the user wrote exactly as written...").
+
+**Rows.** The kinds R3 found broken at retrieval, plus clean for harm: clean, synonym, casual,
+terse (old and new), no-name. That is 781 rows, answerable and unanswerable. Typos are left to
+R4a/R4a′.
+
+**Serving.** The rewrite needs the generator during retrieval, so all three models run in the
+query-sized `serve` profile (`reranker-query`, now safe after the oversized-pair fix). Scores
+are identical to the full profile except on the rare oversized pairs, which are now truncated
+instead of crashing. The control (R3) is re-used as is.
+
+**Arms.** `R4b-man` (`--rewrites 1 --rewrite-style man`) and `R4b-docs` (`--rewrites 1
+--rewrite-style docs`), each against the R3 control on the same rows, and against each other.
+
+**Decision rule.** `docs` becomes `asq`'s default rewrite style only if all four hold:
+1. **Vocabulary recovers:** over synonym + no-name + terse, `R4b-docs` vs control has paired
+   correctness net ≥ +15 with McNemar p < 0.05, **and** it is not worse than `R4b-man` (net ≥ 0
+   vs man).
+2. **Clean text unharmed:** clean paired net vs control ≥ −2.
+3. **No new invention:** abstention on the unanswerable rows in these kinds does not fall by 2
+   or more vs control.
+4. **Affordable:** the rewrite adds ≤ 1.5 s at p50 per question (it is one short generation).
+
+If `man` itself passes 1-3 against control, that is reported as well: it would mean the eval
+baseline has been understating `asq` all along.
