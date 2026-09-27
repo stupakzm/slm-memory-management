@@ -176,3 +176,31 @@ and reading. Vocabulary (synonym, terse, no-name) hurts Emacs far more.
    Targets synonym, no-name and terse, where the loss is mostly in retrieval.
 
 Each is pre-registered below before it runs.
+
+## R4a pre-registration: spelling normalisation (written 2026-09-27, before the build and the run)
+
+**Mechanism.** Before a question is used for anything, snap each word the corpus does not
+contain to the corpus word closest in Damerau-Levenshtein distance (≤1 for words of 4-7
+letters, ≤2 for 8+). Ties go to a keyboard-adjacent substitution, then to the more frequent
+word. The vocabulary is the index's own chunk text: words of 3+ letters seen at least twice.
+The first letter is **not** protected. The typo generator never touches it, so protecting it
+would tune the mechanism to the generator, not to people. Tokens with digits, `-`, `/`, `=` or
+`.` are never touched, because flags and paths are exact. The **corrected question feeds both
+retrieval and the model**, because R3 showed typos mostly break the reader.
+
+**Arm.** Everything as in R3 plus `--normalize spell`. Only rows whose normalised question
+differs from the original are re-run (`--qids`). All other rows are identical inputs to the
+control, so the control's results for them are carried over (`robustness_report.py --overlay`).
+Retrieval uses the full reranker profile, as in R3.
+
+**Decision rule (ships as default only if all four hold):**
+1. **Typos recover:** typo1 + typo3 paired correctness (arm vs control, same variant rows)
+   gains ≥ +10 net answers, McNemar p < 0.05.
+2. **Clean text is left alone:** the normaliser changes ≤ 3 of the 160 clean base questions,
+   and clean correctness loses no more than 1 answer net.
+3. **No new invention:** abstention on unanswerable rows, summed over all kinds, does not
+   fall by 2 or more.
+4. **Cheap:** normalisation adds < 10 ms per question.
+
+Failing 2 or 3 means it does not ship, whatever 1 says. Passing 1 with p ≥ 0.05 is reported as
+"direction only".
