@@ -6,13 +6,22 @@ its answer tokens appear; every "tool not installed" question must name a tool
 that genuinely has no page. This is what stops the eval set from encoding the
 author's recall instead of what is actually on the machine.
 
+A row may also carry "gold_hint": a list of strings that narrow which section
+counts as gold (useful when the real answer token alone matches many sections)
+without inflating what eval_answers/gold.is_correct requires of a model's
+answer. gold_hint strings are required alongside answer_contains tokens when
+locating the gold section, but are never scored and never leak-checked.
+
 Usage: resolve_gold.py [--write]
+       resolve_gold.py [--corpus PATH] [--eval PATH] [--write]
+       resolve_gold.py --md-corpus DIR --domain D [--eval PATH] [--write]
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -21,9 +30,9 @@ CORPUS = ROOT / "data" / "corpus" / "man.jsonl"
 EVAL = ROOT / "data" / "eval" / "questions.jsonl"
 
 
-def load_corpus():
+def load_corpus(corpus_path: Path):
     docs, names = {}, {}
-    for line in CORPUS.open(encoding="utf-8"):
+    for line in corpus_path.open(encoding="utf-8"):
         d = json.loads(line)
         docs[d["doc_id"]] = d
         names.setdefault(d["name"], []).append(d["doc_id"])
@@ -32,13 +41,40 @@ def load_corpus():
     return docs, names
 
 
+def load_md_corpus(md_dir: Path, domain: str):
+    """Load a directory of .md files (one '## <node>' heading per section) the
+    same way scripts/ingest.py would, keyed by doc_id. Aliases are empty: a
+    freshly-ingested markdown corpus has no man-page alias table."""
+    sys.path.insert(0, str(ROOT / "src"))
+    from smm import ingest  # noqa: E402
+
+    docs, names = {}, {}
+    for f in sorted(md_dir.glob("*.md")):
+        d = ingest.from_file(f, domain)
+        docs[d["doc_id"]] = d
+        names.setdefault(d["name"], []).append(d["doc_id"])
+    return docs, names
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", action="store_true", help="write resolved gold ids back")
+    ap.add_argument("--corpus", type=Path, default=CORPUS,
+                     help="man-page corpus jsonl (ignored with --md-corpus)")
+    ap.add_argument("--eval", type=Path, default=EVAL, help="questions jsonl to check")
+    ap.add_argument("--md-corpus", type=Path, default=None,
+                     help="directory of domain .md files, one '## <node>' per section")
+    ap.add_argument("--domain", default=None, help="domain name for --md-corpus")
     args = ap.parse_args()
 
-    docs, names = load_corpus()
-    rows = [json.loads(l) for l in EVAL.open(encoding="utf-8")]
+    md_mode = args.md_corpus is not None
+    if md_mode:
+        if not args.domain:
+            ap.error("--md-corpus requires --domain")
+        docs, names = load_md_corpus(args.md_corpus, args.domain)
+    else:
+        docs, names = load_corpus(args.corpus)
+    rows = [json.loads(l) for l in args.eval.open(encoding="utf-8")]
 
     errors, warnings = [], []
     ids = {r["qid"] for r in rows}
@@ -53,13 +89,15 @@ def main() -> int:
                 errors.append(f"{r['qid']}: no such doc {r['doc']!r}")
                 continue
             toks = r["answer_contains"]
-            matches = [s["sec_id"] for s in doc["sections"] if all(t in s["text"] for t in toks)]
+            hints = r.get("gold_hint") or []
+            needed = toks + hints
+            matches = [s["sec_id"] for s in doc["sections"] if all(t in s["text"] for t in needed)]
             if not matches:
                 near = [t for t in toks if not any(t in s["text"] for s in doc["sections"])]
-                errors.append(f"{r['qid']}: no section of {r['doc']} holds all of {toks} (missing: {near})")
+                errors.append(f"{r['qid']}: no section of {r['doc']} holds all of {needed} (missing: {near})")
                 continue
             if len(matches) > 5:
-                warnings.append(f"{r['qid']}: {len(matches)} sections match {toks} - tokens too generic")
+                warnings.append(f"{r['qid']}: {len(matches)} sections match {needed} - tokens too generic")
             r["gold_sec_ids"] = matches
             # The primary is the section a reader would be sent to: an options or
             # command reference before prose, shortest before longest.
@@ -79,7 +117,19 @@ def main() -> int:
             reason = r.get("unanswerable_reason")
             detail = r.get("unanswerable_detail") or ""
             if reason == "tool-not-installed":
-                if detail in names:
+                if md_mode:
+                    # Stronger than the name check: the Emacs FAQ names many
+                    # third-party packages in prose without them being "installed"
+                    # as a doc, so a name-only check would pass questions whose
+                    # answer is sitting right there in the text.
+                    detail_lower = detail.lower()
+                    hit = next((d["doc_id"] for d in docs.values()
+                                if any(detail_lower in s["text"].lower()
+                                       for s in d["sections"])), None)
+                    if hit:
+                        errors.append(f"{r['qid']}: {detail!r} IS mentioned in the corpus "
+                                      f"({hit}) - not unanswerable")
+                elif detail in names:
                     errors.append(f"{r['qid']}: {detail!r} IS installed ({names[detail][0]}) - not unanswerable")
             elif reason == "out-of-corpus":
                 # This check did not exist, and that is how a wrong label survived
@@ -117,7 +167,7 @@ def main() -> int:
             print("  x " + e)
 
     if args.write and not errors:
-        with EVAL.open("w", encoding="utf-8") as fh:
+        with args.eval.open("w", encoding="utf-8") as fh:
             for r in rows:
                 fh.write(json.dumps(r, ensure_ascii=False) + "\n")
         print("\nwrote resolved gold ids")

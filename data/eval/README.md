@@ -135,3 +135,71 @@ option really appears in the named page, that a `thin-evidence` question's
 `missing_tool` really has no page here, and that a `lookup` names a page that exists.
 It also rejects a request that leaks its own expected token. It caught six leaks and
 one wrong absence claim on first run.
+
+# Emacs set
+
+`emacs_questions.jsonl`, 78 usage questions against the 66 converted Emacs info
+manuals in `data/corpus/domains/emacs/` (`domain: "emacs"` on every row, same
+schema as `questions.jsonl`).
+
+## Composition
+
+| | count | |
+|---|---|---|
+| Answerable | 60 | 44 unique + 6 paraphrases + 10 query-noise variants |
+| Unanswerable | 18 (23%) | all `tool-not-installed` |
+| Distinct gold docs | 12 | emacs, org, tramp, eglot, use-package, eshell, ediff, calc, flymake, dired-x, info, modus-themes |
+| Query-noise variants | 10 | `terse` (5), `typo` (5) |
+
+The 44 unique questions are usage-focused ("how do I ...", "which command ...",
+"what key ...") spread across files/buffers, windows/frames, search and replace,
+regions/kill ring, undo, keyboard macros, registers/bookmarks, dired,
+customisation, major/minor modes, help, version control, org (agenda/TODO/export),
+tramp, eglot, use-package, eshell, ediff, calc and flymake. Each is phrased to ask
+for one form — a key sequence, a command name, or a variable — so `answer_contains`
+names the one literal string a correct answer cannot avoid, and every answerable
+row has exactly one; where that token alone would match more than one plausible
+section, the extra context needed to locate the *right* one lives in a
+`gold_hint` list instead — `gold_hint` is required when resolving `gold_sec_ids`
+but is never scored and never leak-checked, because `answer_contains` is also
+what `eval_answers`/`gold.is_correct` grades a model's answer against.
+
+The 18 `tool-not-installed` questions name a third-party package that is
+genuinely absent from the converted manuals (`projectile`, `lsp-mode`,
+`treemacs`, `smartparens`, `spacemacs`, `prelude`, `tempel`, `restclient`,
+`elpy`, `anaconda-mode`, `paredit`, `racket-mode`, `haskell-mode`, `rustic`,
+`typescript-mode`, `kubernetes-el`, `magit-todos`, `projectile-ripgrep`).
+Better-known names from the same space (`magit`, `evil`, `helm`, `ivy`,
+`counsel`, `company`, `straight`, `doom`, `vertico`, `consult`, `embark`, `avy`,
+`org-roam`, `yasnippet`, `flycheck`, `which-key`, ...) turned out to be named
+somewhere in the corpus — mostly in `efaq.md`'s package-conflict notes or
+`modus-themes.md`'s sample `use-package` configurations — so they were rejected.
+
+## How it was validated
+
+`scripts/resolve_gold.py` grew a markdown-corpus mode for this set, because the
+Emacs manuals ship as one `.md` file per manual (one `## <node>` heading per info
+node) rather than as `man.jsonl`:
+
+```bash
+.venv/bin/python scripts/resolve_gold.py \
+  --md-corpus data/corpus/domains/emacs --domain emacs \
+  --eval data/eval/emacs_questions.jsonl --write
+```
+
+It runs the same answerable checks as phase 0 (every answer token must appear
+literally in one section of the named doc; more than 5 matching sections warns
+as too generic; a question may not contain its own answer token). For
+`tool-not-installed` it is *stricter* than the phase 0 check: instead of only
+confirming the name is not a doc, it errors if the detail string appears
+case-insensitively in *any* section text of the md corpus, because the Emacs FAQ
+and the Modus themes sample configs name many third-party packages in prose
+without them having a manual of their own.
+
+This run produced zero warnings and zero errors.
+
+## Scoring
+
+This set is scored strict: there is no `gold_aliases.json` entry for any `e*`,
+`ep*`, or `u*` qid, so a hit requires the literal `answer_contains` token, not an
+alias.
