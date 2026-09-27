@@ -1,0 +1,1127 @@
+{
+  "aliases": "/home/stupakzm/projects/slm-memory-management/data/eval/gold_aliases.json",
+  "answers": "data/eval/results/p11-pool-answers.json",
+  "kinds": {
+    "casual": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 29,
+            "evidence": 31,
+            "n": 44
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 17,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 3,
+              "gained": 4,
+              "kept": 25,
+              "lost": 12,
+              "net": -8,
+              "p": 0.076812744140625
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 31,
+              "lost": 12,
+              "net": -12,
+              "p": 0.00048828125
+            }
+          },
+          "unanswerable": {
+            "abstained": 17,
+            "n": 18
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 51,
+            "evidence": 64,
+            "n": 72
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 3,
+              "gained": 0,
+              "kept": 22,
+              "lost": 1,
+              "net": -1,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 11,
+              "gained": 6,
+              "kept": 45,
+              "lost": 10,
+              "net": -4,
+              "p": 0.454498291015625
+            },
+            "evidence": {
+              "both_wrong": 4,
+              "gained": 6,
+              "kept": 58,
+              "lost": 4,
+              "net": 2,
+              "p": 0.75390625
+            }
+          },
+          "unanswerable": {
+            "abstained": 22,
+            "n": 26
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 80,
+          "evidence": 95,
+          "n": 116
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 4,
+            "gained": 0,
+            "kept": 39,
+            "lost": 1,
+            "net": -1,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 14,
+            "gained": 10,
+            "kept": 70,
+            "lost": 22,
+            "net": -12,
+            "p": 0.050102459732443094
+          },
+          "evidence": {
+            "both_wrong": 5,
+            "gained": 6,
+            "kept": 89,
+            "lost": 16,
+            "net": -10,
+            "p": 0.052478790283203125
+          }
+        },
+        "unanswerable": {
+          "abstained": 39,
+          "n": 44
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "clean": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 37,
+            "evidence": 43,
+            "n": 44
+          },
+          "unanswerable": {
+            "abstained": 17,
+            "n": 18
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 55,
+            "evidence": 62,
+            "n": 72
+          },
+          "unanswerable": {
+            "abstained": 23,
+            "n": 26
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 92,
+          "evidence": 105,
+          "n": 116
+        },
+        "unanswerable": {
+          "abstained": 40,
+          "n": 44
+        }
+      }
+    },
+    "no-name": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 18,
+            "evidence": 25,
+            "n": 44
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 0,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 5,
+              "gained": 2,
+              "kept": 16,
+              "lost": 21,
+              "net": -19,
+              "p": 6.604194641113281e-05
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 25,
+              "lost": 18,
+              "net": -18,
+              "p": 7.62939453125e-06
+            }
+          },
+          "unanswerable": {
+            "abstained": 0,
+            "n": 0
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 45,
+            "evidence": 58,
+            "n": 72
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 0,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 12,
+              "gained": 5,
+              "kept": 40,
+              "lost": 15,
+              "net": -10,
+              "p": 0.04138946533203125
+            },
+            "evidence": {
+              "both_wrong": 5,
+              "gained": 5,
+              "kept": 53,
+              "lost": 9,
+              "net": -4,
+              "p": 0.4239501953125
+            }
+          },
+          "unanswerable": {
+            "abstained": 0,
+            "n": 0
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 63,
+          "evidence": 83,
+          "n": 116
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 0,
+            "gained": 0,
+            "kept": 0,
+            "lost": 0,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 17,
+            "gained": 7,
+            "kept": 56,
+            "lost": 36,
+            "net": -29,
+            "p": 8.963039363152348e-06
+          },
+          "evidence": {
+            "both_wrong": 6,
+            "gained": 5,
+            "kept": 78,
+            "lost": 27,
+            "net": -22,
+            "p": 0.00011307420209050179
+          }
+        },
+        "unanswerable": {
+          "abstained": 0,
+          "n": 0
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "no-tool": {
+      "domains": {
+        "linux": {
+          "answerable": {
+            "correct": 4,
+            "evidence": 7,
+            "n": 15
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 0,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 3,
+              "gained": 1,
+              "kept": 3,
+              "lost": 8,
+              "net": -7,
+              "p": 0.0390625
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 1,
+              "kept": 6,
+              "lost": 7,
+              "net": -6,
+              "p": 0.0703125
+            }
+          },
+          "unanswerable": {
+            "abstained": 0,
+            "n": 0
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 4,
+          "evidence": 7,
+          "n": 15
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 0,
+            "gained": 0,
+            "kept": 0,
+            "lost": 0,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 3,
+            "gained": 1,
+            "kept": 3,
+            "lost": 8,
+            "net": -7,
+            "p": 0.0390625
+          },
+          "evidence": {
+            "both_wrong": 1,
+            "gained": 1,
+            "kept": 6,
+            "lost": 7,
+            "net": -6,
+            "p": 0.0703125
+          }
+        },
+        "unanswerable": {
+          "abstained": 0,
+          "n": 0
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "paraphrase": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 4,
+            "evidence": 5,
+            "n": 6
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 0,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 4,
+              "lost": 1,
+              "net": -1,
+              "p": 1.0
+            },
+            "evidence": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 5,
+              "lost": 1,
+              "net": -1,
+              "p": 1.0
+            }
+          },
+          "unanswerable": {
+            "abstained": 0,
+            "n": 0
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 4,
+            "evidence": 7,
+            "n": 10
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 3,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 2,
+              "gained": 2,
+              "kept": 2,
+              "lost": 4,
+              "net": -2,
+              "p": 0.6875
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 2,
+              "kept": 5,
+              "lost": 2,
+              "net": 0,
+              "p": 1.0
+            }
+          },
+          "unanswerable": {
+            "abstained": 3,
+            "n": 3
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 8,
+          "evidence": 12,
+          "n": 16
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 0,
+            "gained": 0,
+            "kept": 3,
+            "lost": 0,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 3,
+            "gained": 2,
+            "kept": 6,
+            "lost": 5,
+            "net": -3,
+            "p": 0.453125
+          },
+          "evidence": {
+            "both_wrong": 1,
+            "gained": 2,
+            "kept": 10,
+            "lost": 3,
+            "net": -1,
+            "p": 1.0
+          }
+        },
+        "unanswerable": {
+          "abstained": 3,
+          "n": 3
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "synonym": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 24,
+            "evidence": 29,
+            "n": 44
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 1,
+              "kept": 17,
+              "lost": 0,
+              "net": 1,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 3,
+              "gained": 4,
+              "kept": 20,
+              "lost": 17,
+              "net": -13,
+              "p": 0.007197380065917969
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 29,
+              "lost": 14,
+              "net": -14,
+              "p": 0.0001220703125
+            }
+          },
+          "unanswerable": {
+            "abstained": 18,
+            "n": 18
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 40,
+            "evidence": 57,
+            "n": 72
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 2,
+              "gained": 1,
+              "kept": 22,
+              "lost": 1,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 14,
+              "gained": 3,
+              "kept": 37,
+              "lost": 18,
+              "net": -15,
+              "p": 0.0014896392822265625
+            },
+            "evidence": {
+              "both_wrong": 6,
+              "gained": 4,
+              "kept": 53,
+              "lost": 9,
+              "net": -5,
+              "p": 0.266845703125
+            }
+          },
+          "unanswerable": {
+            "abstained": 23,
+            "n": 26
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 64,
+          "evidence": 86,
+          "n": 116
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 2,
+            "gained": 2,
+            "kept": 39,
+            "lost": 1,
+            "net": 1,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 17,
+            "gained": 7,
+            "kept": 57,
+            "lost": 35,
+            "net": -28,
+            "p": 1.5097200957825407e-05
+          },
+          "evidence": {
+            "both_wrong": 7,
+            "gained": 4,
+            "kept": 82,
+            "lost": 23,
+            "net": -19,
+            "p": 0.000310748815536499
+          }
+        },
+        "unanswerable": {
+          "abstained": 41,
+          "n": 44
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "terse": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 19,
+            "evidence": 35,
+            "n": 49
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 1,
+              "kept": 17,
+              "lost": 0,
+              "net": 1,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 6,
+              "gained": 3,
+              "kept": 16,
+              "lost": 24,
+              "net": -21,
+              "p": 4.9233436584472656e-05
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 35,
+              "lost": 13,
+              "net": -13,
+              "p": 0.000244140625
+            }
+          },
+          "unanswerable": {
+            "abstained": 18,
+            "n": 18
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 55,
+            "evidence": 73,
+            "n": 87
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 2,
+              "gained": 1,
+              "kept": 27,
+              "lost": 1,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 13,
+              "gained": 8,
+              "kept": 47,
+              "lost": 19,
+              "net": -11,
+              "p": 0.052238985896110535
+            },
+            "evidence": {
+              "both_wrong": 6,
+              "gained": 6,
+              "kept": 67,
+              "lost": 8,
+              "net": -2,
+              "p": 0.79052734375
+            }
+          },
+          "unanswerable": {
+            "abstained": 28,
+            "n": 31
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 74,
+          "evidence": 108,
+          "n": 136
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 2,
+            "gained": 2,
+            "kept": 44,
+            "lost": 1,
+            "net": 1,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 19,
+            "gained": 11,
+            "kept": 63,
+            "lost": 43,
+            "net": -32,
+            "p": 1.4013057456185862e-05
+          },
+          "evidence": {
+            "both_wrong": 7,
+            "gained": 6,
+            "kept": 102,
+            "lost": 21,
+            "net": -15,
+            "p": 0.005924612283706665
+          }
+        },
+        "unanswerable": {
+          "abstained": 46,
+          "n": 49
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "typo": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 4,
+            "evidence": 5,
+            "n": 5
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 0,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 4,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "evidence": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 5,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            }
+          },
+          "unanswerable": {
+            "abstained": 0,
+            "n": 0
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 9,
+            "evidence": 12,
+            "n": 15
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 0,
+              "gained": 0,
+              "kept": 5,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 2,
+              "gained": 2,
+              "kept": 7,
+              "lost": 4,
+              "net": -2,
+              "p": 0.6875
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 1,
+              "kept": 11,
+              "lost": 2,
+              "net": -1,
+              "p": 1.0
+            }
+          },
+          "unanswerable": {
+            "abstained": 5,
+            "n": 5
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 13,
+          "evidence": 17,
+          "n": 20
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 0,
+            "gained": 0,
+            "kept": 5,
+            "lost": 0,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 3,
+            "gained": 2,
+            "kept": 11,
+            "lost": 4,
+            "net": -2,
+            "p": 0.6875
+          },
+          "evidence": {
+            "both_wrong": 1,
+            "gained": 1,
+            "kept": 16,
+            "lost": 2,
+            "net": -1,
+            "p": 1.0
+          }
+        },
+        "unanswerable": {
+          "abstained": 5,
+          "n": 5
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "typo1": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 35,
+            "evidence": 42,
+            "n": 44
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 17,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 6,
+              "gained": 1,
+              "kept": 34,
+              "lost": 3,
+              "net": -2,
+              "p": 0.625
+            },
+            "evidence": {
+              "both_wrong": 0,
+              "gained": 1,
+              "kept": 41,
+              "lost": 2,
+              "net": -1,
+              "p": 1.0
+            }
+          },
+          "unanswerable": {
+            "abstained": 17,
+            "n": 18
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 42,
+            "evidence": 59,
+            "n": 72
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 2,
+              "gained": 1,
+              "kept": 22,
+              "lost": 1,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 15,
+              "gained": 2,
+              "kept": 40,
+              "lost": 15,
+              "net": -13,
+              "p": 0.002349853515625
+            },
+            "evidence": {
+              "both_wrong": 9,
+              "gained": 1,
+              "kept": 58,
+              "lost": 4,
+              "net": -3,
+              "p": 0.375
+            }
+          },
+          "unanswerable": {
+            "abstained": 23,
+            "n": 26
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 77,
+          "evidence": 101,
+          "n": 116
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 3,
+            "gained": 1,
+            "kept": 39,
+            "lost": 1,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 21,
+            "gained": 3,
+            "kept": 74,
+            "lost": 18,
+            "net": -15,
+            "p": 0.0014896392822265625
+          },
+          "evidence": {
+            "both_wrong": 9,
+            "gained": 2,
+            "kept": 99,
+            "lost": 6,
+            "net": -4,
+            "p": 0.2890625
+          }
+        },
+        "unanswerable": {
+          "abstained": 40,
+          "n": 44
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    },
+    "typo3": {
+      "domains": {
+        "emacs": {
+          "answerable": {
+            "correct": 32,
+            "evidence": 40,
+            "n": 44
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 17,
+              "lost": 0,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 6,
+              "gained": 1,
+              "kept": 31,
+              "lost": 6,
+              "net": -5,
+              "p": 0.125
+            },
+            "evidence": {
+              "both_wrong": 1,
+              "gained": 0,
+              "kept": 40,
+              "lost": 3,
+              "net": -3,
+              "p": 0.25
+            }
+          },
+          "unanswerable": {
+            "abstained": 17,
+            "n": 18
+          },
+          "unpaired": {
+            "n": 0
+          }
+        },
+        "linux": {
+          "answerable": {
+            "correct": 33,
+            "evidence": 57,
+            "n": 72
+          },
+          "paired": {
+            "abstained": {
+              "both_wrong": 1,
+              "gained": 2,
+              "kept": 21,
+              "lost": 2,
+              "net": 0,
+              "p": 1.0
+            },
+            "correct": {
+              "both_wrong": 15,
+              "gained": 2,
+              "kept": 31,
+              "lost": 24,
+              "net": -22,
+              "p": 1.049041748046875e-05
+            },
+            "evidence": {
+              "both_wrong": 7,
+              "gained": 3,
+              "kept": 54,
+              "lost": 8,
+              "net": -5,
+              "p": 0.2265625
+            }
+          },
+          "unanswerable": {
+            "abstained": 23,
+            "n": 26
+          },
+          "unpaired": {
+            "n": 0
+          }
+        }
+      },
+      "overall": {
+        "answerable": {
+          "correct": 65,
+          "evidence": 97,
+          "n": 116
+        },
+        "paired": {
+          "abstained": {
+            "both_wrong": 2,
+            "gained": 2,
+            "kept": 38,
+            "lost": 2,
+            "net": 0,
+            "p": 1.0
+          },
+          "correct": {
+            "both_wrong": 21,
+            "gained": 3,
+            "kept": 62,
+            "lost": 30,
+            "net": -27,
+            "p": 1.4011748135089874e-06
+          },
+          "evidence": {
+            "both_wrong": 8,
+            "gained": 3,
+            "kept": 94,
+            "lost": 11,
+            "net": -8,
+            "p": 0.057373046875
+          }
+        },
+        "unanswerable": {
+          "abstained": 40,
+          "n": 44
+        },
+        "unpaired": {
+          "n": 0
+        }
+      }
+    }
+  },
+  "n_results": 1160,
+  "pool": [
+    "data/eval/emacs_questions.jsonl",
+    "data/eval/questions.jsonl",
+    "data/eval/variations_emacs.jsonl",
+    "data/eval/variations_man.jsonl",
+    "data/eval/variations_typo.jsonl"
+  ]
+}
