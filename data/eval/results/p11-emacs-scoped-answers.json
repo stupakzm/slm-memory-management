@@ -1,0 +1,2256 @@
+{
+  "name": "p11-emacs-scoped",
+  "k": 5,
+  "n": 78,
+  "config": {
+    "mode": "dense",
+    "rerank": true,
+    "gate": 0.65,
+    "grammar": true,
+    "candidates": 50,
+    "expand": 0,
+    "db": "data/index/phase11.db",
+    "domain": "emacs",
+    "rewrites": 0,
+    "aliases": true,
+    "cache": "p11-emacs-scoped",
+    "read_k": 0,
+    "cap_per_doc": 0,
+    "answer_mode": "cite",
+    "qids": null,
+    "abstain_rule": "all-sentences",
+    "evidence_rule": "aliased"
+  },
+  "answer_accuracy": 0.5833333333333334,
+  "accuracy_given_evidence": 0.5833333333333334,
+  "false_abstention_with_evidence": 0.1,
+  "abstention_recall": 0.9444444444444444,
+  "spoke_without_evidence": 0.0,
+  "unsupported_rate": 0.01282051282051282,
+  "results": [
+    {
+      "qid": "e01",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command visits a file purely for viewing, so that you can't accidentally modify it?",
+      "answer": "\u2018C-x C-r\u2019 (\u2018find-file-read-only\u2019) [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9995359778404236,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e02",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command closes the buffer you're currently visiting, freeing the memory it was using?",
+      "answer": "\u2018C-x k\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "vip.emacs"
+      ],
+      "top_score": 0.9987951517105103,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e03",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command gets rid of every window in the frame except the one you're in?",
+      "answer": "C-x 1 [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9987061023712158,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e04",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command splits the selected window into two side by side, left and right?",
+      "answer": "split-window-right [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9987430572509766,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e05",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command replaces every occurrence of one string with another from point onward, without asking for confirmation each time?",
+      "answer": "M-x replace-string [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "vip.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9996652603149414,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e06",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command steps through each match of a search pattern one at a time and asks whether to replace it?",
+      "answer": "C-M-% (\u2018query-replace-regexp\u2019) [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "reftex.emacs"
+      ],
+      "top_score": 0.993489146232605,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e07",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command copies the region onto the kill ring without deleting the text from the buffer?",
+      "answer": "copy-region-as-kill [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9996545314788818,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e08",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command tells the very next kill to combine with the previous one instead of starting a new kill-ring entry?",
+      "answer": "C-M-w [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9987406134605408,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e09",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command undoes changes without ever undoing an undo?",
+      "answer": "M-x undo-only [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.995826780796051,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e10",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command discards unsaved edits and reloads a buffer's contents from the file on disk?",
+      "answer": "revert-buffer [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "speedbar.emacs"
+      ],
+      "top_score": 0.9960266351699829,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e11",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command gives the most recently defined keyboard macro a name you can invoke like any other command?",
+      "answer": "C-x C-k n [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.999580442905426,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e12",
+      "kind": "answerable",
+      "tags": [
+        "key"
+      ],
+      "variant_kind": null,
+      "question": "What key sequence starts defining a keyboard macro the old-fashioned way?",
+      "answer": "C-x ( [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9995623230934143,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e13",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command copies the region into a register so you can reinsert it later?",
+      "answer": "\u2018C-x r s R\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "calc.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9998564720153809,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e14",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command jumps straight to a saved bookmark by name?",
+      "answer": "\u2018C-x r b BOOKMARK <RET>\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9986057877540588,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e15",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command marks every file in a Dired listing whose name matches a regular expression?",
+      "answer": "% m REGEXP <RET> [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9996126890182495,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e16",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command renames, or moves, the marked files in Dired?",
+      "answer": "The command that renames or moves the marked files in Dired is `R NEW <RET>`. This command renames the specified files (\u2018dired-do-rename\u2019), and if renaming several files, NEW is the directory into which to move them, similar to the shell command \u2018mv\u2019 [1] . This is the primary command for renaming or moving marked files in Dired. Additionally, Wdired mode allows renaming or moving files by editing the file names directly, but the specific Dired command for marked files is `R`. [4] confirms that renaming/moving is done via editing in Wdired, but the direct Dired command for marked files is `R`. Hence, the answer is `R NEW <RET>`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9987290501594543,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e17",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command jumps straight to the customization buffer for one particular group of settings, instead of browsing the whole hierarchy?",
+      "answer": "M-x customize-group [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.999340832233429,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e18",
+      "kind": "answerable",
+      "tags": [
+        "path"
+      ],
+      "variant_kind": null,
+      "question": "For brevity, which single filename does the rest of the Emacs manual use to refer to the init file?",
+      "answer": "~/.emacs.d/init.el [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9989666938781738,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e19",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command shows documentation for the buffer's current major mode, including the keys and features it changes?",
+      "answer": "C-h m (\u2018describe-mode\u2019) [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9998788833618164,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e20",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command toggles Auto Fill mode on or off in the current buffer?",
+      "answer": "\u2018M-x auto-fill-mode\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "eintr.emacs",
+        "efaq.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9997588992118835,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e21",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command displays a help buffer with the full documentation string for whatever key you press next?",
+      "answer": "C-h k [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9995781779289246,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e22",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command starts the Emacs interactive learn-by-doing tutorial?",
+      "answer": "C-h t [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "efaq.emacs",
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9854676127433777,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e23",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command annotates each line of a version-controlled file with the revision that last changed it?",
+      "answer": "C-x v g [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9993919134140015,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e24",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command displays the change log for the file under version control that you're currently visiting?",
+      "answer": "C-x v l [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9989945292472839,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e25",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which Org command is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org files?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9989321827888489,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e26",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command opens the hierarchical menu for exporting the current Org file to another format?",
+      "answer": "\u2018C-c C-e\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "emacs.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9989175796508789,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e27",
+      "kind": "answerable",
+      "tags": [
+        "syntax"
+      ],
+      "variant_kind": null,
+      "question": "What short filename prefix do I type before a remote path, after C-x C-f, to open a file on a remote host over ssh with TRAMP?",
+      "answer": "/news@news.my.domain:/opt/news/etc <RET> [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9998427629470825,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e28",
+      "kind": "answerable",
+      "tags": [
+        "syntax"
+      ],
+      "variant_kind": null,
+      "question": "What short filename prefix opens a local file with root permissions through TRAMP's sudo method?",
+      "answer": "The short filename prefix that opens a local file with root permissions through TRAMP's sudo method is `/sudo::`. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9988424777984619,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e29",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which Emacs Lisp function do I add to a major mode's hook so Eglot starts automatically for every buffer in that mode?",
+      "answer": "eglot-ensure [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.9998356103897095,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e30",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command shuts down every running Eglot language server connection at once?",
+      "answer": "M-x eglot-shutdown-all [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.9999353885650635,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e31",
+      "kind": "answerable",
+      "tags": [
+        "keyword"
+      ],
+      "variant_kind": null,
+      "question": "Which use-package keyword takes a number of seconds so a package only loads after Emacs has been idle that long?",
+      "answer": "The `:defer` keyword takes a number of seconds so a package only loads after Emacs has been idle that long. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "use-package.emacs",
+        "use-package.emacs",
+        "elisp.emacs",
+        "use-package.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9998569488525391,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e32",
+      "kind": "answerable",
+      "tags": [
+        "keyword"
+      ],
+      "variant_kind": null,
+      "question": "Which use-package keyword forces a package to load right away, overriding any autoloading keywords?",
+      "answer": ":demand t [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs"
+      ],
+      "top_score": 0.9998883008956909,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e33",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which eshell command, run with the -w switch, truncates an ever-growing history file down to size?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs"
+      ],
+      "top_score": 0.9997101426124573,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e34",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command reloads eshell's alias table after you've hand-edited the aliases file?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "eshell.emacs",
+        "mh-e.emacs",
+        "mh-e.emacs",
+        "eshell.emacs",
+        "eshell.emacs"
+      ],
+      "top_score": 0.9990880489349365,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e35",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which Ediff command compares a file against its own backup file?",
+      "answer": "\u2018ediff-backup\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ediff.emacs",
+        "ediff.emacs",
+        "emacs.emacs",
+        "ediff.emacs",
+        "ediff.emacs"
+      ],
+      "top_score": 0.9994288086891174,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e36",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which Ediff command compares a buffer with its file on disk, acting as a safer revert-buffer?",
+      "answer": "ediff-current-file [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ediff.emacs",
+        "ediff.emacs",
+        "ediff.emacs",
+        "ediff.emacs",
+        "ediff.emacs"
+      ],
+      "top_score": 0.9998525381088257,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e37",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command is bound to the C-x * prefix and starts the Calculator?",
+      "answer": "The command bound to the `C-x *` prefix and starts the Calculator is `calc-dispatch` [3] . This is confirmed by the text in extract [3] which states: \"On most systems, you can type \u2018C-x *\u2019 to start the Calculator. The key sequence \u2018C-x *\u2019 is bound to the command \u2018calc-dispatch\u2019\". Therefore, the answer is `calc-dispatch` [3] . \u2705. However, note that the question asks for the command that starts the Calculator, and the manual indicates that `calc-dispatch` is the command bound to `C-x *`, which dispatches to different interfaces based on the next key. Thus, the correct answer is: `calc-dispatch` [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs"
+      ],
+      "top_score": 0.9998663663864136,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e38",
+      "kind": "answerable",
+      "tags": [
+        "key"
+      ],
+      "variant_kind": null,
+      "question": "What key sequence turns on Calc's Embedded mode for a formula written directly in a text buffer?",
+      "answer": "The key sequence that turns on Calc's Embedded mode for a formula written directly in a text buffer is `C-x * e`. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs"
+      ],
+      "top_score": 0.9998236894607544,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e39",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command jumps to the next Flymake diagnostic when it's outside the visible part of the buffer?",
+      "answer": "flymake-goto-next-error [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.99950110912323,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e40",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command opens a structured listing of every Flymake diagnostic across the whole project?",
+      "answer": "\u2018M-x flymake-show-project-diagnostics\u2019 [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs",
+        "emacs.emacs",
+        "flymake.emacs"
+      ],
+      "top_score": 0.9998642206192017,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e41",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command toggles whether Dired hides 'uninteresting' files like backups and auto-save files?",
+      "answer": "\u2018C-x M-o\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dired-x.emacs",
+        "dired-x.emacs",
+        "efaq.emacs",
+        "emacs.emacs",
+        "dired-x.emacs"
+      ],
+      "top_score": 0.9994177222251892,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e42",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which dired-x command behaves like find-file but, given a prefix argument, guesses the file to visit from text at point?",
+      "answer": "dired-x-find-file [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "dired-x.emacs",
+        "dired-x.emacs",
+        "dired-x.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9996870160102844,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e43",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "In Info mode, which general Emacs command does the M-n key run to open an independent copy of the current Info buffer?",
+      "answer": "The command \u2018M-n\u2019 runs the Emacs command \u2018clone-buffer\u2019 to open an independent copy of the current Info buffer [1] and [2] . Therefore, the answer is: clone-buffer. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "info.emacs",
+        "info.emacs",
+        "emacs.emacs",
+        "info.emacs",
+        "info.emacs"
+      ],
+      "top_score": 0.9998352527618408,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        2
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e44",
+      "kind": "answerable",
+      "tags": [
+        "variable"
+      ],
+      "variant_kind": null,
+      "question": "Which user option holds the pair of themes that modus-themes-toggle switches between?",
+      "answer": "The user option that holds the pair of themes modus-themes-toggle switches between is \u2018modus-themes-to-toggle\u2019 [2] . \u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705\u2705",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "modus-themes.emacs",
+        "modus-themes.emacs",
+        "modus-themes.emacs",
+        "modus-themes.emacs",
+        "modus-themes.emacs"
+      ],
+      "top_score": 0.9997168183326721,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "u01",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I jump between a file and its test file using projectile?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "ert.emacs",
+        "emacs.emacs",
+        "ede.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.03825763612985611
+    },
+    {
+      "qid": "u02",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I peek at a function's definition through lsp-mode without leaving my buffer?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9973013401031494
+    },
+    {
+      "qid": "u03",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I toggle the treemacs sidebar to browse my project's file tree?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "ebrowse.emacs",
+        "ebrowse.emacs",
+        "speedbar.emacs",
+        "emacs.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.8403173089027405
+    },
+    {
+      "qid": "u04",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I get smartparens to automatically balance parentheses as I type?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "autotype.emacs",
+        "autotype.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9968295693397522
+    },
+    {
+      "qid": "u05",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I open Spacemacs's leader-key menu with SPC?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "info.emacs",
+        "info.emacs",
+        "info.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9796455502510071
+    },
+    {
+      "qid": "u06",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "What keybinding does Prelude add for switching quickly between recently opened files?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "ido.emacs",
+        "speedbar.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.26086562871932983
+    },
+    {
+      "qid": "u07",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I expand a tempel template snippet at point?",
+      "answer": "Use `M-x tempo-expand` to expand a template snippet at point. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "autotype.emacs",
+        "org.emacs",
+        "org.emacs",
+        "autotype.emacs"
+      ],
+      "top_score": 0.9949744939804077
+    },
+    {
+      "qid": "u08",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I send an HTTP request from a restclient buffer?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "url.emacs",
+        "gnus.emacs",
+        "url.emacs",
+        "url.emacs",
+        "url.emacs"
+      ],
+      "top_score": 0.0917128324508667
+    },
+    {
+      "qid": "u09",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I start a Python REPL for the current buffer using elpy?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "eshell.emacs",
+        "eintr.emacs",
+        "eintr.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.17533016204833984
+    },
+    {
+      "qid": "u10",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I get anaconda-mode to show a Python function's docstring?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.6605125069618225
+    },
+    {
+      "qid": "u11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "Which command in paredit slurps the next expression into the current one?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "eintr.emacs",
+        "eintr.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.027462247759103775
+    },
+    {
+      "qid": "u12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I evaluate a Racket expression in the REPL using racket-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "elisp.emacs",
+        "eintr.emacs",
+        "eintr.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.03540502488613129
+    },
+    {
+      "qid": "u13",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I load a Haskell file into the REPL with haskell-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "modus-themes.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.026646804064512253
+    },
+    {
+      "qid": "u14",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I jump to a Rust type's definition using rustic?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "semantic.emacs",
+        "semantic.emacs",
+        "ebrowse.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.4775272607803345
+    },
+    {
+      "qid": "u15",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I rename a symbol across a TypeScript project with typescript-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "semantic.emacs",
+        "ccmode.emacs",
+        "emacs.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.10635058581829071
+    },
+    {
+      "qid": "u16",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I list the pods in my Kubernetes cluster from kubernetes-el?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "eshell.emacs",
+        "efaq.emacs"
+      ],
+      "top_score": 0.1818985641002655
+    },
+    {
+      "qid": "u17",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I scan a project for TODO comments with magit-todos?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "todo-mode.emacs"
+      ],
+      "top_score": 0.9367802739143372
+    },
+    {
+      "qid": "u18",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I run a ripgrep search across a project using projectile-ripgrep?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9901546835899353
+    },
+    {
+      "qid": "ep01",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "I just want to look at a file's contents without any risk of accidentally editing it -- which command visits it that way?",
+      "answer": "`C-x C-r` (\u2018find-file-read-only\u2019) [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9986726641654968,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "ep02",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Is there a command that swaps every instance of one string for another after point, without prompting me each time?",
+      "answer": "Yes. The command `M-x replace-string` replaces every occurrence of a string with another string, operating from point to the end of the buffer, and does not prompt each time. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "vip.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9992364645004272,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "ep03",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "How do I give the keyboard macro I just recorded a proper command name so I can invoke it later?",
+      "answer": "Use \u2018C-x C-k n\u2019 (\u2018kmacro-name-last-macro\u2019), which reads a name as an argument using the minibuffer and defines that name to execute the last keyboard macro in its current form. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "calc.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.99941086769104,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "ep04",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which command takes me directly to the customization screen for one particular group of settings, instead of browsing the whole hierarchy of groups?",
+      "answer": "M-x customize-group [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9983695149421692,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "ep05",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "What's the Org command people bind to a global key so the agenda works no matter which buffer I'm in?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9994937181472778,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "ep06",
+      "kind": "answerable",
+      "tags": [
+        "keyword"
+      ],
+      "variant_kind": null,
+      "question": "Is there a use-package keyword that puts off loading a package until Emacs has been sitting idle for some number of seconds?",
+      "answer": "Yes, the keyword is `:defer` with a numeric argument. For example, `:defer 30` loads the package after 30 seconds of idle time [2] . \u2705 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs"
+      ],
+      "top_score": 0.9999386072158813,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e02.t",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "kill buffer command",
+      "answer": "The kill buffer command is `C-x k BUFFER <RET>` or `M-x kill-some-buffers` for killing buffers one by one, or `M-x kill-matching-buffers` for killing buffers matching a regular expression. The primary command to kill a specific buffer is `kill-buffer`, which can be invoked with `C-x k` [2] or as a function in Elisp with `kill-buffer &optional buffer-or-name` [4] (where the default is to kill the current buffer). If the buffer contains unsaved changes, confirmation is required [4] and can be avoided by clearing the modified flag [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9994133710861206,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e07.t",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "copy region without deleting kill ring",
+      "answer": "The command `copy-region-as-kill` saves the text in a region to the kill ring without deleting it from the buffer. This function does not modify the buffer, thus preserving the original text. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "eintr.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9993704557418823,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e13.t",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "register copy text",
+      "answer": "\u2018C-x r s R\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9994827508926392,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e19.t",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "describe major mode command",
+      "answer": "The major mode command is described in extract [1] as the `describe-mode` function, which displays the documentation of the current buffer's major mode and minor modes. It is normally bound to `C-h m` and uses the `documentation` function to retrieve the documentation strings. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9994658827781677,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e27.t",
+      "kind": "answerable",
+      "tags": [
+        "syntax",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tramp ssh filename prefix",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9997281432151794,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e04.z",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "how do i split a windw side by side lft and rigth",
+      "answer": "Use `split-window-right` [1] or `C-x 3` [5] to split a window side by side, with the original window on the left. \u2705 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "ediff.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9889858961105347,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e09.z",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "undo with out ever redoign a undo",
+      "answer": "Use \u2018M-x undo-only\u2019. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "calc.emacs",
+        "emacs.emacs",
+        "calc.emacs"
+      ],
+      "top_score": 0.9962869882583618,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e15.z",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "mark files in a dierd buffer that mach a regex",
+      "answer": "Use the command `% m REGEXP <RET>` to mark files in a Dired buffer whose names match the regular expression REGEXP [4] (also referenced in [3] and [5] for related functionality). This command marks files with an asterisk (*) and uses only the non-directory part of the file name for matching. For matching file contents instead of names, use `% g REGEXP <RET>` [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "dired-x.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "efaq.emacs"
+      ],
+      "top_score": 0.9995511174201965,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4,
+        3,
+        5
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e21.z",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "wich comand shows the full doc string for a key i press",
+      "answer": "C-h k KEY \u2192 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9816607236862183,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e33.z",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo"
+      ],
+      "variant_kind": "typo",
+      "question": "eshel command to truncat the histroy file with -w",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs",
+        "eshell.emacs"
+      ],
+      "top_score": 0.9948416948318481,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    }
+  ]
+}
