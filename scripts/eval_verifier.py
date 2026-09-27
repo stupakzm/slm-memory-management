@@ -143,6 +143,17 @@ def _sum_counts(a: dict, b: dict) -> dict:
             ("kept_good", "removed_good", "kept_bad", "removed_bad")}
 
 
+def no_evidence_answered(ans_recs: list[dict], still_answered) -> tuple[int, int]:
+    """(answered, total) over the no-evidence subset: answerable records whose
+    evidence_retrieved is false (the same subset eval_answers.py's `no_ev`
+    uses, scripts/eval_answers.py:301-302) - not all of ans_recs. `answered`
+    counts those still answered (not abstained, not verifier-removed) after
+    replay via `still_answered(qid)`."""
+    no_ev = [r for r in ans_recs if not r["evidence_retrieved"]]
+    answered = sum(1 for r in no_ev if still_answered(r["qid"]))
+    return answered, len(no_ev)
+
+
 def stage_score(args) -> int:
     if not args.mech:
         print("--mech is required for --stage score", file=sys.stderr)
@@ -269,14 +280,13 @@ def stage_replay(args) -> int:
                              if r["correct"] and r["qid"] not in removed_qids)
         abstained_final = sum(1 for r in una_recs
                                if r["abstained"] or r["qid"] in removed_qids)
-        no_ev_answered = sum(1 for r in ans_recs
-                              if not r["evidence_retrieved"] and still_answered(r["qid"]))
+        no_ev_answered, no_ev_total = no_evidence_answered(ans_recs, still_answered)
         none_coverage = sum(1 for s in scores.values() if s is None)
 
         end_to_end = {
             "correct_over_answerable": [correct_final, len(ans_recs)],
             "unanswerable_correctly_abstained": [abstained_final, len(una_recs)],
-            "answered_with_no_evidence": [no_ev_answered, len(ans_recs)],
+            "answered_with_no_evidence": [no_ev_answered, no_ev_total],
             "none_coverage": [none_coverage, len(all_qids)],
         }
 
@@ -296,7 +306,7 @@ def stage_replay(args) -> int:
         print(f"  held-out sum              {held_out_sum}")
         print(f"  correct/answerable            {correct_final}/{len(ans_recs)}")
         print(f"  unanswerable correctly abstained  {abstained_final}/{len(una_recs)}")
-        print(f"  answered with no evidence      {no_ev_answered}/{len(ans_recs)}")
+        print(f"  answered with no evidence      {no_ev_answered}/{no_ev_total}")
         print(f"  no-opinion (None) coverage     {none_coverage}/{len(all_qids)}")
 
     suffix = "-aliased" if args.label == "aliased" else ""

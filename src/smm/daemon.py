@@ -75,8 +75,10 @@ def start(name: str, wait: float = 90.0) -> bool:
     port = PORT_OF[name]
     RUN.mkdir(parents=True, exist_ok=True)
     with open(RUN / f"{name}.launch.log", "ab") as log:
-        subprocess.run(["bash", str(SERVERS_SH), "start", target],
-                        stdout=log, stderr=log, check=False)
+        proc = subprocess.run(["bash", str(SERVERS_SH), "start", target],
+                               stdout=log, stderr=log, check=False)
+    if proc.returncode != 0:
+        return False
     deadline = time.time() + wait
     while time.time() < deadline:
         if health(port):
