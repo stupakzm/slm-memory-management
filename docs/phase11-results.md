@@ -245,3 +245,35 @@ instead of crashing. The control (R3) is re-used as is.
 
 If `man` itself passes 1-3 against control, that is reported as well: it would mean the eval
 baseline has been understating `asq` all along.
+
+## R4a results (run 2026-09-27)
+
+Diagnostic arm, as pre-registered: the 370 pool rows whose question the normaliser changes were
+re-run with `--normalize spell`. The other 790 rows are identical inputs to the control. Files:
+`data/eval/results/p11-r4a-answers.json`. Paired arm vs the R3 control on the same rows:
+
+| kind | answerable rows changed | lost | gained | **net** | McNemar p |
+|---|---|---|---|---|---|
+| typo1 | 99 | 4 | 15 | **+11** | 0.019 |
+| typo3 | 116 | 4 | 20 | **+16** | 0.0015 |
+| synonym | 3 | 2 | 0 | −2 | 0.50 |
+| typo (old), casual, clean | 26 | 0 | 0 | 0 | – |
+
+Unanswerable rows changed: 126. Abstention lost 3, gained 7 (net +4).
+
+**Against the rule:**
+1. Typos recover: **+27 net (p < 0.0001). Pass.** That is 27 of the 42 answers typos cost in R3.
+2. Clean text left alone: **fail.** 11/160 clean questions changed (≤ 3 allowed), mostly names of
+   uninstalled tools rewritten into installed ones (`nmap`→`mmap`, `elpy`→`elpa`,
+   `projectile`→`projectfile`).
+3. No new invention: pass (net +4). In this run the renamed tools still drew refusals, but that is
+   luck of the corpus, not a property of the mechanism.
+4. Cheap: pass (p95 0.36 ms per question).
+
+**Verdict: does not ship** (rule 2). `--normalize spell` stays default-off.
+
+**What it establishes:** R3's reading of the typo loss was right. Repairing the words of the
+question itself, not only the retrieval query, recovers most of what typos cost the 4B reader.
+The open problem is doing it without renaming things the corpus has never heard of. That is
+R4a′: the 4B corrects spelling under an explicit keep-every-name instruction (built, default
+off). It is pre-registered next, with the same four rules.
