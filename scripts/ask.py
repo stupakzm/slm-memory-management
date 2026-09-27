@@ -104,6 +104,17 @@ def main() -> int:
     ap.add_argument("--vocab-cache", default=None,
                     help="override path for --normalize spell's vocab cache (default: "
                          "<db>.vocab.json next to --db)")
+    ap.add_argument("--rewrite-style", choices=("man", "docs"), default="man",
+                    help="phase 11 R4b: 'docs' asks the rewriter for documentation's "
+                         "own terminology (manual pages and the GNU Emacs manuals) "
+                         "instead of everyday words; only meaningful with --rewrites > "
+                         "0. 'man' (default) reproduces today's behaviour exactly.")
+    ap.add_argument("--llm-correct", action="store_true",
+                    help="phase 11 R4a': ask the 4B generator itself to fix spelling "
+                         "in the question (Generator.correct) before retrieval, "
+                         "including any rewrites/fusion, and generation; composes with "
+                         "--normalize (normalize runs first). Default off reproduces "
+                         "today's behaviour exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
     if args.rewrites is None:
@@ -120,15 +131,26 @@ def main() -> int:
     rewrite_texts: list[str] = []
     interpreted_idx = 0
     gen = None
-    if args.rewrites > 0:
+    if args.rewrites > 0 or args.llm_correct:
         # Deliberate reorder (see module docstring): the generator has to run
-        # before retrieval to produce the rewrites, so it starts here - before
-        # the embedder/reranker and before the gate - on every such ask.
+        # before retrieval to produce the rewrites and/or the corrected text,
+        # so it starts here - before the embedder/reranker and before the
+        # gate - on every such ask.
         gen = Generator()
         if not gen.health():
             print("generator not running: ./scripts/servers.sh start generator", file=sys.stderr)
             return 2
-        rewrite_texts = gen.rewrites(question, n=args.rewrites)
+    if args.llm_correct:
+        # Runs on the already-normalized text (--normalize runs first, above) -
+        # the corrected text then feeds retrieval, including rewrites/fusion,
+        # and generation (phase 11 R4a'; blk_normalize_spell_api's wiring
+        # pattern, extended).
+        corrected_question = gen.correct(question)
+        if corrected_question != question:
+            print(f'(read as: "{corrected_question}")')
+        question = corrected_question
+    if args.rewrites > 0:
+        rewrite_texts = gen.rewrites(question, n=args.rewrites, style=args.rewrite_style)
 
     emb = Embedder()
     if not emb.health():

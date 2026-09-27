@@ -61,13 +61,53 @@ states what the claim says - not because it sounds plausible or is true in
 general."""
 
 
-def build_rewrite_prompt(question: str, n: int) -> list[dict]:
-    system = (f"Rewrite the user's request as {n} alternative search queries for a "
-              "Linux manual-page search engine. Each on its own line, no numbering, "
-              "no explanation. Keep them short, name the likely command if you can, "
-              "and vary the wording.")
+def build_rewrite_prompt(question: str, n: int, style: str = "man") -> list[dict]:
+    """`style="man"` (default) is exactly today's prompt, byte-for-byte - phase 11
+    R4b's docs-vocabulary style is opt-in only. `style="docs"` targets the R3
+    finding that synonym/no-name/terse wordings lose answers mostly at
+    RETRIEVAL, a vocabulary gap (blk phase11-results.md R3): it asks for
+    documentation's own terminology instead, while still keeping any
+    program/package/command name the user wrote exactly as written (the same
+    verbatim-names guard as build_correct_prompt below -
+    blk_r4a_spell_normalisation_fails_rule)."""
+    if style == "docs":
+        system = (
+            f"Rewrite the user's request as {n} alternative search queries for a "
+            "search engine over software documentation (Linux manual pages and the "
+            "GNU Emacs manuals). Use the terminology that documentation itself would "
+            "use for the commands, options and concepts, which is often different "
+            "from everyday words. Keep any program, package or command name the user "
+            "wrote exactly as written. Each on its own line, no numbering, no "
+            "explanation. Keep them short."
+        )
+    else:
+        system = (f"Rewrite the user's request as {n} alternative search queries for a "
+                  "Linux manual-page search engine. Each on its own line, no numbering, "
+                  "no explanation. Keep them short, name the likely command if you can, "
+                  "and vary the wording.")
     return [
         {"role": "system", "content": system},
+        {"role": "user", "content": question},
+    ]
+
+
+# Phase 11 R4a': the model-based spelling corrector. R4a's corpus-vocabulary
+# corrector (smm.normalize) failed its own safety rule by rewriting the names
+# of uninstalled tools into installed ones (nmap -> mmap,
+# blk_r4a_spell_normalisation_fails_rule); this prompt asks the model itself
+# to fix spelling while holding every program/package/command/option/file
+# name fixed, even ones it has never seen.
+CORRECT_SYSTEM = (
+    "Fix spelling mistakes in the user's question. Change nothing else: keep "
+    "the wording, and keep every program, package, command, option and file "
+    "name exactly as written, even unfamiliar ones. Output only the corrected "
+    "question on one line."
+)
+
+
+def build_correct_prompt(question: str) -> list[dict]:
+    return [
+        {"role": "system", "content": CORRECT_SYSTEM},
         {"role": "user", "content": question},
     ]
 
@@ -121,18 +161,37 @@ class Generator:
         g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
         return self.chat(build_prompt(question, chunks), grammar=g, **kw)
 
-    def rewrites(self, question: str, n: int = 1, max_tokens: int = 120) -> list[str]:
+    def rewrites(self, question: str, n: int = 1, max_tokens: int = 120,
+                 style: str = "man") -> list[str]:
         """N grammar-constrained alternative search queries for `question`, one per
         line, no numbering. Grammar-constrained rather than filtered afterwards on
         purpose: the local 4B is sloppy at this (one run produced a 300-token blob
         of ORs) and rank fusion is what makes the fused-retrieval path robust to a
         bad variant, not a quality check here - see retrieve.fuse_variants.
+
+        `style` is passed straight through to build_rewrite_prompt; "man"
+        (default) reproduces today's behaviour exactly, "docs" is phase 11 R4b.
         """
         if n <= 0:
             return []
-        text = self.chat(build_rewrite_prompt(question, n), max_tokens=max_tokens,
+        text = self.chat(build_rewrite_prompt(question, n, style=style), max_tokens=max_tokens,
                          temperature=0.0, grammar=_rewrite_grammar(n))
         return [l.strip() for l in text.splitlines() if l.strip()][:n]
+
+    def correct(self, question: str, max_tokens: int = 120) -> str:
+        """Phase 11 R4a': ask the model to fix spelling in `question`, holding
+        every program/package/command/option/file name fixed (build_correct_prompt).
+        Grammar-constrained to a single non-empty line, same idiom as rewrites().
+
+        Guard against the model answering the question instead of correcting it
+        (blk_r4a_spell_normalisation_fails_rule's failure mode, generalised): an
+        empty output, or one more than 2x the input's length plus 20 chars, is
+        treated as a bad correction and `question` is returned unchanged."""
+        text = self.chat(build_correct_prompt(question), max_tokens=max_tokens,
+                         temperature=0.0, grammar=_rewrite_grammar(1)).strip()
+        if not text or len(text) > 2 * len(question) + 20:
+            return question
+        return text
 
     def judge(self, claim: str, extract: str) -> float:
         """Does `extract` explicitly support `claim`? Grammar-constrained to
