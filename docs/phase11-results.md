@@ -670,3 +670,33 @@ answers (phase 9's failure), right or wrong.
 inventions, 14 wrong), re-run with `--cascade --answer-mode quote`. Question: does quote mode
 remove the cascade's inventions and keep its rescues? A clear yes would make "cascade + quote" a
 candidate arm with its own pre-registration.
+
+## Exploratory: term menu from mechanically extracted cards (2026-09-28, not pre-registered)
+
+**Idea (user's).** Collect each documented term with the doc's own one-line description (a "card").
+At question time, the question's embedding pulls the nearest cards, and the 4B would pick from that
+menu. It can only choose real names, which removes R4b/R4d's invented rewrites. The go/no-go asks
+whether the right term is in the 30-card menu at all. **Bar, fixed before the first run:** ≥ 50 % on
+no-name + synonym Emacs rows whose R3 evidence was missing.
+
+**v1**: 9,709 cards from the Emacs manuals: `-- Command/Function/Option:` definitions, definition
+lists, and inline `‘key’ (‘command’)` and `‘M-x name’`, first mention kept. All Emacs rows:
+**15/34 = 44 %, fail.** Clean 31/44, no-name 26/44, synonym 25/44 in the top 30. Hits include
+the motivating cases: "closing all the other split views except the one I'm in" →
+`delete-other-windows` at rank 6; "look inside a document without any risk I might change it" →
+`find-file-read-only` at rank 2. Of the 13 clean misses, 7 have answers that are not command names
+(files, TRAMP prefixes, use-package keywords, an eshell command), so no card could exist. The rest
+are extraction defects.
+
+**Repair round, with a frozen split** (62 Emacs bases, seed 20260928, 31/31; variants follow their
+base). 8 of the inspected misses fell in the test half, disclosed. v2 fixes: definitional cards
+beat passing mentions, `M-x name` with arguments, bare keys dropped. **Dev half: v1 5/12 (42 %),
+v2 4/12 (33 %).** v2 is no better anywhere, and neither passes on dev, so the test half was not
+spent and stays clean.
+
+**What it establishes.** Mechanical cards carry the manual's vocabulary, and the manual's vocabulary
+is the gap. "The recording I just made" does not embed near "give a command name to the most
+recently defined keyboard macro". The misses that remain are not extraction bugs; they are the
+problem itself. Cleaner cards will not close it. Plain-English descriptions written for each card
+might: the 4B writes them once, offline, so query-time cost is unchanged. That is the next version
+of this check, and it runs against the untouched test half.
