@@ -542,3 +542,79 @@ profile and run). A question that doesn't name its tool needs the candidates den
 The overall −11 is not significant (p = 0.30), but R5 is a non-inferiority test, and −11 is well
 outside its margin. A future speed arm would have to keep depth for questions the gate finds weak.
 One option is the R4d cascade's own shape: 20 first, 50 only on refusal.
+
+## R4d results (run 2026-09-28)
+
+Run as pre-registered: the 412 pool rows the R3 control refused (158 answerable, 254
+unanswerable), `--cascade --stage both`, serve profile. File: `data/eval/results/p11-r4d-answers.json`.
+All other 748 rows were answered at tier 0 and carry over. 6,262 s wall time (15 s per row).
+
+**Where each row ended:**
+
+| | final tier 0 | tier 1 | tier 2, answered | tier 2, refused |
+|---|---|---|---|---|
+| answerable (158) | 9 answered | 21 answered | 8 | 120 |
+| unanswerable (254) | 0 | 2 answered | 4 | 248 |
+
+Tier 0 answered 9 rows the control had refused. The inputs are identical, so this is the serve
+profile and server nondeterminism, not the cascade. A byte-identity check the same day found
+1/40 answers reworded on identical input (b05.m, identical on 3 further reruns). 4 of those 9 are
+correct.
+
+**Paired against control (answerable):** 0 lost, **19 gained (+19, p < 0.0001)**. Of the gains,
+4 come from tier 0 (noise, above), 11 from tier 1 and 4 from tier 2. Counting only the cascade's
+tiers: **+15, p < 0.0001**. By kind: typo3 +7, synonym +4, typo1 +3, no-name +2, clean, terse and
+casual +1 each. Evidence@5 on these rows: 2 lost, 13 gained.
+
+**Unanswerable:** abstention **lost 6, gained 0**. Tier 1 accounts for 2 and tier 2 for 4:
+- `eu03.y1` (tier 1): rewrite `treeemacs-toggle-sidebar-visibility`, answered `window-toggle-side-windows`
+- `eu17.y3` (tier 1): a 9-term rewrite about magit-todos, answered with org-agenda advice
+- `u25` (tier 2): answered `systemctl is-active`
+- `u11.y3` (tier 2): rewrites were long grep/rg command lines, answered with git-grep `--exclude-standard`
+- `u07.k` and `eu07.k` (tier 2): both are refusals in substance ("the extract does not contain
+  information about…"), phrased outside `ABSTAIN_RE`. That is the known limit of the abstention
+  rule (`blk_abstain_re_false_positives`), and the rule counts them as spoken.
+
+Even without the last two, abstention falls by 4.
+
+**Added wall time**, rows that reached tier 1 (n = 403): p50 **11.8 s**, p95 16.4 s. Most rows
+went through both tiers (two rewrite calls, two reranks over 100-150 candidates in the query-sized
+reranker, two generations).
+
+**Against the rule:**
+1. Recovers answers: **pass.** +19 net (p < 0.0001), +15 from the cascade's own tiers.
+2. Clean unharmed: pass (+1; nothing lost anywhere, as the construction predicts).
+3. No new invention: **fail.** Abstention falls by 6 (tier 1 alone: 2, which is also a fail).
+4. Affordable: **fail.** p50 11.8 s against 3 s.
+
+**Verdict: does not ship.** `asq` keeps its current default for now.
+
+**What it establishes.** The shape works on the side it was built for. Retrying only refusals, with
+the rewrite limited to widening the pool, recovered 15 answers and cost none. R4b's every-question
+rewrite lost 41-47. Answered rows stay untouched by construction, and nothing was lost there. The
+cost is on the side the gate protects: 6 of 254 refused unanswerable questions got two more chances
+and 4-6 of them took one. Two of the four real inventions came from rewrites that invented a
+package name, the same failure R4b sampled. Candidate fixes, none pre-registered:
+- **tier 1 only, with a stricter gate on retries.** A retry has already failed once, so the evidence
+  should be held to more than the first attempt was. This is swept from these rows' recorded scores
+  before any new run.
+- **Rewrite quality**: drop rewrites that contain a name not in the index vocabulary, which is R4a's
+  detector reused as a filter.
+- **Latency**: stop at tier 1, and rerank only the rewrite's new candidates, merging them with the
+  question's already-scored ones.
+
+## Phase 11 R4 summary
+
+| arm | mechanism | answers vs control | clean | invention | latency | ships |
+|---|---|---|---|---|---|---|
+| R4a | spell lookup | typos +27 | 11/160 renamed | ok | 0.4 ms | no (rule 2) |
+| R4a′ | 4B spelling fix | typos +29 | 6/160 reworded | ok | 0.22 s | no (rule 2) |
+| R4b | docs rewrite, every question | −41 (syn+noname+terse −19) | −14 | ok | 0.19 s | no (rules 1-2) |
+| R4b (asq today) | man rewrite, every question | −47 | −16 | ok | 0.60 s | (control is better) |
+| R4d | rewrite only on refusal | **+15** | +1 | −6 | 11.8 s | no (rules 3-4) |
+| R5 | rerank 20, not 50 | −11 (no-name −13) | −4 | ok | −58 % | no (rules 1-2) |
+
+No R4/R5 mechanism ships. One result changes the default story, though. `asq`'s current
+`--rewrites 1` loses 47 of 600 answers against plain retrieval on the same rows, and no-rewrite
+plain retrieval is what every result above is measured against. Switching `asq` to `--rewrites 0`
+is a decision for the user. It was not pre-registered as a shipping rule.
