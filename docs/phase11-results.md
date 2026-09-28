@@ -502,3 +502,43 @@ hold):**
 Failing 3 means it does not ship, whatever 1 says. Reported as well: gains and abstention losses
 split by the tier they came from. If rule 3 fails at tier 2 but not at tier 1, that is reported,
 and a tier-1-only cascade needs its own run before it can ship.
+
+## R5 results (run 2026-09-28)
+
+Run as pre-registered: all 1,160 rows, `--candidates 20`, full profile, retrieval and generation
+staged. File: `data/eval/results/p11-r5-c20-answers.json`. Paired against the R3 control
+(883 answerable, 277 unanswerable):
+
+| kind | answerable | lost | gained | **net** | McNemar p |
+|---|---|---|---|---|---|
+| clean | 116 | 7 | 3 | −4 | 0.34 |
+| no-name | 116 | 15 | 2 | **−13** | 0.0023 |
+| casual | 116 | 6 | 2 | −4 | 0.29 |
+| synonym | 116 | 7 | 6 | −1 | 1.0 |
+| terse | 136 | 8 | 11 | +3 | 0.65 |
+| typo1 / typo3 | 116 / 116 | 3 / 4 | 10 / 6 | +7 / +2 | 0.09 / 0.75 |
+| paraphrase, no-tool, typo (old) | 51 | 2 | 1 | −1 | – |
+| **all** | 883 | 52 | 41 | **−11** | 0.30 |
+
+Evidence@5: 32 lost, 19 gained, **net −13**. Abstention: 3 lost (eu03.y1, u01.c, u05.s),
+2 gained, net −1. Retrieval latency on the fixed 100-row sample, two interleaved passes each:
+50 candidates p50 3.35 / 3.28 s, p95 3.54 / 3.44 s; 20 candidates p50 1.39 / 1.39 s, p95 1.47 /
+1.49 s (**−58 %**).
+
+Correctness lost, by qid: a01.m a02 a02.m a03.k a04.m a04.n a09 a09.y3 a10.k a10.m a11.y1 a17.y3
+a19.m a19.s a24.y1 a25.t a29 a30 a37 a37.k a38.m a41.s a43.k b03.n b08.m b14.m c02.k c02.m c06
+c06.y1 e01 e01.s e03.s e05.y3 e11.c e12.c e12.k e12.m e13.c e14.c e14.m e20.c e24.y3 e25.c e25.k
+e25.m e25.s e26.s e35.m e38.m e39.m e41.s.
+
+**Against the rule:**
+1. Correctness holds: **fail**, −11 against a floor of −2.
+2. Evidence holds: **fail**, −13 against −3.
+3. No new invention: pass (net −1).
+4. Faster: pass (−58 %).
+
+**Verdict: does not ship.** 50 candidates stays the default. The loss sits where R4b's
+diagnostic said it would: no-name questions (−13 here, −14 in the diagnostic, on a different
+profile and run). A question that doesn't name its tool needs the candidates dense ranks 21st-50th.
+The overall −11 is not significant (p = 0.30), but R5 is a non-inferiority test, and −11 is well
+outside its margin. A future speed arm would have to keep depth for questions the gate finds weak.
+One option is the R4d cascade's own shape: 20 first, 50 only on refusal.
