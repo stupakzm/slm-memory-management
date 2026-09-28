@@ -414,3 +414,46 @@ rephrase. Not tested here: more rewrites (3 lists instead of 2), or fusion with 
 weighted above the rewrite. Either would need its own pre-registration. Changing `asq`'s default
 to `--rewrites 0` is suggested by these numbers but was not pre-registered, so it is left as a
 decision, not shipped.
+
+## R4a′ results (run 2026-09-28)
+
+**Pre-pass**, all 1,160 rows: the model changes the text of 393 rows and the words of 386. By
+kind (words changed): typo1 151/160, typo3 159/160, old typo 25/25, terse 34/185, synonym
+7/160, **clean 6/160**, casual 2/160, no-name 2/116, paraphrase and no-tool 0. Wall time per
+correction: p50 0.22 s, p95 0.44 s. In the arm, the corrected text matched the pre-pass on all
+393 rows. Arm file: `data/eval/results/p11-r4a2-answers.json`. Paired against the R3 control on
+the same rows:
+
+| kind | answerable rows changed | lost | gained | **net** | McNemar p |
+|---|---|---|---|---|---|
+| typo1 | 110 | 5 | 14 | **+9** | 0.064 |
+| typo3 | 116 | 5 | 25 | **+20** | 0.0003 |
+| terse | 28 | 4 | 4 | 0 | – |
+| synonym | 6 | 1 | 0 | −1 | – |
+| clean, old typo, no-name, casual | 30 | 0 | 0 | 0 | – |
+
+Unanswerable rows changed: 103. Abstention lost 3, gained 4 (net +1).
+
+**Against the rule:**
+1. Typos recover: **+29 net** (typo1 + typo3: 10 lost, 39 gained, **p < 0.0001**). **Pass.** R4a's
+   lookup normaliser recovered +27.
+2. Clean text is left alone: **fail.** The model changes the words of 6 of the 160 clean questions
+   (≤ 3 allowed). Clean correctness is unchanged (0 net over 5 answerable rows). The three names
+   R4a renamed are kept, in every variant: `nmap` (u04, 6 rows), `elpy` (eu09, 5 rows),
+   `projectile` (eu01/eu18, 10 rows). But the model renames two other packages the corpus doesn't
+   have: `tempel` → `template` (eu07), and "Kubernetes cluster" → "kubernetes-el cluster" (eu16).
+   The other four are harmless rewordings the prompt didn't ask for ("left out" → "excluded",
+   "hand" → "pass", a01/a09/a30/a41).
+3. No new invention: pass (net +1).
+4. Affordable: pass (p50 0.22 s).
+
+**Verdict: does not ship** (rule 2). `--llm-correct` stays default-off.
+
+**What it establishes.** The keep-every-name instruction fixed the specific renames R4a made,
+and it recovers typos as well as the lookup did (+29 vs +27). It hasn't removed the failure class:
+the model still turns names it doesn't recognise into words it does, and still tidies wording
+nobody asked it to change. Both R4 spelling mechanisms now fail the same way on the same rule.
+The next candidate is the combination: correct only the words the index vocabulary doesn't
+contain (R4a's detector), and let the model choose the replacement only for those. A name the
+corpus has never seen still gets flagged by the detector, so that alone would not fix eu07/eu16.
+Not pre-registered.
