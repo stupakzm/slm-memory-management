@@ -700,3 +700,32 @@ recently defined keyboard macro". The misses that remain are not extraction bugs
 problem itself. Cleaner cards will not close it. Plain-English descriptions written for each card
 might: the 4B writes them once, offline, so query-time cost is unchanged. That is the next version
 of this check, and it runs against the untouched test half.
+
+### v3: plain-English cards written by the 4B (2026-09-29)
+
+For each of the 7,065 v2 cards, the 4B wrote two questions a user might ask without knowing the
+name, at temperature 0 (36 min, 0.31 s/card at 4 parallel slots). Examples:
+`calc-vector-covariance` → "How do I find out how two sets of data vary together in a matrix?";
+`window-width` → "Can I resize a window horizontally in Emacs?". Two embeddings were tried on dev
+only: the plain lines alone, and the plain lines plus the manual description.
+
+| | dev (bar rows, n = 12) | test (bar rows, n = 22) |
+|---|---|---|
+| v1 mechanical cards | 5 (42 %) | 10 (45 %), reference only |
+| v2 fixed extraction | 4 (33 %) | not run |
+| v3 plain + description | 6 (50 %) | not run |
+| **v3 plain only** (chosen on dev) | **7 (58 %)** | **13 (59 %), pass** |
+
+**The bar passes on the untouched test half: 13/22 = 59 %** (v1 on the same rows: 45 %). Test half,
+all rows, right term in the top 30: no-name 15/20, synonym 13/20, casual 13/20, terse 15/23,
+**clean 11/20** (v1: 15/20).
+
+**How to read it.** The go/no-go passes as defined, so the idea goes on to a real arm. The margin is
+small: +3 rows over mechanical cards at n = 22 is not significant, and one test-half case got worse
+(e03.m, `delete-other-windows`: rank 6 under v1, 15 under v3). Plain-only cards also lose clean
+questions: a question already in the manual's words matches the manual's description better. The
+two kinds of card are complementary. A real arm should take candidates from both, not choose one.
+What remains unshown is whether the 4B picks the right term from a 30-item menu, and whether
+searching with it rescues answers. That is the pre-registered arm, not this check. The bar also
+still misses what no card can hold: e18 (`~/.emacs.d/init.el`) and e02 (`kill-buffer`, rank 28 or
+none).
