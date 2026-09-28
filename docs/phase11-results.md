@@ -347,3 +347,70 @@ p95 per question for retrieval and for end to end.
 Rules 1-3 test non-inferiority: at this n, "loses nothing measurable" can only mean a loss this
 small or smaller. Any loss is listed by qid, whatever the count. If rules 1-3 hold and 4 fails,
 it does not ship: slower-or-equal for the same answers is not worth a changed default.
+
+## R4b results (run 2026-09-28)
+
+Run as pre-registered: 781 rows (clean 160, synonym 160, casual 160, terse 185, no-name 116),
+serve profile, `--rewrites 1` with `--rewrite-style man` and with `docs`. Files:
+`data/eval/results/p11-r4b-{man,docs}-answers.json`. Paired against the R3 control on the same
+rows (600 answerable, 181 unanswerable):
+
+| kind | answerable | man vs control | docs vs control | docs vs man |
+|---|---|---|---|---|
+| clean | 116 | −16 (22 lost / 6 gained), p=0.004 | −14 (21/7), p=0.013 | +2 |
+| synonym | 116 | −5 | −6 | −1 |
+| no-name | 116 | −17 (20/3), p=0.0005 | −10 (16/6), p=0.053 | +7 |
+| terse | 136 | +4 | −3 | −7 |
+| casual | 116 | −13 (19/6), p=0.015 | −8 | +5 |
+| **synonym + no-name + terse** | 368 | **−18**, p=0.047 | **−19**, p=0.034 | −1 |
+| all | 600 | −47, p<0.0001 | −41, p=0.0002 | +6, p=0.59 |
+
+Abstention on the 181 unanswerable rows: man lost 0 and gained 1; docs lost 0 and gained 0.
+Rewrite latency on a fixed sample of 100 of these rows (seed 11, warm server): man p50 0.60 s,
+p95 1.65 s; docs p50 0.19 s, p95 1.54 s.
+
+**Against the rule:**
+1. Vocabulary recovers: **fail.** docs vs control is −19 net, not the required ≥ +15. It is not
+   worse than man (−1, p=1.0), but that half is moot.
+2. Clean text unharmed: **fail.** −14 against a floor of −2.
+3. No new invention: pass (abstention unchanged).
+4. Affordable: pass (p50 0.19 s).
+
+**Verdict: `docs` does not ship.** `man` doesn't pass 1-3 against control either. So the
+pre-registered question "has the eval baseline been understating `asq`?" gets the opposite answer.
+On this eval, `asq`'s default one-rewrite fusion **costs** answers compared with no rewrite.
+
+### Diagnostic, not pre-registered: the fused path also changes candidate depth
+
+Found while reading `retrieve_fused` after the run: in the fused path, every variant, **the original
+question included**, gets `VARIANT_CANDIDATES = 20` candidates. The control gives the original 50.
+So both arms changed two things at once, and the pre-registration missed it. One extra arm
+separates them: `--rewrites 0 --candidates 20`, serve profile, same 781 rows
+(`p11-r4b-diag-c20-answers.json`). It differs from control in depth (and in the serve profile's
+truncation of rare oversized pairs), and from the R4b arms only in the rewrite.
+
+| step | clean | synonym | no-name | terse | casual | all (600) |
+|---|---|---|---|---|---|---|
+| control → depth 20, no rewrite | −5 | +2 | **−14** (16/2), p=0.001 | −1 | −3 | −21, p=0.017 |
+| depth 20 → + man rewrite | −11, p=0.019 | −7 | −3 | +5 | −10 | −26, p=0.013 |
+| depth 20 → + docs rewrite | −9 | −8 | +4 | −2 | −5 | −20, p=0.050 |
+
+At equal depth, the rewrite itself still costs 20-26 answers, and clean questions lose most. The
+depth cut costs 21, and 14 of those are no-name questions. A question that doesn't name its tool
+depends most on candidates dense ranked 21st-50th. That is a strong prior against R5
+(pre-registered above), and R5 will now be read knowing it. R5's own run still decides.
+
+**Why the rewrite hurts.** Eight sampled rewrites, both styles: the 4B mostly writes a command
+line, not a search query (`man chmod -R`, `strace -e all -f myprogram.exe`,
+`git blame filename.txt`). It invents names (`seekable-file-position-lookup`, `AllowRootLogin`).
+Once (`docs`, e16) it repeated `dired-visit-file-other-window` until it ran out of tokens. With one
+rewrite, fusion is two lists, so a bad rewrite gets half the vote over which 5 chunks the reader
+sees. The `docs` prompt's "use documentation's terminology" doesn't change that: the problem is
+the model's idea of what a query looks like, not its vocabulary.
+
+**What it establishes.** Query rewriting by this 4B is net harmful on this pool, whichever prompt
+is used. The vocabulary gap R3 found (synonym, no-name) is not closed by asking the reader to
+rephrase. Not tested here: more rewrites (3 lists instead of 2), or fusion with the original
+weighted above the rewrite. Either would need its own pre-registration. Changing `asq`'s default
+to `--rewrites 0` is suggested by these numbers but was not pre-registered, so it is left as a
+decision, not shipped.
