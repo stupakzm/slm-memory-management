@@ -187,6 +187,42 @@ class Retriever:
         gate_hits = lists_by_variant[0] if lists_by_variant else []
         return fused, winner, variants, gate_hits
 
+    def retrieve_widened(self, question: str, extra_queries: list[str],
+                          k: int = KEEP) -> list[dict]:
+        """Phase 11 R4d cascade (docs/phase11-results.md): the question's own
+        dense candidates plus each of `extra_queries`'s (a rewrite, typically),
+        deduplicated by `chunk_id`, reranked ONCE against the ORIGINAL
+        `question` - never a rewrite, which never ranks anything here. This is
+        deliberately unlike `retrieve_fused`/`fuse_variants`: there is no rank
+        fusion in this path, just one candidate pool and one rerank call, so
+        the resulting top-1 is a genuine cross-encoder score against the
+        question - the same kind of number the gate was swept on
+        (blk_fusion_gate_semantic_slip), safe for the gate to read directly
+        with no separate gate_hits list needed.
+
+        Each entry in `extra_queries` is retrieved at `self.candidates` - the
+        SAME candidate count as the question's own pool, not
+        `VARIANT_CANDIDATES` (that knob belongs to `retrieve_fused` alone).
+
+        Order of the deduplicated pool: the question's own candidates first,
+        then each extra query's new (not-yet-seen) candidates, in order - the
+        rerank call re-sorts it regardless, so this only matters for the
+        `reranker is None` fallback and for tests asserting exact pool
+        composition.
+        """
+        pools = [self.candidates_for(question)] + [
+            self.candidates_for(q) for q in extra_queries]
+        seen: set[str] = set()
+        merged: list[dict] = []
+        for pool in pools:
+            for c in pool:
+                if c["chunk_id"] not in seen:
+                    seen.add(c["chunk_id"])
+                    merged.append(c)
+        if self.reranker is None:
+            return merged[:k]
+        return self.reranker.rerank(question, merged, top_k=k)
+
 
 def expand(db, hits: list[dict], span: int = 1, budget: int = 6000) -> list[dict]:
     """Widen each hit to its neighbours in the same section, preserving hit order.
