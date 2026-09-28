@@ -598,6 +598,11 @@ package name, the same failure R4b sampled. Candidate fixes, none pre-registered
 - **tier 1 only, with a stricter gate on retries.** A retry has already failed once, so the evidence
   should be held to more than the first attempt was. This is swept from these rows' recorded scores
   before any new run.
+  *Checked offline the same day, on the 35 rows answered at tier 1-2:* the final reranker scores
+  don't separate them. The inventions score 0.73, 0.92, 0.97, 0.99, 0.99, 0.99. The 15 correct
+  answers score 0.67-1.00. Only u25 falls below 0.80, and a gate there also drops 2 correct
+  answers. **A stricter retry gate is not the fix.** The retries find pages the reranker is sure
+  about; the reader then answers a question those pages don't actually settle.
 - **Rewrite quality**: drop rewrites that contain a name not in the index vocabulary, which is R4a's
   detector reused as a filter.
 - **Latency**: stop at tier 1, and rerank only the rewrite's new candidates, merging them with the
