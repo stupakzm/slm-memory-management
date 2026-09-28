@@ -457,3 +457,48 @@ The next candidate is the combination: correct only the words the index vocabula
 contain (R4a's detector), and let the model choose the replacement only for those. A name the
 corpus has never seen still gets flagged by the detector, so that alone would not fix eu07/eu16.
 Not pre-registered.
+
+## R4d pre-registration: cascade — rewrite only when the plain search refuses (written 2026-09-28, before the build and any run)
+
+**Why.** R4b showed rewriting every question costs answers: the rewrite gets half the vote in
+fusion, and the fused path also cuts candidates to 20. The user proposed spending rewrites only
+where the plain search has already failed. A question that is answered at tier 0 is then
+untouched by construction.
+
+**Mechanism (`--cascade`).**
+- **Tier 0:** exactly R3's configuration: dense, 50 candidates, reranked against the question,
+  k = 5, gate 0.65, grammar-constrained answer. If the result is **not a refusal**, stop.
+- **Tier 1**, only after a tier-0 refusal: the 4B writes 1 rewrite (`--rewrite-style docs`,
+  chosen for speed and its better no-name score in R4b). The rewrite's 50 dense candidates are
+  **added** to the question's 50 (deduplicated by chunk id). The union is reranked **against the
+  original question**, the top 5 are kept, and the gate reads that list's top-1. The rewrite widens
+  the pool and never ranks anything, so the gate keeps its calibrated meaning. The reader sees the
+  original question. If this is not a refusal, stop.
+- **Tier 2**, only after a tier-1 refusal: the same with 2 rewrites (a fresh `n=2` call). The pool
+  is the question's candidates plus both rewrites'. The tier-2 result is final, whatever it is.
+- **Refusal** = gated (top-1 below 0.65) **or** the reader refused (`abstained()`, the
+  all-sentences rule the eval already scores with).
+
+**Rows.** Every pool row the R3 control refused: 412 (158 answerable, 254 unanswerable). All other
+rows were answered at tier 0 and carry over from the control (`--overlay`). Each re-run row runs
+the full cascade from tier 0. Tier 0 runs in the serve profile, since the cascade needs all
+three models resident. Rows where tier 0 now answers although the control refused are counted
+and reported.
+
+**Recorded per row:** the final tier (0/1/2) and the cascade's added wall time beyond tier 0.
+
+**Decision rule (the cascade becomes `asq`'s default, replacing `--rewrites 1`, only if all four
+hold):**
+1. **Recovers answers:** over all answerable pool rows (arm overlaid on control), paired
+   correctness net ≥ +10, McNemar p < 0.05.
+2. **Clean text unharmed:** clean paired net ≥ −1. It should be ≥ 0 by construction; a loss would
+   mean a defect.
+3. **No new invention:** abstention over all unanswerable pool rows does not fall by 2 or more.
+   This is the rule the cascade is most likely to break: 254 refused unanswerable rows get two more
+   chances to find something.
+4. **Affordable:** on rows that reach tier 1, the added wall time is ≤ 3 s at p50. Rows answered
+   at tier 0 add nothing.
+
+Failing 3 means it does not ship, whatever 1 says. Reported as well: gains and abstention losses
+split by the tier they came from. If rule 3 fails at tier 2 but not at tier 1, that is reported,
+and a tier-1-only cascade needs its own run before it can ship.
