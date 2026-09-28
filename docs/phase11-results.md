@@ -277,3 +277,73 @@ question itself, not only the retrieval query, recovers most of what typos cost 
 The open problem is doing it without renaming things the corpus has never heard of. That is
 R4a′: the 4B corrects spelling under an explicit keep-every-name instruction (built, default
 off). It is pre-registered next, with the same four rules.
+
+## R4a′ pre-registration: the 4B corrects spelling, keeping every name (written 2026-09-28, before any R4a′ run)
+
+**Mechanism.** `--llm-correct` (built in tsk_20260927_docvocab, default off). The 4B is asked to
+fix spelling and nothing else, holding every program, package, command, option and file name
+exactly as written (`build_correct_prompt`). Output is grammar-constrained to one line at
+temperature 0. It is discarded, and the question kept, if it is empty or longer than twice the
+input plus 20 characters. The corrected question feeds retrieval **and** the model, as in R4a.
+No rewrites (`--rewrites 0`), so the only difference from R3 is the corrected text.
+
+**Which rows run.** Unlike R4a's normaliser, which rows the model changes can't be known
+without asking it. So:
+1. **Pre-pass:** `Generator.correct` over all 1,160 pool rows. It records the corrected text
+   and the wall time per question, which is rule 4's measurement.
+2. **Arm:** every row whose corrected text differs from the original at all, as a byte string,
+   is re-run with `--llm-correct` (`--qids`). All other rows are identical inputs to the control,
+   and their control results carry over (`robustness_report.py --overlay`), as in R4a.
+   If the in-run correction (cached as `question_corrected`) differs from the pre-pass on any row,
+   the count is reported. The arm result uses the in-run text.
+
+**What counts as "changed" for rule 2.** Words, not bytes: the question lower-cased and split on
+anything that isn't a letter, digit, `-`, `.`, `/` or `=`. A change to capitals or punctuation
+alone is cosmetic. Such rows are still re-run, but they don't count against rule 2. This is
+fixed now because the model, unlike the normaliser, may tidy capitals.
+
+**Serving.** As R4b: all three models in the `serve` profile. The control is R3 as is.
+
+**Decision rule (ships as `asq`'s default only if all four hold).** Rules 1-3 are R4a's
+unchanged; rule 4 is re-set for a model call:
+1. **Typos recover:** typo1 + typo3 paired correctness (arm vs control, same rows) net ≥ +10,
+   McNemar p < 0.05.
+2. **Clean text is left alone:** the model changes the words of ≤ 3 of the 160 clean base
+   questions, and clean correctness loses no more than 1 answer net. The three tool names R4a
+   renamed (`nmap`, `elpy`, `projectile`) are reported by name, whatever the count.
+3. **No new invention:** abstention over all unanswerable rows in the pool, summed over every
+   kind, does not fall by 2 or more.
+4. **Affordable:** the correction adds ≤ 1.5 s at p50 per question (R4b's bound for one short
+   generation; R4a's 10 ms was set for a lookup and no model call can meet it).
+
+Failing 2 or 3 means it does not ship, whatever 1 says. Passing 1 with p ≥ 0.05 is reported as
+"direction only". If R4b's `docs` rewrite also ships, the two together are a separate arm
+(plan R4c) and are not claimed from these two results.
+
+## R5 pre-registration: rerank 20 candidates instead of 50 (written 2026-09-28, before any R5 run)
+
+**Mechanism.** `--candidates 20` instead of 50: the dense retriever passes 20 chunks, not 50,
+to the 0.6B reranker. Everything else is R3's configuration. The reranker's own ordering is
+unchanged. A chunk can only be lost if dense ranked it 21st-50th and the reranker would have
+lifted it into the top 5. The gate reads the reranked top-1, so it moves only in that case too.
+
+**Rows.** The full pool, 1,160 rows. Speed has to be paid for everywhere, so the bill is
+checked everywhere.
+
+**Serving.** R3's full profile (`reranker`, not `reranker-query`). Both arms then score every
+pair identically, and the comparison is candidate count alone. The control is R3 as is.
+
+**Latency.** `eval_answers.py` doesn't time each question, so rule 4 is measured separately.
+A fixed random sample of 100 pool rows (seed 11) is retrieved and answered end to end at 20
+and at 50, on the same servers, one arm after the other, after a warm-up query. Report p50 and
+p95 per question for retrieval and for end to end.
+
+**Decision rule (20 becomes the default only if all four hold):**
+1. **Correctness holds:** paired correctness over all answerable rows (arm vs control) net ≥ −2.
+2. **Evidence holds:** paired evidence@5 net ≥ −3.
+3. **No new invention:** abstention over all unanswerable rows does not fall by 2 or more.
+4. **Actually faster:** retrieval p50 per question falls by ≥ 30 %.
+
+Rules 1-3 test non-inferiority: at this n, "loses nothing measurable" can only mean a loss this
+small or smaller. Any loss is listed by qid, whatever the count. If rules 1-3 hold and 4 fails,
+it does not ship: slower-or-equal for the same answers is not worth a changed default.
