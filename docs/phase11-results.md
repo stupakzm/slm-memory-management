@@ -623,3 +623,50 @@ No R4/R5 mechanism ships. One result changes the default story, though. `asq`'s 
 `--rewrites 1` loses 47 of 600 answers against plain retrieval on the same rows, and no-rewrite
 plain retrieval is what every result above is measured against. Switching `asq` to `--rewrites 0`
 is a decision for the user. It was not pre-registered as a shipping rule.
+
+## R6 pre-registration: quote-grounded answers (written 2026-09-28, before any R6 run)
+
+**Why now.** Quote mode was built in phase 10 (`4c75c90`) and parked unmeasured. At n = 127, even
+perfect grounding could not reach significance. The pool is now 1,160 rows. R4d also gave it a
+concrete target: its inventions came from real, confidently-ranked pages that did not answer the
+question (reranker 0.73-0.99). Only a check on what the answer claims can catch that. The gate
+can't.
+
+**Mechanism.** `--answer-mode quote`: `QUOTE_SYSTEM` and the `grammar.quoted_answer` grammar, so
+every claim must open with a quotation from the extract it cites. `grammar.verify_quotes` then
+checks each quote mechanically: whitespace-collapsed substring of the cited extract, no judge. If
+any claim fails, the answer becomes the refusal before scoring. Retrieval, gate and k are R3's,
+unchanged.
+
+**Arm.** All 1,160 pool rows, generation only, from R3's cached retrieval
+(`--stage generate --cache p11-pool`). The two arms therefore read identical extracts and differ only
+in how the answer is produced. The generator runs in the same profile as R3, on :8083.
+
+**Metrics** (paired per row against the R3 control):
+- **unsupported answer** (primary): a spoken answer (not abstained) on an unanswerable row, or on
+  an answerable row whose gold evidence was not retrieved. Evidence is identical in both arms (same
+  cache), so this counts answers the extracts could not have supported.
+- correctness (aliased), over all answerable rows.
+- abstention on unanswerable rows.
+- quote failure rate (answers converted to refusal by `verify_quotes`), reported by kind.
+- generation time per question: a fixed sample of 100 pool rows (seed 11), cite vs quote, on the same
+  server one after the other, after a warm-up.
+
+**Decision rule (quote becomes the default answer mode only if all four hold):**
+1. **Fewer unsupported answers:** paired, net reduction ≥ 10, McNemar p < 0.05.
+2. **Correctness holds:** paired net over all 883 answerable rows ≥ −2. This is the same margin as
+   R5, so a mode that refuses its way to safety cannot pass.
+3. **No new invention:** abstention on the 277 unanswerable rows does not fall by 2 or more. It is
+   expected to rise, which rule 1 already counts.
+4. **Affordable:** generation p50 rises by ≤ 1 s per question.
+
+If 1 and 3 pass but 2 fails, it is reported as "safer, at a cost of N answers". It does not ship as
+the default. It could be offered as an opt-in (`asq --strict`), which would be the user's decision.
+Reported whatever the verdict: how many of the 3 answerable rows the R3 control got right
+**without** retrieved evidence (counted from `p11-pool-answers.json`) stay right under quote mode, since quote mode should kill parametric
+answers (phase 9's failure), right or wrong.
+
+**Secondary, diagnostic, not a ship rule:** the 35 rows R4d answered at tiers 1-2 (15 correct, 6
+inventions, 14 wrong), re-run with `--cascade --answer-mode quote`. Question: does quote mode
+remove the cascade's inventions and keep its rescues? A clear yes would make "cascade + quote" a
+candidate arm with its own pre-registration.
