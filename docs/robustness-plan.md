@@ -94,3 +94,49 @@ come to about 3-4 h of GPU in total. None of it needs an index rebuild.
 The user authorised running this part by part, including commits and merges, without asking
 (2026-09-27). Not covered: pushing to the remote, and ORCH's mandatory checkpoints (those
 still stop and ask).
+
+## Next session: task list (written 2026-09-29, after R4a-R5, R4d and the term-menu check)
+
+Where things stand: every R4/R5 arm is run and written in `docs/phase11-results.md` (summary table
+"Phase 11 R4 summary"). None ships. The term-menu go/no-go passed on its held-out half. Ranked by
+value for cost:
+
+1. **Switch `asq` to `--rewrites 0`.** One line in `scripts/ask.py` (`args.rewrites = 0 if
+   args.retrieve_only else 1` becomes 0). Measured in R4b: today's default loses 47/600 answers
+   against plain retrieval on the same rows, and is about 1 s slower. Needs the user's yes (not
+   pre-registered as a shipping rule). The tsk_20260928_cascade registry check pins that line, so
+   it must be superseded in the same task.
+2. **Document expansion: plain-English questions as extra index vectors.** The term-menu check showed
+   4B-written user-style questions bridge the vocabulary gap (held-out 13/22 = 59 % vs 45 % for
+   manual-text cards). Simplified into the main index: per chunk, 2-3 generated "how would a user ask
+   for this" questions, stored as **extra vectors pointing at that chunk**. The reranker still scores
+   the real chunk text against the original question, and the gate is unchanged. No query-time
+   generation, no rewrite shown to anything. Emacs first: ~19k chunks × 0.31 s ≈ 1.6 h generation +
+   ~30 min embedding, additive, no full rebuild. Pre-register (target: no-name + synonym; guards:
+   clean unharmed, abstention, latency), then build via orch-task.
+3. **Typo correction that can't rename things.** R4a/R4a′ recovered ~28 typo answers but renamed
+   names. New rule: correct a word only into an **ordinary English word** (an English wordlist), never
+   into a technical term: `mostake→mistake` yes, `nmap→mmap` and `elpy→elpa` no. CPU only.
+   Pre-register with R4a's four rules.
+4. **Deterministic eval serving.** 1/40 answers reworded on identical input, and 9 tier-0
+   answer/refuse flips in R4d. Run the eval generator with one slot (`--parallel 1`) so paired tests
+   lose that noise floor. Check it with a repeat run.
+5. **R6 quote mode**: pre-registered (`234b173`), not run. Generation only, from R3's cache,
+   ~25 min. The natural guard for anything in item 2 that brings new pages to the reader.
+6. **Adaptive rerank depth for speed**: 20 candidates first, 50 only when the top score is weak.
+   R5: 20 is 58 % faster and loses answers only where it is unsure (no-name).
+7. **Term menu as an arm** (only if item 2 underdelivers): menu from both card types, the 4B picks
+   ≤ 3 with grammar-restricted choices, widen the pool, rerank against the original.
+8. **R7 write-up**: README status row and phase 11 closing section.
+
+Do not: rewrite every question with the 4B (R4b), use a stricter gate on retries (R4d scores don't
+separate), use a bigger reranker, or use a bigger reader (the 30B answers from its own knowledge).
+
+Artifacts from 2026-09-28/29 (gitignored, local): `data/index/phase11-scratch/`. The pool file is
+`cat data/eval/{questions,emacs_questions,variations_typo,variations_man,variations_emacs}.jsonl`.
+- `cards_plain.json`: 7,065 Emacs term cards with 2 plain-English questions each (36 min GPU)
+- `termmenu_split.json`: frozen dev/test split of the 62 Emacs bases (seed 20260928); test half
+  used once, by v3
+- `termmenu_*.py`: the go/no-go scripts
+- `r4b_compare.py`: the paired arm-vs-control table used for every R4/R5 result
+- `r4b-qids.json`, `r4d-qids.json`, `r4a2-prepass.json`: the arms' row lists and pre-pass
