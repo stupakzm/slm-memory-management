@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 import time
 from collections import defaultdict
@@ -36,31 +35,18 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from smm import gold, grammar, lexical, store  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
+from smm.cascade import ABSTAIN_RE, abstained, run_cascade  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
 from smm.retrieve import Retriever, cap_per_doc, expand, gate_score  # noqa: E402
 
-ABSTAIN_RE = re.compile(
-    r"\bi\s*(?:do\s*n[o']?t|don'?t)\s+know\b"
-    r"|\bnot\s+(?:in|contained\s+in|found\s+in|covered\s+by)\s+the\s+extracts?\b"
-    r"|\bthe\s+extracts?\s+do\s*(?:es)?\s*n[o']?t\s+contain\b"
-    r"|\bno\s+(?:relevant\s+)?information\b",
-    re.I,
-)
-
-
-def abstained(text: str) -> bool:
-    """True iff EVERY sentence in `text` matches ABSTAIN_RE (empty text is not
-    an abstention). The 30B hedges: it appends "I don't know. [n]" after real,
-    cited claims, and ABSTAIN_RE.search(text) alone would call that a refusal
-    just because the phrase appears somewhere. A claim followed by "I don't
-    know" is still an answer - only a text with no speaking sentence at all is
-    a genuine abstention. Citation markers are stripped first so a trailing
-    `[n]` never affects where a sentence ends."""
-    stripped = re.sub(r"\s*\[\d\]\s*", " ", text)
-    sentences = [s for s in re.split(r"(?<=[.!?])\s+", stripped) if s.strip()]
-    return bool(sentences) and all(ABSTAIN_RE.search(s) for s in sentences)
+# ABSTAIN_RE/abstained moved to smm.cascade (phase 11 R4d build): the cascade
+# is the thing that has to decide, tier by tier, whether the reader refused,
+# so this is where the rule now lives. Re-exported under the SAME names so
+# `eval_answers.abstained`/`eval_answers.ABSTAIN_RE` keep working unchanged -
+# see tests/test_scoring.py, which asserts the exact all-sentences behaviour
+# and passes with no edits.
 
 
 def evidence_in(hits: list, toks: list, token_aliases) -> tuple:
@@ -195,8 +181,23 @@ def main() -> int:
                          "generation, reusing the SAME corrected text at both stages; "
                          "composes with --normalize (normalize runs first). Default off "
                          "reproduces every existing run byte-for-byte.")
+    ap.add_argument("--cascade", action="store_true",
+                    help="phase 11 R4d: rewrite only after the plain search refuses "
+                         "(smm.cascade), replacing --rewrites' fusion path (--rewrites "
+                         "is ignored). Requires --stage both: the tier depends on the "
+                         "reader's own answer, so retrieval and generation run inline, "
+                         "row by row, with all three servers resident - there is no "
+                         "retrieval cache under --cascade. Records gain cascade_tier "
+                         "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
+                         "cascade_rewrites ([] at tier 0). Default off reproduces "
+                         "every existing run byte-for-byte.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if args.cascade and args.stage != "both":
+        print("--cascade requires --stage both (the tier depends on the reader's "
+              "own answer)", file=sys.stderr)
+        return 2
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -223,6 +224,9 @@ def main() -> int:
 
     def query_text(row: dict) -> str:
         return normalized[row["qid"]][0] if args.normalize == "spell" else row["question"]
+
+    if args.cascade:
+        return run_cascade_eval(args, rows, qid_aliases, normalized, query_text)
 
     # --- stage 1: retrieval only (embedder + reranker resident) ---
     if args.stage in ("retrieve", "both"):
@@ -372,6 +376,16 @@ def main() -> int:
             print(f"\r  {i}/{len(rows)}  {(time.time()-t0)/i:.1f}s/q", end="", flush=True)
     print()
 
+    return write_report(args, results, t0)
+
+
+def write_report(args, results: list, t0: float) -> int:
+    """Score `results` (one record per row - see the per-row loops above and
+    `run_cascade_eval` below, both of which build the SAME record shape) and
+    write `<name>-answers.json`. Factored out so --cascade's inline loop
+    (which has no retrieval cache and cannot share the two-stage code above)
+    still ends in exactly this one scoring/report path - not a second,
+    possibly-drifting copy of it."""
     ans = [r for r in results if r["kind"] == "answerable"]
     una = [r for r in results if r["kind"] == "unanswerable"]
 
@@ -448,6 +462,8 @@ def main() -> int:
         config["rewrite_style"] = args.rewrite_style
     if args.llm_correct:
         config["llm_correct"] = True
+    if args.cascade:
+        config["cascade"] = True
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
@@ -461,6 +477,119 @@ def main() -> int:
     }, indent=2))
     print(f"\nwrote {out}")
     return 0
+
+
+def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
+                      query_text) -> int:
+    """--cascade: retrieval and generation run inline, row by row, with the
+    embedder, reranker AND generator all resident together - there is no
+    retrieval cache (unlike --rewrites, the tier a row needs depends on the
+    reader's own answer, so the two stages above cannot be separated in
+    time). `smm.cascade.run_cascade` runs the tier 0/1/2 loop itself; this
+    function only wires it to the eval's usual per-row record and ends in
+    the SAME `write_report` the two-stage path does, so both produce the
+    same output shape plus, here, the three cascade_* fields.
+
+    Reranking is always on here, independent of `--rerank` (which the
+    two-stage path uses to ablate the cross-encoder): the R4d pre-
+    registration's tier 0 IS "R3's configuration" - dense, reranked,
+    gated - and every tier's gate/widening depends on a real reranker score
+    (docs/phase11-results.md, "R4d pre-registration").
+    """
+    emb = Embedder()
+    if not emb.health():
+        print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
+        return 2
+    rr = Reranker()
+    if not rr.health():
+        print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
+        return 2
+    gen = Generator(args.gen_url)
+    if not gen.health():
+        print(f"no generator at {args.gen_url}: "
+              f"./scripts/servers.sh start generator", file=sys.stderr)
+        return 2
+    db = store.connect(ROOT / args.db)
+    if args.mode in ("bm25", "hybrid") and not lexical.has_index(db):
+        print(f"{args.db} has no chunks_fts", file=sys.stderr)
+        return 2
+    r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
+                  candidates=args.candidates, domain=args.domain)
+
+    def read_view(hits: list) -> list:
+        h = expand(db, hits, span=args.expand) if args.expand else hits
+        return select_hits(h, args.read_k, args.cap_per_doc)
+
+    results, t0 = [], time.time()
+    for i, row in enumerate(rows, 1):
+        qtext = query_text(row)
+        # Same wiring as the two-stage path (--llm-correct composes with
+        # --normalize, which query_text() already applied): the cascade
+        # itself gets no special treatment, only the resulting text.
+        corrected = gen.correct(qtext) if args.llm_correct else None
+        if corrected is not None:
+            qtext = corrected
+
+        def answer_fn(q: str, raw_hits: list) -> str:
+            ph = read_view(raw_hits)
+            if args.answer_mode == "quote":
+                return gen.answer(q, ph, mode="quote")
+            return gen.answer(q, ph, cite_grammar=args.grammar)
+
+        cres = run_cascade(r, gen, qtext, answer_fn, args.gate, k=args.k)
+        hits = read_view(cres["hits"])
+        gated = cres["gated"]
+        score = cres["score"]
+        text = cres["answer"]
+
+        # Quote mode's verification has to run BEFORE correct/evidence scoring -
+        # see the identical comment in the two-stage loop above.
+        quote_info, answer_raw = None, None
+        if not gated and args.answer_mode == "quote":
+            quote_info = grammar.verify_quotes(text, hits)
+            if quote_info["quote_failed"]:
+                answer_raw = text
+                text = grammar.REFUSAL
+
+        rec = {
+            "qid": row["qid"], "kind": row["kind"], "tags": row["tags"],
+            "variant_kind": row.get("variant_kind"),
+            "question": row["question"], "answer": text,
+            "abstained": gated or abstained(text),
+            "gated": gated,
+            "retrieved_docs": [h["doc_id"] for h in hits],
+            "top_score": score,
+            "cascade_tier": cres["tier"],
+            "cascade_seconds": cres["seconds"],
+            "cascade_rewrites": cres["rewrites"],
+        }
+        if answer_raw is not None:
+            rec["answer_raw"] = answer_raw
+        if quote_info is not None:
+            rec.update(quote_info)
+        if args.normalize == "spell":
+            norm_text, norm_edits = normalized[row["qid"]]
+            rec["question_normalized"] = norm_text
+            rec["normalize_edits"] = norm_edits
+        if args.llm_correct:
+            rec["question_corrected"] = qtext
+        if row["kind"] == "answerable":
+            toks = row["answer_contains"]
+            row_aliases = gold.aliases_for(
+                qid_aliases, row["qid"], row.get("variant_of") or row.get("paraphrase_of"))
+            rec["correct"] = gold.is_correct(text, toks, row_aliases)
+            rec["correct_strict"] = all(t in text for t in toks)
+            aliased_ev, strict_ev = evidence_in(hits, toks, row_aliases)
+            rec["evidence_retrieved"] = aliased_ev
+            rec["evidence_retrieved_strict"] = strict_ev
+            if not gated:
+                rec.update(grammar.verify_citations(text, hits, toks))
+        results.append(rec)
+        if sys.stdout.isatty():
+            print(f"\r  {i}/{len(rows)}  {(time.time()-t0)/i:.1f}s/q", end="", flush=True)
+    print()
+
+    return write_report(args, results, t0)
 
 
 if __name__ == "__main__":

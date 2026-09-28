@@ -50,7 +50,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import grammar, store, tools  # noqa: E402
+from smm import cascade, grammar, store, tools  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
 from smm.embed import Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
@@ -115,6 +115,16 @@ def main() -> int:
                          "including any rewrites/fusion, and generation; composes with "
                          "--normalize (normalize runs first). Default off reproduces "
                          "today's behaviour exactly.")
+    ap.add_argument("--cascade", action="store_true",
+                    help="phase 11 R4d: rewrite only after the plain search refuses "
+                         "(smm.cascade). Tier 0 is today's plain dense+rerank+gate "
+                         "path; a refusal (gated or the reader abstaining) escalates "
+                         "to a widened retrieval against 1, then 2, docs-style "
+                         "rewrites - the reader always sees the original question. "
+                         "Replaces --rewrites' fusion path entirely (--rewrites is "
+                         "ignored under --cascade). Default off reproduces today's "
+                         "behaviour exactly; a no-op under --retrieve-only, which "
+                         "stays generator-free.")
     args = ap.parse_args()
     question = " ".join(args.question)
     if args.rewrites is None:
@@ -131,7 +141,11 @@ def main() -> int:
     rewrite_texts: list[str] = []
     interpreted_idx = 0
     gen = None
-    if args.rewrites > 0 or args.llm_correct:
+    # --cascade replaces the --rewrites fusion path entirely (ignored below),
+    # but --llm-correct still runs here exactly as it does today - the cascade
+    # only ever sees the (possibly corrected) `question`, the same as any
+    # other retrieval path; it gets no special wiring of its own.
+    if args.llm_correct or (args.rewrites > 0 and not args.cascade):
         # Deliberate reorder (see module docstring): the generator has to run
         # before retrieval to produce the rewrites and/or the corrected text,
         # so it starts here - before the embedder/reranker and before the
@@ -149,7 +163,7 @@ def main() -> int:
         if corrected_question != question:
             print(f'(read as: "{corrected_question}")')
         question = corrected_question
-    if args.rewrites > 0:
+    if args.rewrites > 0 and not args.cascade:
         rewrite_texts = gen.rewrites(question, n=args.rewrites, style=args.rewrite_style)
 
     emb = Embedder()
@@ -166,6 +180,48 @@ def main() -> int:
     db = store.connect(ROOT / args.db)
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                   candidates=args.candidates, domain=args.domain)
+
+    if args.cascade and not args.retrieve_only:
+        # --retrieve-only stays generator-free (module docstring); --cascade
+        # is a no-op there and falls through to the plain path below.
+        if args.act and args.gate == GATE:
+            args.gate = GATE_ACT
+        if gen is None:
+            gen = Generator()
+            if not gen.health():
+                print("generator not running: ./scripts/servers.sh start generator",
+                      file=sys.stderr)
+                return 2
+
+        def answer_fn(q: str, hits: list) -> str:
+            return gen.answer(q, hits, cite_grammar=not args.no_grammar)
+
+        cres = cascade.run_cascade(r, gen, question, answer_fn,
+                                   0.0 if args.no_gate else args.gate, k=args.k)
+        hits = expand(db, cres["hits"], span=args.expand) if args.expand else cres["hits"]
+
+        if cres["tier"] > 0:
+            shown = ", ".join(f'"{t}"' for t in cres["rewrites"])
+            print(f"(found on retry {cres['tier']}: {shown})")
+
+        if args.show_context:
+            for i, h in enumerate(hits, 1):
+                head = h["text"].splitlines()[0][:66] if h["text"] else ""
+                print(f"[{i}] {h.get('rerank_score', h['score']):.4f}  {h['chunk_id']:24} {head}")
+            print()
+
+        if cres["gated"]:
+            print(f"{grammar.REFUSAL}\n\n(gate: best evidence scored {cres['score']:.3f}, "
+                  f"below {args.gate:.3f} - the model was not asked)")
+            return 0
+
+        # --act's tool-calling path is deliberately not wired into the
+        # cascade (design note): --cascade always answers in plain reader
+        # mode, whatever --act says.
+        print(cres["answer"])
+        print("\nsources: " + ", ".join(f"[{i}] {h['doc_id']}" for i, h in enumerate(hits, 1)))
+        return 0
+
     if args.rewrites > 0:
         hits, interpreted_idx, _variants, gate_hits = r.retrieve_fused(
             question, rewrites=rewrite_texts, k=args.k)
