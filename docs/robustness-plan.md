@@ -101,11 +101,12 @@ Where things stand: every R4/R5 arm is run and written in `docs/phase11-results.
 "Phase 11 R4 summary"). None ships. The term-menu go/no-go passed on its held-out half. Ranked by
 value for cost:
 
-1. **Switch `asq` to `--rewrites 0`.** One line in `scripts/ask.py` (`args.rewrites = 0 if
-   args.retrieve_only else 1` becomes 0). Measured in R4b: today's default loses 47/600 answers
-   against plain retrieval on the same rows, and is about 1 s slower. Needs the user's yes (not
-   pre-registered as a shipping rule). The tsk_20260928_cascade registry check pins that line, so
-   it must be superseded in the same task.
+1. **Switch `asq` to `--rewrites 0`.** *Done 2026-09-29* (user said yes; tsk_20260929_rewrites0,
+   branch `orch/tsk_20260929_rewrites0`, awaiting merge). `--rewrites` now defaults to 0 in every
+   mode, with a stubbed test (`tests/test_ask_defaults.py`). Measured in R4b: the old default lost
+   47/600 answers against plain retrieval and was about 1 s slower. Correction: no registry check
+   pinned that line (the cascade checks cover `tests/test_cascade.py` only), so nothing was
+   superseded.
 2. **Document expansion: plain-English questions as extra index vectors.** The term-menu check showed
    4B-written user-style questions bridge the vocabulary gap (held-out 13/22 = 59 % vs 45 % for
    manual-text cards). Simplified into the main index: per chunk, 2-3 generated "how would a user ask
@@ -114,6 +115,12 @@ value for cost:
    generation, no rewrite shown to anything. Emacs first: ~19k chunks × 0.31 s ≈ 1.6 h generation +
    ~30 min embedding, additive, no full rebuild. Pre-register (target: no-name + synonym; guards:
    clean unharmed, abstention, latency), then build via orch-task.
+   *In progress 2026-09-29:* pre-registered as **R8** (`fc6ae0a`, docs/phase11-results.md; 3
+   questions per chunk, M = 30 question vectors widen the pool). Built as tsk_20260929_qvec
+   (branch `orch/tsk_20260929_qvec`, awaiting merge; `scripts/build_qvec.py`,
+   `--question-vectors`). Generation is running into `data/index/qvec-emacs.json` (0.49 s/chunk,
+   about 2.5 h). Then: embed into `phase11-qx.db`, pool retrieval, and re-generation only where
+   the reader's input changed.
 3. **Typo correction that can't rename things.** R4a/R4a′ recovered ~28 typo answers but renamed
    names. New rule: correct a word only into an **ordinary English word** (an English wordlist), never
    into a technical term: `mostake→mistake` yes, `nmap→mmap` and `elpy→elpa` no. CPU only.
