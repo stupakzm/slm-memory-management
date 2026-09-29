@@ -54,3 +54,41 @@ control is `p11-pool-r3d`.
 - R8c's chunk vectors move away from the manual's wording, which may cost questions phrased in that
   wording. The screen has few such rows, so any cost there shows only in the confirmation run
   (clean rule).
+
+## Screen results (run 2026-09-29)
+
+Set: `data/eval/realistic_emacs.jsonl` (9f2abf2). A 15-row label audit passed before any run, with two
+caveats: er59 is under-credited for `M-x holidays`, and er57's token is a substring of a correct variant.
+Retrieval in the full profile (`p12-{ctl,r8,r8c}-retrieved.json`). Generation under setting C
+(`p12-*-answers.json`).
+
+| arm | correct /80 | lost | gained | **net** | p | evidence /80 (lost/gained) | abstention /20 | retrieval p50 |
+|---|---|---|---|---|---|---|---|---|
+| control | 23 | – | – | – | – | 49 | 20 | 3.35 s |
+| R8 (M = 30) | 26 | 1 (er37) | 4 | **+3** | 0.375 | 53 (1/5) | 20 | (+1.78 s in phase 11) |
+| R8c (folded) | 26 | 1 (er79) | 4 | **+3** | 0.375 | 53 (1/5) | 20 | **3.17 s** |
+
+**Screen rule** (net ≥ +4, lost ≤ 1, abstention held): **neither arm advances.** Both are +3 with 1 loss,
+one gain short. R8c does what it was built for on cost: retrieval p50 is 3.17 s against 3.35 s for the
+control, with no extra candidates. Its benefit matches R8's (+3 answers, evidence +4) at no latency.
+Gains by style: R8 no-name +3, synonym +1, casual −1. R8c synonym +2, no-name +1.
+
+**What the screen found that matters more than either arm.** Realistic questions are far harder than
+the phase 11 pool. The control answers 23/80 (29 %; the pool's clean Emacs rows: 37/44). It retrieves
+the right page for 49/80, so **26 rows fail at reading with the evidence in hand.** A look at 14 of
+them:
+- **Domain ambiguity.** Most realistic questions don't say "Emacs". The man pages then compete and
+  often win on a question they genuinely answer: `uniq` for "remove repeated lines",
+  `git-stripspace` for "strip trailing spaces". Some answers are just wrong (`nsswitch.conf` for
+  "reload a file when another program changes it").
+- **Label under-credit.** At least 5 of the 14 are correct alternatives the one-token label doesn't
+  accept: `string-insert-rectangle`, `C-x C-+` (the key for `text-scale-adjust`, not in the derived
+  aliases), `find-file-read-only`, `rename-uniquely`, `C-x C-k n`. Paired comparisons are unbiased by
+  this, but noisier.
+
+**Verdict:** neither arm goes to the full pool. The screen set needs two fixes before it can screen
+well:
+1. accept documented alternative commands as aliases (a derivation rule, not hand edits);
+2. either scope the screen to `--domain emacs` or accept man-page answers where they're genuinely
+   right.
+R8c is the cheaper form of R8, with equal benefit on this set, and is the arm to carry forward.
