@@ -139,6 +139,46 @@ def test_build_leaves_source_db_untouched():
             raise AssertionError("--out == --src must be refused")
 
 
+def test_fold_replaces_only_domain_vectors():
+    class _Emb:
+        def embed_documents(self, texts):
+            return [[float(len(t) % 7), 1.0, 0.0, 0.5] for t in texts]
+
+    def dump(p):
+        db = store.connect(p)
+        try:
+            return (db.execute("SELECT * FROM chunks ORDER BY rowid").fetchall(),
+                    dict(db.execute("SELECT rowid, embedding FROM vec_chunks").fetchall()),
+                    store.has_qvec(db),
+                    db.execute("SELECT count(*) FROM sqlite_master WHERE name='chunk_questions'")
+                    .fetchone()[0], store.get_meta(db))
+        finally:
+            db.close()
+
+    with tempfile.TemporaryDirectory() as td:
+        src, out = Path(td) / "src.db", Path(td) / "out.db"
+        make_src(src)
+        before = hashlib.sha256(src.read_bytes()).hexdigest()
+        build_qvec.prepare_out(src, out)
+        n = build_qvec.fold(out, {"e1:0": ["q one?", "q two?"], "l1:0": ["ignored?"]},
+                            _Emb(), "emacs")
+        check(n == 1, f"only e1:0 is folded, got {n}")
+        check(hashlib.sha256(src.read_bytes()).hexdigest() == before, "source changed")
+        s_chunks, s_vecs, *_ = dump(src)
+        o_chunks, o_vecs, has_q, has_cq, meta = dump(out)
+        check(o_chunks == s_chunks, "chunks table must be identical")
+        want = store.pack(_Emb().embed_documents(
+            [build_qvec.fold_text("", "text of e1:0", ["q one?", "q two?"])])[0])
+        check(o_vecs[1] == want, "folded vector is the embedding of fold_text")
+        check(o_vecs[2] == s_vecs[2] and o_vecs[3] == s_vecs[3],
+              "unfolded and other-domain vectors byte-identical")
+        check(o_vecs[1] != s_vecs[1], "folded vector changed")
+        check(not has_q and has_cq == 0, "no qvec / chunk_questions table")
+        check(meta["qvec_fold"] == "1" and meta["qvec_domain"] == "emacs", meta)
+        check(hashlib.sha256(build_qvec.system_prompt(3).encode()).hexdigest()
+              == meta["qvec_prompt_sha256"], "prompt hash")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

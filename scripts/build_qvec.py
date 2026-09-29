@@ -8,6 +8,7 @@ go into a COPY of the source index - the source is only ever opened read-only.
 
   .venv/bin/python scripts/build_qvec.py --limit 20 --out /tmp/qx-smoke.db   # smoke run
   .venv/bin/python scripts/build_qvec.py                                     # emacs, 3 per chunk
+  .venv/bin/python scripts/build_qvec.py --fold   # R8c: re-embed chunks with their cached questions
 
 Both stages are resumable: generation skips chunks already in --cache, embedding
 skips questions already in --out. Generation needs the generator server; embedding
@@ -138,6 +139,37 @@ def embed(out: Path, cache: dict, emb, domain: str, per_chunk: int) -> int:
     return len(todo)
 
 
+def fold_text(prefix: str, text: str, questions: list[str]) -> str:
+    """R8c document text: the chunk as embedded today plus its questions."""
+    return f"{prefix}{text}\n\nQuestions this passage answers:\n" + "\n".join(questions)
+
+
+def fold(out: Path, cache: dict, emb, domain: str, per_chunk: int = 3) -> int:
+    """Replace, in `out`, the vector of every `domain` chunk that has cached questions
+    with the embedding of fold_text(...); same rowid, chunks table untouched."""
+    db = store.connect(out)
+    try:
+        rows = db.execute("SELECT rowid, chunk_id, prefix, text FROM chunks WHERE domain=? "
+                          "ORDER BY rowid", (domain,)).fetchall()
+        todo = [r for r in rows if cache.get(r[1])]
+        for i in range(0, len(todo), EMBED_BATCH):
+            batch = todo[i:i + EMBED_BATCH]
+            vecs = emb.embed_documents([fold_text(pre, txt, cache[cid])
+                                        for _, cid, pre, txt in batch])
+            for (rid, *_), v in zip(batch, vecs):
+                db.execute("DELETE FROM vec_chunks WHERE rowid=?", (rid,))
+                db.execute("INSERT INTO vec_chunks(rowid,embedding) VALUES(?,?)",
+                           (rid, store.pack(v)))
+            db.commit()
+            print(f"  folded {min(i + EMBED_BATCH, len(todo))}/{len(todo)}", flush=True)
+        store.set_meta(db, qvec_fold=1, qvec_domain=domain, qvec_per_chunk=per_chunk,
+                       qvec_prompt_sha256=hashlib.sha256(
+                           system_prompt(per_chunk).encode()).hexdigest())
+    finally:
+        db.close()
+    return len(todo)
+
+
 def build(src: Path, out: Path, domain: str, per_chunk: int, cache_path: Path,
           gen=None, emb=None, stage: str = "both", parallel: int = 4,
           limit: int | None = None) -> None:
@@ -154,7 +186,8 @@ def build(src: Path, out: Path, domain: str, per_chunk: int, cache_path: Path,
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default="data/index/phase11.db")
-    ap.add_argument("--out", default="data/index/phase11-qx.db")
+    ap.add_argument("--out", default=None,
+                    help="default: data/index/phase11-qx.db (phase11-qc.db with --fold)")
     ap.add_argument("--domain", default="emacs")
     ap.add_argument("--per-chunk", type=int, default=3)
     ap.add_argument("--cache", default=None,
@@ -164,8 +197,25 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=0,
                     help="only the first N chunks of the domain (smoke runs)")
     ap.add_argument("--stage", choices=("generate", "embed", "both"), default="both")
+    ap.add_argument("--fold", action="store_true",
+                    help="R8c: re-embed each chunk with its cached questions (no generation)")
     args = ap.parse_args()
     cache = ROOT / (args.cache or f"data/index/qvec-{args.domain}.json")
+    out = ROOT / (args.out or ("data/index/phase11-qc.db" if args.fold
+                               else "data/index/phase11-qx.db"))
+
+    if args.fold:
+        if not cache.exists():
+            print(f"--fold needs an existing cache; not found: {cache}", file=sys.stderr)
+            return 2
+        from smm.embed import Embedder
+        emb = Embedder()
+        if not emb.health():
+            print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
+            return 2
+        prepare_out(ROOT / args.src, out)
+        fold(out, json.loads(cache.read_text()), emb, args.domain, args.per_chunk)
+        return 0
 
     gen = emb = None
     if args.stage in ("generate", "both"):
@@ -180,7 +230,7 @@ def main() -> int:
         if not emb.health():
             print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
             return 2
-    build(ROOT / args.src, ROOT / args.out, args.domain, args.per_chunk, cache,
+    build(ROOT / args.src, out, args.domain, args.per_chunk, cache,
           gen=gen, emb=emb, stage=args.stage, parallel=args.parallel,
           limit=args.limit or None)
     return 0

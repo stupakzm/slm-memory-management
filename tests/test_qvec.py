@@ -284,6 +284,54 @@ def test_build_resume_skips_done_chunks():
               and len(asked) == 2, "a second run asks nothing")
 
 
+def test_fold_text_format():
+    check(build_qvec.fold_text("P: ", "body", ["a?", "b?"])
+          == "P: body\n\nQuestions this passage answers:\na?\nb?", "fold_text format")
+    check(build_qvec.fold_text("", "t", ["q"]) == "t\n\nQuestions this passage answers:\nq",
+          "empty prefix")
+
+
+def test_fold_skips_chunks_without_questions():
+    import sqlite3
+
+    class _Emb:
+        def __init__(self):
+            self.texts = []
+
+        def embed_documents(self, texts):
+            self.texts += texts
+            return [[9.0, 9.0] for _ in texts]
+
+    real_connect = store.connect
+    with tempfile.TemporaryDirectory() as td:
+        path = Path(td) / "o.db"
+        db = sqlite3.connect(path)  # plain tables stand in for vec0 (sqlite_vec is stubbed)
+        db.execute("CREATE TABLE chunks(chunk_id TEXT, prefix TEXT, text TEXT, domain TEXT)")
+        db.execute("CREATE TABLE vec_chunks(rowid INTEGER PRIMARY KEY, embedding BLOB)")
+        db.execute("CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT)")
+        for i, (cid, dom) in enumerate([("a", "emacs"), ("b", "emacs"), ("c", "emacs"),
+                                        ("d", "linux")], 1):
+            db.execute("INSERT INTO chunks VALUES(?,?,?,?)", (cid, "P:", f"t{cid}", dom))
+            db.execute("INSERT INTO vec_chunks VALUES(?,?)", (i, store.pack([1.0, 1.0])))
+        db.commit()
+        db.close()
+        store.connect = lambda p, dim=None: sqlite3.connect(p)
+        try:
+            emb = _Emb()
+            n = build_qvec.fold(path, {"a": ["qa"], "b": [], "d": ["qd"]}, emb, "emacs")
+        finally:
+            store.connect = real_connect
+        check(n == 1 and emb.texts == [build_qvec.fold_text("P:", "ta", ["qa"])], emb.texts)
+        db = sqlite3.connect(path)
+        vecs = dict(db.execute("SELECT rowid, embedding FROM vec_chunks"))
+        meta = dict(db.execute("SELECT key, value FROM meta"))
+        db.close()
+        check(vecs[1] == store.pack([9.0, 9.0]), "chunk with questions is replaced")
+        check(all(vecs[i] == store.pack([1.0, 1.0]) for i in (2, 3, 4)),
+              "no-question chunk, missing chunk and other domain keep their vector")
+        check(meta["qvec_fold"] == "1" and meta["qvec_domain"] == "emacs", meta)
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
