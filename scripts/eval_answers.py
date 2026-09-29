@@ -170,6 +170,10 @@ def main() -> int:
     ap.add_argument("--vocab-cache", default=None,
                     help="override path for --normalize spell's vocab cache (default: "
                          "<db>.vocab.json next to --db)")
+    ap.add_argument("--question-vectors", type=int, default=0,
+                    help="phase 11 R8: add the chunks of the M nearest generated-question "
+                         "vectors (scripts/build_qvec.py) to the candidate pool; 0 "
+                         "(default) reproduces today's behaviour exactly")
     ap.add_argument("--rewrite-style", choices=("man", "docs"), default="man",
                     help="phase 11 R4b: 'docs' asks the rewriter for documentation's "
                          "own terminology (manual pages and the GNU Emacs manuals) "
@@ -198,6 +202,9 @@ def main() -> int:
         print("--cascade requires --stage both (the tier depends on the reader's "
               "own answer)", file=sys.stderr)
         return 2
+
+    # Only passed when set, so a default run constructs Retriever exactly as before.
+    qv_kw = {"question_vectors": args.question_vectors} if args.question_vectors else {}
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -254,7 +261,8 @@ def main() -> int:
             print(f"{args.db} has no chunks_fts", file=sys.stderr)
             return 2
         r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
-                      candidates=args.candidates, domain=args.domain)
+                      candidates=args.candidates, domain=args.domain,
+                      **qv_kw)
         retrieved, t0 = {}, time.time()
         for i, row in enumerate(rows, 1):
             qtext = query_text(row)
@@ -464,6 +472,8 @@ def write_report(args, results: list, t0: float) -> int:
         config["llm_correct"] = True
     if args.cascade:
         config["cascade"] = True
+    if args.question_vectors > 0:
+        config["question_vectors"] = args.question_vectors
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
@@ -514,7 +524,9 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
         print(f"{args.db} has no chunks_fts", file=sys.stderr)
         return 2
     r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
-                  candidates=args.candidates, domain=args.domain)
+                  candidates=args.candidates, domain=args.domain,
+                  **({"question_vectors": args.question_vectors}
+                     if args.question_vectors else {}))
 
     def read_view(hits: list) -> list:
         h = expand(db, hits, span=args.expand) if args.expand else hits

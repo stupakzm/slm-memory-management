@@ -13,6 +13,11 @@ being the thing that actually decides.
 The gate is deliberately the last step and deliberately dumb: one threshold on the
 reranker's top-1 score. Finding 04's point is that the model must never be invoked
 on thin evidence, and a mechanism the model participates in is not that.
+
+Phase 11 R8 (`question_vectors` > 0, docs/phase11-results.md "R8 pre-registration"):
+the chunk pool is joined by the chunks whose generated-question vectors sit nearest
+the query. That route only widens the pool - the union is still reranked against the
+original question and the gate reads that top-1.
 """
 
 from __future__ import annotations
@@ -116,7 +121,7 @@ class Retriever:
     def __init__(self, db: sqlite3.Connection, embedder=None, reranker=None,
                  mode: str = "hybrid", candidates: int = CANDIDATES,
                  dense_weight: float = 1.0, bm25_weight: float = 1.0,
-                 domain: str | None = None):
+                 domain: str | None = None, question_vectors: int = 0):
         self.db = db
         self.embedder = embedder
         self.reranker = reranker
@@ -126,9 +131,13 @@ class Retriever:
         # None means every domain competes, which is the thing phase 5 measures
         # rather than assumes.
         self.domain = domain
+        # R8: how many nearest question vectors join the pool; 0 is today's path.
+        self.question_vectors = question_vectors
 
     def candidates_for(self, question: str, n: int | None = None) -> list[dict]:
         n = n or self.candidates
+        if self.question_vectors > 0 and self.mode != "bm25":
+            return self._with_question_route(question, n)
         if self.mode == "dense":
             return store.search(self.db, self.embedder.embed_query(question), k=n,
                                 domain=self.domain)
@@ -138,6 +147,25 @@ class Retriever:
                              domain=self.domain)
         sparse = lexical.search(self.db, question, k=n)
         return rrf([dense, sparse], weights=list(self.weights))[:n]
+
+    def _with_question_route(self, question: str, n: int) -> list[dict]:
+        """The chunk pool exactly as above, then the question route's new chunks,
+        each dict tagged `route`. One query embedding serves both searches."""
+        vec = self.embedder.embed_query(question)
+        dense = store.search(self.db, vec, k=n, domain=self.domain)
+        if self.mode == "dense":
+            pool = dense
+        else:
+            sparse = lexical.search(self.db, question, k=n)
+            pool = rrf([dense, sparse], weights=list(self.weights))[:n]
+        out = [dict(c, route="chunk") for c in pool]
+        seen = {c["chunk_id"] for c in out}
+        for c in store.search_questions(self.db, vec, k=self.question_vectors,
+                                        domain=self.domain):
+            if c["chunk_id"] not in seen:
+                seen.add(c["chunk_id"])
+                out.append(dict(c, route="question"))
+        return out
 
     def retrieve(self, question: str, k: int = KEEP) -> list[dict]:
         cands = self.candidates_for(question)

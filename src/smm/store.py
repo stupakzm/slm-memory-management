@@ -50,6 +50,35 @@ def create(db: sqlite3.Connection, dim: int) -> None:
     db.commit()
 
 
+def create_qvec(db: sqlite3.Connection, dim: int) -> None:
+    """Phase 11 R8: generated questions, one vector each, pointing at their chunk.
+    qvec.rowid == chunk_questions.rowid."""
+    db.execute(
+        """CREATE TABLE IF NOT EXISTS chunk_questions(
+               rowid    INTEGER PRIMARY KEY,
+               chunk_id TEXT NOT NULL,
+               question TEXT NOT NULL)"""
+    )
+    db.execute("CREATE INDEX IF NOT EXISTS chunk_questions_chunk ON chunk_questions(chunk_id)")
+    db.execute(f"CREATE VIRTUAL TABLE IF NOT EXISTS qvec USING vec0(embedding float[{dim}])")
+    db.commit()
+
+
+def add_questions(db: sqlite3.Connection, rows: list[tuple[str, str, list[float]]]) -> None:
+    """rows: [(chunk_id, question, embedding), ...]"""
+    cur = db.cursor()
+    for chunk_id, question, emb in rows:
+        cur.execute("INSERT INTO chunk_questions(chunk_id,question) VALUES(?,?)",
+                    (chunk_id, question))
+        cur.execute("INSERT INTO qvec(rowid,embedding) VALUES(?,?)",
+                    (cur.lastrowid, pack(emb)))
+    db.commit()
+
+
+def has_qvec(db: sqlite3.Connection) -> bool:
+    return db.execute("SELECT 1 FROM sqlite_master WHERE name='qvec'").fetchone() is not None
+
+
 def set_meta(db: sqlite3.Connection, **kw) -> None:
     db.executemany("INSERT OR REPLACE INTO meta(key,value) VALUES(?,?)",
                    [(k, str(v)) for k, v in kw.items()])
@@ -138,6 +167,43 @@ def search(db: sqlite3.Connection, query_vec: list[float], k: int = 5,
          "distance": r[8], "score": 1.0 - r[8] / 2.0}
         for r in rows[:k]
     ]
+
+
+def search_questions(db: sqlite3.Connection, query_vec: list[float], k: int = 30,
+                     domain: str | None = None, max_overfetch: int = 4096) -> list[dict]:
+    """Top-k question vectors by distance, mapped to their chunks and deduplicated
+    by chunk_id (the best question wins), best first. `k` counts question hits
+    before dedupe. Same dicts as search(), scored by the best matching question,
+    plus `matched_question`. The domain overfetch loop is search()'s.
+    """
+    struct = "c.sec_id, c.tag" if has_structure(db) else "'' , ''"
+    dom = "c.domain" if has_domain(db) else "'linux'"
+    want = k if domain is None else min(max(k * 8, 64), max_overfetch)
+    while True:
+        rows = db.execute(
+            f"""SELECT c.chunk_id, c.doc_id, c.text, c.prefix, {struct}, c.ord,
+                       {dom}, v.distance, q.question
+                  FROM qvec v JOIN chunk_questions q ON q.rowid = v.rowid
+                              JOIN chunks c ON c.chunk_id = q.chunk_id
+                 WHERE v.embedding MATCH ? AND k = ?
+                 ORDER BY v.distance""",
+            (pack(query_vec), want),
+        ).fetchall()
+        if domain is not None:
+            rows = [r for r in rows if r[7] == domain]
+        if domain is None or len(rows) >= k or want >= max_overfetch:
+            break
+        want = min(want * 4, max_overfetch)
+    out, seen = [], set()
+    for r in rows[:k]:
+        if r[0] in seen:
+            continue
+        seen.add(r[0])
+        out.append({"chunk_id": r[0], "doc_id": r[1], "text": r[2], "prefix": r[3],
+                    "sec_id": r[4], "tag": r[5], "ord": r[6], "domain": r[7],
+                    "distance": r[8], "score": 1.0 - r[8] / 2.0,
+                    "matched_question": r[9]})
+    return out
 
 
 def count(db: sqlite3.Connection) -> int:
