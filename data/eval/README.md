@@ -306,3 +306,26 @@ base's (`a01`'s) aliases, used by both `scripts/eval_answers.py` and
 (or the documented fallback) with its first letter untouched; no edited word
 overlaps an answer token or `gold_hint` string; every copied field equals
 the base's; and qids are unique, with none colliding with either base file.
+
+# Realistic Emacs screen set (Phase 12)
+
+`realistic_emacs.jsonl`, 100 rows, `domain: "emacs"`, same schema as
+`emacs_questions.jsonl`. 80 answerable (`er01`-`er80`) and 20 unanswerable
+(`eru01`-`eru20`, all `tool-not-installed`, each naming a third-party package that
+appears in no manual section).
+
+Each answerable row asks for a *need* the way someone mid-task would type it, not
+a command name, and none of the 80 answer tokens appears in any `answer_contains`
+of `emacs_questions.jsonl`. Exactly one style tag per row: `no-name` (25, goal only,
+no command or feature name), `casual` (20, chatty first person), `synonym` (15,
+vocabulary that differs from the manual's), `terse` (10, keywords), `typo` (10, one
+or two typos in ordinary words). Gold sections are resolved with
+`scripts/resolve_gold.py --md-corpus ... --write` (`gold_hint` pins the section
+where the token alone is too generic and is never scored); keybinding aliases are
+merged into `gold_aliases.json` with `derive_gold_aliases.py --merge`.
+
+Blind to R8: no question has token Jaccard >= 0.5 (tokens `[a-z0-9]+`, lowercased)
+with any of the 57,138 generated questions in `data/index/qvec-emacs.json`. The
+questions and labels are written by a model (Claude), so "realistic" is the
+author's judgment, not observed user logs; 15 random answerable rows are
+hand-audited before any arm runs.
