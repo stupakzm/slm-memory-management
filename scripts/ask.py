@@ -15,13 +15,13 @@ The gate is on by default and the threshold is not a taste decision - it is the
 operating point `scripts/sweep_gate.py` picked off the labelled set. Below it the
 generator is never invoked, so there is nothing to speculate with.
 
-`--rewrites N` (default 1) fuses the question with N model-generated rewrites:
-each variant is retrieved and reranked separately and the reranked lists are
-combined by rank fusion (measured; see src/smm/retrieve.py:fuse_variants -
-reranking a single pre-fused pool was tried and barely moved gold). `--rewrites 0`
-reproduces today's single-query path exactly. Under `--retrieve-only` the default
-is 0 instead of 1 - that mode stays generator-free unless `--rewrites` is passed
-explicitly.
+`--rewrites N` (default 0, in every mode) fuses the question with N
+model-generated rewrites when N > 0: each variant is retrieved and reranked
+separately and the reranked lists are combined by rank fusion (measured; see
+src/smm/retrieve.py:fuse_variants - reranking a single pre-fused pool was tried
+and barely moved gold). The default single-query path never starts the generator
+for rewrites; phase 11 R4b measured that one default rewrite lost 47/600 answers
+against plain retrieval and cost ~1 s.
 
 The gate itself, with rewrites on, still reads the ORIGINAL question's own
 reranked top-1 - never the fused list's. rrf() orders by rank, so the fused
@@ -32,7 +32,8 @@ tsk_20260828_a47f0496). `GATE`/`GATE_ACT` were swept against the original
 question's own top-1, so that is what stays gated on - the generator answers
 from the fused `hits`, the gate decides from `gate_hits`.
 
-Known, accepted tradeoff: with `--rewrites` > 0 the generator has to produce the
+Known, accepted tradeoff (applies only when `--rewrites` > 0 is passed
+explicitly): the generator has to produce the
 rewrites *before* retrieval can run, so it now starts before the embedder/reranker
 and before the gate decision - on every such ask, including one the gate goes on
 to refuse. That both reorders the embedder -> reranker -> generator lazy-start
@@ -91,11 +92,11 @@ def main() -> int:
                          "is never run by this program under any flag")
     ap.add_argument("--retrieve-only", action="store_true")
     ap.add_argument("--show-context", action="store_true")
-    ap.add_argument("--rewrites", type=int, default=None,
+    ap.add_argument("--rewrites", type=int, default=0,
                     help="fuse the question with N model-generated rewrites, each "
-                         "retrieved and reranked separately (default 1; 0 under "
-                         "--retrieve-only unless passed explicitly). --rewrites 0 "
-                         "reproduces the single-query path exactly.")
+                         "retrieved and reranked separately (default 0: no "
+                         "rewrites, generator not started for them). --rewrites 0 "
+                         "is the single-query path.")
     ap.add_argument("--normalize", choices=("off", "spell"), default="off",
                     help="phase 11 R4a: 'spell' corrects the question against the "
                          "index's own vocabulary (smm.normalize) before retrieval AND "
@@ -127,8 +128,6 @@ def main() -> int:
                          "stays generator-free.")
     args = ap.parse_args()
     question = " ".join(args.question)
-    if args.rewrites is None:
-        args.rewrites = 0 if args.retrieve_only else 1
 
     if args.normalize == "spell":
         vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
