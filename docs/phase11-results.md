@@ -885,3 +885,56 @@ interleaved twice after a warm-up, in R5's profile.
 4. retrieval p50 falls by ≥ 30 %.
 Reported alongside: the escalation rate, and losses by qid. A sweep of the threshold is reported
 as a diagnostic only. It is chosen on the same rows, so it cannot ship.
+
+## R5b results (run 2026-09-29, offline)
+
+Evaluated as pre-registered, from R3's and R5's cached retrieval and answers
+(`data/index/phase11-scratch/r5b_adaptive.py`, arm file `p11-r5b-answers.json`). Of 1,160 rows,
+236 (20.3 %) escalate to 50 candidates, and 277 keep R3's exact reader input at 20. The other 647
+read R5's top-5, which differs from R3's in membership or order.
+
+| kind | answerable | lost | gained | **net** | McNemar p |
+|---|---|---|---|---|---|
+| clean | 116 | 7 | 3 | −4 | 0.34 |
+| no-name | 116 | 13 | 2 | **−11** | 0.0074 |
+| typo1 | 116 | 2 | 10 | +8 | 0.039 |
+| **all** | 883 | 45 | 41 | **−4** | 0.75 |
+
+Evidence@5: 22 lost, 15 gained, net −7. Abstention: 3 lost, 1 gained, net −2.
+
+**Against the rule:** 1 fails (−4 against −2), 2 fails (−7 against −3), and 3 fails (−2).
+Rule 4 was not measured: with 1-3 failed the verdict cannot change, so the 100-row latency run was
+skipped. That is a deviation from the pre-registration, stated here.
+
+**Verdict: does not ship.** The loss is R5's, nearly unchanged: no-name −11 (R5: −13). Escalating
+on refusal doesn't reach it, because the 20-candidate pass is **confident** on those rows. It
+ranks a wrong chunk above 0.65, so nothing triggers the deeper pass. *Diagnostic sweep (same rows,
+cannot ship):* raising the trigger to 0.8/0.9/0.95/0.99 escalates 25/31/37/54 % of rows, and no-name
+still loses −9/−6/−5/−5. The shallow reranker's confidence does not predict when depth matters.
+Plan item 6 is closed. Candidate depth stays at 50.
+
+## R4a″ results (pre-pass, run 2026-09-29)
+
+CPU pre-pass as pre-registered (`data/index/phase11-scratch/r4a3_prepass.py`): R4a's normaliser, with
+English-word sources left alone and corrections allowed only into index words that are also in
+`american-english`. That leaves 14,876 of 46,849 vocabulary words as targets. It changes 323 pool
+rows: typo1 125, typo3 159, typo (old) 22, and 17 others. **4 of those are clean base questions:**
+
+| qid | edit |
+|---|---|
+| u04 | `nmap` → `map` |
+| u15 | `playbook` → `playback` |
+| eu07 | `tempel` → `temple` |
+| eu08 | `restclient` → `resilient` |
+
+**Rule 2 fails at the pre-pass (4 > 3),** so, as pre-registered, the GPU arm was not run. **Verdict:
+does not ship.**
+
+**What it establishes.** Restricting targets to English words stopped the renames *into* technical
+names (R4a's `nmap→mmap`, `elpy→elpa`). But short or compound tool names sit within one edit of an
+ordinary word just as often: `nmap→map`. All four are unanswerable rows about tools the corpus lacks,
+the exact case where a rename risks an invented answer. Whether a word is a typo can't be decided from
+the word and a dictionary alone. Every spelling arm so far (R4a, R4a′, R4a″) recovers typos and
+fails on names. Plan item 3 is closed. A fourth variant would need a signal the question alone
+doesn't carry, such as the corrected word being found near the rest of the question in the corpus,
+and it would get its own pre-registration.
