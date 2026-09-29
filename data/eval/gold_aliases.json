@@ -973,6 +973,467 @@
   "ep04": {},
   "ep05": {},
   "ep06": {},
+  "er01": {},
+  "er02": {
+    "winner-undo": [
+      {
+        "alias": "C-c left",
+        "line": "\u2018C-c left\u2019 (\u2018winner-undo\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#window-convenience"
+      }
+    ]
+  },
+  "er03": {
+    "transpose-words": [
+      {
+        "alias": "M-t",
+        "line": "\u2018M-t\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#transpose"
+      },
+      {
+        "alias": "M-t",
+        "line": "\u2018M-t\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#words"
+      }
+    ]
+  },
+  "er04": {
+    "upcase-word": [
+      {
+        "alias": "M-u",
+        "line": "\u2018M-u\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#case"
+      }
+    ]
+  },
+  "er05": {},
+  "er06": {},
+  "er07": {
+    "string-rectangle": [
+      {
+        "alias": "C-x r t",
+        "line": "\u2018C-x r t STRING <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#rectangles"
+      }
+    ]
+  },
+  "er08": {},
+  "er09": {
+    "narrow-to-region": [
+      {
+        "alias": "C-x n n",
+        "line": "\u2018C-x n n\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#narrowing"
+      }
+    ]
+  },
+  "er10": {},
+  "er11": {},
+  "er12": {},
+  "er13": {},
+  "er14": {
+    "view-lossage": [
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019 (\u2018view-lossage\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-help"
+      },
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019\n(\u2018view-lossage\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#text-garbled"
+      }
+    ]
+  },
+  "er15": {
+    "where-is": [
+      {
+        "alias": "C-h w",
+        "line": "\u2018C-h w COMMAND <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      }
+    ]
+  },
+  "er16": {
+    "shell-command-on-region": [
+      {
+        "alias": "M-|",
+        "line": "\u2018M-| CMD <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#shell"
+      },
+      {
+        "alias": "M-|",
+        "line": "\u2018M-|\u2019 (\u2018shell-command-on-region\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#single-shell"
+      }
+    ]
+  },
+  "er17": {},
+  "er18": {},
+  "er19": {},
+  "er20": {},
+  "er21": {
+    "org-deadline": [
+      {
+        "alias": "C-c C-d",
+        "line": "\u2018C-c C-d\u2019 (\u2018org-deadline\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#inserting-deadline-schedule"
+      }
+    ]
+  },
+  "er22": {},
+  "er23": {
+    "org-table-create-or-convert-from-region": [
+      {
+        "alias": "C-c |",
+        "line": "\u2018C-c |\u2019 (\u2018org-table-create-or-convert-from-region\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#built-in-table-editor"
+      }
+    ]
+  },
+  "er24": {
+    "fill-paragraph": [
+      {
+        "alias": "M-q",
+        "line": "\u2018M-q\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#fill-commands"
+      }
+    ]
+  },
+  "er25": {},
+  "er26": {
+    "read-only-mode": [
+      {
+        "alias": "C-x C-q",
+        "line": "\u2018C-x C-q\u2019\n(\u2018read-only-mode\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#visiting"
+      },
+      {
+        "alias": "C-x C-q",
+        "line": "\u2018C-x C-q\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-buffer"
+      }
+    ]
+  },
+  "er27": {},
+  "er28": {},
+  "er29": {},
+  "er30": {},
+  "er31": {},
+  "er32": {},
+  "er33": {},
+  "er34": {
+    "goto-line": [
+      {
+        "alias": "M-g M-g",
+        "line": "\u2018M-g M-g\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#moving-point"
+      },
+      {
+        "alias": "M-g g",
+        "line": "\u2018M-g g\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#moving-point"
+      }
+    ]
+  },
+  "er35": {},
+  "er36": {},
+  "er37": {},
+  "er38": {},
+  "er39": {
+    "vc-diff": [
+      {
+        "alias": "C-x v =",
+        "line": "\u2018C-x v =\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#old-revisions"
+      }
+    ]
+  },
+  "er40": {
+    "vc-revert": [
+      {
+        "alias": "C-x v u",
+        "line": "\u2018C-x v u\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#vc-undo"
+      }
+    ]
+  },
+  "er41": {
+    "org-refile": [
+      {
+        "alias": "C-c C-w",
+        "line": "\u2018C-c C-w\u2019 (\u2018org-refile\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#refile-and-copy"
+      }
+    ]
+  },
+  "er42": {},
+  "er43": {},
+  "er44": {},
+  "er45": {},
+  "er46": {
+    "balance-windows": [
+      {
+        "alias": "C-x +",
+        "line": "\u2018C-x +\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#change-window"
+      }
+    ]
+  },
+  "er47": {},
+  "er48": {},
+  "er49": {
+    "toggle-input-method": [
+      {
+        "alias": "C-\\",
+        "line": "\u2018C-\\\u2019 (\u2018toggle-input-method\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#input-methods"
+      },
+      {
+        "alias": "C-\\",
+        "line": "\u2018C-\\\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#select-input-method"
+      }
+    ]
+  },
+  "er50": {
+    "insert-char": [
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8 <RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#inserting-text"
+      },
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8\n<RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#international-chars"
+      },
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8 <RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#input-methods"
+      }
+    ]
+  },
+  "er51": {
+    "zap-to-char": [
+      {
+        "alias": "M-z",
+        "line": "\u2018M-z CHAR\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#other-kill-commands"
+      }
+    ]
+  },
+  "er52": {
+    "delete-indentation": [
+      {
+        "alias": "M-^",
+        "line": "\u2018M-^\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#deletion"
+      },
+      {
+        "alias": "M-^",
+        "line": "\u2018M-^\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#indentation-commands"
+      }
+    ]
+  },
+  "er53": {},
+  "er54": {
+    "vc-create-tag": [
+      {
+        "alias": "C-x v s",
+        "line": "\u2018C-x v s NAME <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#revision-tags"
+      }
+    ]
+  },
+  "er55": {},
+  "er56": {
+    "org-toggle-checkbox": [
+      {
+        "alias": "C-c C-c",
+        "line": "\u2018C-c C-c\u2019 (\u2018org-toggle-checkbox\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#checkboxes"
+      },
+      {
+        "alias": "C-c C-x C-b",
+        "line": "\u2018C-c C-x C-b\u2019 (\u2018org-toggle-checkbox\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#checkboxes"
+      }
+    ]
+  },
+  "er57": {
+    "org-archive-subtree": [
+      {
+        "alias": "C-c $",
+        "line": "\u2018C-c $\u2019 (\u2018org-archive-subtree\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#moving-subtrees"
+      }
+    ]
+  },
+  "er58": {},
+  "er59": {},
+  "er60": {},
+  "er61": {
+    "highlight-regexp": [
+      {
+        "alias": "M-s h r",
+        "line": "\u2018M-s h r REGEXP <RET> FACE <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "C-x w h",
+        "line": "\u2018C-x w h REGEXP <RET> FACE <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      }
+    ]
+  },
+  "er62": {
+    "indent-rigidly": [
+      {
+        "alias": "C-x <TAB>",
+        "line": "\u2018C-x <TAB>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#indentation-commands"
+      }
+    ]
+  },
+  "er63": {
+    "kill-rectangle": [
+      {
+        "alias": "C-x r k",
+        "line": "\u2018C-x r k\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#rectangles"
+      }
+    ]
+  },
+  "er64": {
+    "comment-dwim": [
+      {
+        "alias": "M-;",
+        "line": "\u2018M-;\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "M-;",
+        "line": "\u2018M-;\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#fortran-comments"
+      }
+    ]
+  },
+  "er65": {},
+  "er66": {
+    "org-clock-in": [
+      {
+        "alias": "C-c C-x C-i",
+        "line": "\u2018C-c C-x C-i\u2019 (\u2018org-clock-in\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#clocking-commands"
+      }
+    ]
+  },
+  "er67": {},
+  "er68": {},
+  "er69": {},
+  "er70": {},
+  "er71": {},
+  "er72": {},
+  "er73": {},
+  "er74": {
+    "vc-region-history": [
+      {
+        "alias": "C-x v h",
+        "line": "\u2018C-x v h\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#vc-change-log"
+      }
+    ]
+  },
+  "er75": {
+    "apropos-command": [
+      {
+        "alias": "C-h a",
+        "line": "\u2018C-h a TOPICS <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h a",
+        "line": "\u2018C-h a\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#apropos"
+      }
+    ]
+  },
+  "er76": {},
+  "er77": {
+    "eval-last-sexp": [
+      {
+        "alias": "C-x C-e",
+        "line": "\u2018C-x C-e\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#lisp-eval"
+      }
+    ]
+  },
+  "er78": {
+    "reftex-toc": [
+      {
+        "alias": "C-c =",
+        "line": "\u2018C-c =\u2019 (\u2018reftex-toc\u2019)",
+        "rule": "keybinding",
+        "sec_id": "reftex.emacs#reftex-in-a-nutshell"
+      }
+    ]
+  },
+  "er79": {},
+  "er80": {},
   "p01": {
     "--exclude-from": [
       {
