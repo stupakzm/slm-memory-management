@@ -938,3 +938,167 @@ the word and a dictionary alone. Every spelling arm so far (R4a, R4a′, R4a″)
 fails on names. Plan item 3 is closed. A fourth variant would need a signal the question alone
 doesn't carry, such as the corrected word being found near the rest of the question in the corpus,
 and it would get its own pre-registration.
+
+## Deterministic serving check: results (run 2026-09-29)
+
+40 rows (first 40 of the seed-11 sample), generation only from R3's cache, 3 runs per setting,
+`data/index/phase11-scratch/det_run.sh`:
+
+| setting | generator flags | identical in all 3 runs | 40 rows took |
+|---|---|---|---|
+| A | today's (4 slots, prompt cache on) | **33/40** | ~38 s |
+| B | `--parallel 1` | **33/40** | ~19 s |
+| C | `--parallel 1 --no-cache-prompt --cache-ram 0` | **40/40** | ~40 s |
+
+The rows that differ under A and B are not the same rows, run to run. The noise floor is far higher
+than the 1/40 measured before. A run of 40 in which 7 answers can change on identical input bounds
+every paired test above that regenerated rows (R4a, R4a′, R4b, R4d). Their verdicts don't move:
+each passed or failed its rules by margins larger than R3-sized noise could explain on that many
+rows. But their small nets (R4b clean −14, R5 −11) now carry an unknown noise share. **Prompt-cache
+reuse, not slot count, is the source**: with one slot and the cache on, identical prompts still
+diverge. Setting C is used for every generation run from here on, including the regenerated control
+`p11-pool-r3d`.
+
+## R6 results (run 2026-09-29)
+
+Run as pre-registered, with the control amended beforehand (deterministic serving section): all 1,160
+pool rows, generation only from R3's cached retrieval, `--answer-mode quote`, setting C. The control
+is `p11-pool-r3d` (R3's cache regenerated under setting C). Files: `p11-r6-quote-answers.json`,
+`p11-pool-r3d-answers.json`. *Control check:* `r3d` against the original R3 answers is 3 lost,
+3 gained (net 0), abstention unchanged. The regenerated control reproduces R3.
+
+**Unsupported answers (primary):** control 112, quote 53. Removed 62, added 3: **net −59, McNemar
+p ≈ 2 × 10⁻¹⁵.**
+
+| kind | answerable | lost | gained | **net** |
+|---|---|---|---|---|
+| clean | 116 | 45 | 1 | −44 |
+| terse | 136 | 44 | 1 | −43 |
+| casual | 116 | 40 | 4 | −36 |
+| typo1 / typo3 | 116 / 116 | 35 / 25 | 2 / 3 | −33 / −22 |
+| no-name | 116 | 36 | 3 | −33 |
+| synonym | 116 | 33 | 4 | −29 |
+| **all** | 883 | 276 | 18 | **−258** (p < 10⁻⁴) |
+
+Abstention on the 277 unanswerable rows: 1 lost, 17 gained (net +16). Quote verification rejected
+318 of 1,160 answers (27 %; 25-36 % in every kind: clean 57/179, no-name 36/116). Generation time,
+76 ungated rows of the seed-11 sample: cite p50 0.90 s, quote 1.51 s (**+0.61 s**); p95 3.13 → 7.64 s.
+Correct without retrieved evidence: control 3 (a01.y3, a11.k, b12.c, the same 3 as R3), quote 1
+(a01.c). None of the control's 3 survives.
+
+**Against the rule:**
+1. Fewer unsupported answers: **pass** (−59, p ≈ 2 × 10⁻¹⁵).
+2. Correctness holds (net ≥ −2): **fail**, −258.
+3. No new invention: pass (+16).
+4. Affordable (p50 +≤ 1 s): pass (+0.61 s).
+
+**Verdict: "safer, at a cost of 258 answers."** Quote mode does not become the default. It removes half
+of the unsupported answers, and it kills parametric answers as phase 9 predicted. But the 4B fails
+its own quoting on over a quarter of answers, and the verifier turns every one of those into a
+refusal. Those are mostly answers that were right. An opt-in `asq --strict` is possible and is the
+user's decision. It would not be worth offering until the quote failure rate is down.
+
+## R8 results (run 2026-09-29)
+
+Built and run as pre-registered, with the control amended (deterministic serving section). The 4B
+wrote 3 questions for each of the 19,046 Emacs chunks (2.9 h, temperature 0, prompt sha256
+`b878e89e…`), giving 57,138 vectors in `phase11-qx.db`. Pool retrieval ran with
+`--question-vectors 30` (`p11-r8-retrieved.json`). **296 rows' reader input changed** (Emacs 162,
+linux 134). 281 of them have a question-routed chunk in their top 5; the other 15 are reranker
+reorderings within a larger batch. Those 296 were generated under setting C. Every other row takes
+the control's answer (`p11-r8-arm-answers.json`). Control: `p11-pool-r3d`.
+
+| group (rule) | answerable | lost | gained | **net** | McNemar p | evidence lost/gained |
+|---|---|---|---|---|---|---|
+| 1. Emacs no-name + synonym | 88 | 0 | 5 | **+5** | 0.0625 | 0 / 13 |
+| 2. clean, both domains | 116 | 2 | 2 | 0 | 1.0 | 0 / 0 |
+| 3. all other answerable | 679 | 7 | 14 | +7 | 0.19 | 1 / 10 |
+| all answerable | 883 | 9 | 21 | +12 | 0.043 | 1 / 23 |
+
+By kind (Emacs): no-name +3, synonym +2, casual +4, paraphrase +1, typo3 +1, clean, typo1, terse 0.
+Linux: synonym −2, casual −1, typo1 +2, typo3 +1, terse +1. Abstention: 0 lost, 1 gained. Retrieval
+p50 on the fixed 100-row sample, two interleaved passes: 3.42 / 3.46 s without, 5.20 / 5.23 s with
+(**+1.78 s**). p95 3.60-3.64 → 5.58-5.60 s.
+
+*Count correction:* the pre-registration gave 132 clean and 751 other answerable rows. The pool has
+116 and 679 (the 16 old paraphrases and 20 old typos are not clean). The rules are unchanged.
+
+**Against the rule:**
+1. Target net ≥ +5 **and** p < 0.05: **fail.** +5 with no losses is p = 0.0625. The pre-registration's
+   stated limit (6 needed at n = 88) is exactly where it landed.
+2. Clean ≥ −1: pass (0).
+3. Other rows ≥ −2: pass (+7).
+4. No new invention: pass (abstention +1).
+5. Retrieval p50 +≤ 1.5 s: **fail** (+1.78 s).
+
+**Verdict: does not ship.** It fails on significance by one row and on latency by 0.28 s.
+
+**What it establishes.** This is the first phase 11 mechanism with **no measurable cost to anything
+it wasn't aimed at**. Across 883 answerable rows it loses 9 and gains 21. Evidence moves +23 against
+1 lost, clean text is untouched, and it adds no inventions. It works where it was built to: the
+target's evidence rises 13 with 0 lost. Only 5 of those 13 turn into answers, which is the reader's
+share of the gap, as every earlier phase found. *Leakage check:* no gain came through a generated
+question resembling the row's wording (max token Jaccard 0.37 against the 0.8 flag). The hard cases
+are unchanged: e02 and e18 were already right under the control, and e03.m (`delete-other-windows`,
+no-name) still misses. The 0.8 flag had nothing to count, so the "not shown" clause doesn't apply.
+
+The cost is all in reranking up to 30 more candidates. Candidate fixes, none pre-registered:
+- rerank a smaller question route (M = 10);
+- let question vectors *replace* the weakest dense candidates rather than add to them (fixed pool
+  of 50).
+
+Either needs its own pre-registration, on a pool with more target rows. Also noted, not tested: the
+coverage diagnostic in the pre-registration was ill-posed (a question vector always retrieves its
+own chunk), so it is not reported.
+
+### R6 secondary diagnostic: cascade + quote on R4d's 35 tier-1/2 rows
+
+The 35 rows R4d answered at tiers 1-2 (15 correct, 6 inventions, 14 wrong), re-run with `--cascade
+--stage both` in the serve profile under setting C, once with cite and once with quote
+(`p11-r6-cascade-{cite,quote}-answers.json`). Against R4d's original outcomes, quote keeps **8 of the
+15 rescues** (7 become refusals), removes **3 of the 6 inventions** (3 remain), and turns 8 of 14 wrong
+answers into refusals. Under setting C, cite itself reproduces R4d only roughly: 14 correct, 3
+inventions, 6 refusals. Part of R4d's tier-1/2 outcome was server noise. **Not a clear yes:**
+quote halves the cascade's inventions but also halves its rescues, so "cascade + quote" doesn't
+become a candidate arm.
+
+## Phase 11 closing (2026-09-29)
+
+| arm | mechanism | answers vs control | clean | invention | latency | ships |
+|---|---|---|---|---|---|---|
+| R4a | spell lookup | typos +27 | 11/160 renamed | ok | 0.4 ms | no (rule 2) |
+| R4a′ | 4B spelling fix | typos +29 | 6/160 reworded | ok | 0.22 s | no (rule 2) |
+| R4a″ | spell lookup, English words only | not run | 4/160 renamed | – | – | no (rule 2, pre-pass) |
+| R4b | 4B rewrite, every question | −41 / −47 | −14 / −16 | ok | 0.2-0.6 s | no; **today's default was worse than no rewrite: switched off** |
+| R4d | rewrite only on refusal | +15 | +1 | −6 | +11.8 s | no (rules 3-4) |
+| R5 | rerank 20, not 50 | −11 | −4 | ok | −58 % | no (rules 1-2) |
+| R5b | 20, then 50 below the gate | −4 | −4 | −2 | – | no (rules 1-3) |
+| R6 | quote-grounded answers | −258 | −44 | +16; unsupported −59 | +0.61 s | no (rule 2) |
+| R8 | 4B-written questions as index vectors (Emacs) | +12 (target +5, p = 0.06) | 0 | +1 | +1.78 s | no (rules 1, 5) |
+
+**What shipped:** `asq` no longer rewrites every question (`--rewrites 0` by default, tsk_20260929_rewrites0).
+Plain retrieval beat the shipped one-rewrite default by 47 answers in R4b.
+
+**What phase 11 established:**
+- **Where each wording breaks** (R3): typos break the *reader* (the page arrives and the 4B misreads
+  the question). Unnamed tools and synonyms break *retrieval* (the page never arrives). Fixes have
+  to target the right side.
+- **Typos:** repairing the question's own words recovers most of what typos cost (R4a +27, R4a′
+  +29). But no correction rule tried can tell a misspelled word from an unfamiliar name: three
+  mechanisms, three renamings.
+- **Vocabulary gap:** query-time rewriting costs answers (R4b), and query-time retries cost
+  inventions and seconds (R4d). Moving the plain-English wording **into the index** (R8) is the only
+  mechanism with no measured side cost: +23 evidence against 1 lost, clean untouched, no inventions.
+  It misses its bar on significance (one row) and on latency (0.28 s). The next arm is a cheaper R8
+  on more target rows.
+- **Depth:** the reranker's confidence doesn't say when 50 candidates are needed (R5b), so 50 stays.
+- **Grounding:** quote verification halves unsupported answers, but the 4B fails its own quoting on
+  27 % of answers (R6).
+- **Measurement:** eval generation was nondeterministic. 7/40 answers changed on identical input,
+  because of prompt-cache reuse. With setting C (`--parallel 1 --no-cache-prompt --cache-ram 0`) it
+  is 40/40 identical. Every future paired eval should generate under C, against a control
+  regenerated under C.
+
+**Plan items closed without a run:** the term-menu arm (plan item 7). Its trigger (R8
+underdelivering) was met, but it widens the pool as R8 does *and* adds a 4B call before retrieval.
+R8's widening alone already exceeded the latency bar, so the menu arm is dominated. Not run.

@@ -1,0 +1,1353 @@
+{
+  "name": "p11-r6-cascade-quote",
+  "k": 5,
+  "n": 35,
+  "config": {
+    "mode": "dense",
+    "rerank": true,
+    "gate": 0.65,
+    "grammar": true,
+    "candidates": 50,
+    "expand": 0,
+    "db": "data/index/phase11.db",
+    "domain": null,
+    "rewrites": 0,
+    "aliases": true,
+    "cache": "p11-r6-cascade-quote",
+    "read_k": 0,
+    "cap_per_doc": 0,
+    "answer_mode": "quote",
+    "qids": "data/index/phase11-scratch/r6-cascade-qids.json",
+    "abstain_rule": "all-sentences",
+    "evidence_rule": "aliased",
+    "cascade": true
+  },
+  "answer_accuracy": 0.27586206896551724,
+  "accuracy_given_evidence": 0.42105263157894735,
+  "false_abstention_with_evidence": 0.5789473684210527,
+  "abstention_recall": 0.5,
+  "spoke_without_evidence": 0.6,
+  "unsupported_rate": 0.2571428571428571,
+  "results": [
+    {
+      "qid": "u25",
+      "kind": "unanswerable",
+      "tags": [
+        "requires-execution"
+      ],
+      "variant_kind": null,
+      "question": "Which of my services are currently running?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "systemctl.1",
+        "systemctl.1",
+        "systemctl.1",
+        "systemd-analyze.1",
+        "systemctl.1"
+      ],
+      "top_score": 0.31530505418777466,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.685296773910522,
+      "cascade_rewrites": [
+        "what services are active and running in the current system state",
+        "how to query the status of running services in systemd"
+      ]
+    },
+    {
+      "qid": "a35.n",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-tool"
+      ],
+      "variant_kind": "no-tool",
+      "question": "make this daemon come up on its own after a reboot",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7",
+        "daemon.7"
+      ],
+      "top_score": 0.9669678807258606,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.589242219924927,
+      "cascade_rewrites": [
+        "enable daemon at boot time, set daemon to start on system initialization, configure daemon to run during boot sequence, ensure daemon is active on system startup, make daemon start during runlevel initialization, add daemon to system startup services, set daemon to auto-start on reboot, configure daemon for automatic invocation at boot"
+      ],
+      "answer_raw": "\"place a symlink to the unit file in the .wants/ directory of either multi-user.target or graphical.target, which are normally used as boot targets at system startup\" 3. \u2705 This action ensures the daemon starts automatically after a reboot. The manual page extract [3] \"].(3)\" is the correct reference. The exact quote is: \"place a symlink to the unit file in the .wants/ directory of either multi-user.target or graphical.target, which are normally used as boot targets at system startup.\" [3]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 2,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e25",
+      "kind": "answerable",
+      "tags": [
+        "command"
+      ],
+      "variant_kind": null,
+      "question": "Which Org command is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org files?",
+      "answer": "\"\u2018M-x org-agenda\u2019\" is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org files. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9997380375862122,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.301934719085693,
+      "cascade_rewrites": [
+        "org-agenda-global-key",
+        "org-agenda-mode-global-map"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e27.t",
+      "kind": "answerable",
+      "tags": [
+        "syntax",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tramp ssh filename prefix",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "eshell.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9997281432151794,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.554800510406494,
+      "cascade_rewrites": [
+        "tramp ssh FILENAME PREFIX",
+        "tramp ssh filename prefix option"
+      ],
+      "answer_raw": "\"Temporary files have the file name prefix 'tramp.'.\" 2. This refers to the prefix used for temporary files in TRAMP, including those produced by `file-local-copy`. While the question asks about the \"ssh filename prefix\", the most relevant and specific prefix mentioned in the context of TRAMP is the temporary file prefix, which is \"tramp.\" for SSH and other methods. No explicit \"ssh filename prefix\" is defined in the extracts. However, the temporary prefix is clearly stated. Thus, based on the extract, the answer is: \"tramp.\" [2]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b07.y1",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "exact-token",
+        "variant-typo1"
+      ],
+      "variant_kind": "typo1",
+      "question": "My ssh sessions drop whwn they go idle. Which setting keeps them alive?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "sshd_config.5",
+        "sshd_config.5",
+        "tramp.emacs",
+        "ssh_config.5",
+        "ssh_config.5"
+      ],
+      "top_score": 0.9951879978179932,
+      "cascade_tier": 0,
+      "cascade_seconds": 0.0,
+      "cascade_rewrites": [],
+      "answer_raw": "\"ServerAliveInterval\" sets a timeout interval in seconds after which if no data has been received from the server, a server alive message is sent [1] \"ServerAliveCountMax\" sets the number of server alive messages which may be sent without ssh receiving any messages back from the server [4] \"TCPKeepAlive\" specifies whether the system should send TCP keepalive messages to the other side [5] \"ClientAliveInterval\" sets a timeout interval in seconds after which if no data has been received from the client, a client alive message is sent [1]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 4,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "b10.y3",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Wha is the format of a lije in /etc/hsots?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "hosts.5",
+        "hosts.equiv.5",
+        "hosts.allow.5",
+        "ssh.1",
+        "sshd.8"
+      ],
+      "top_score": 0.9973893761634827,
+      "cascade_tier": 1,
+      "cascade_seconds": 8.428268432617188,
+      "cascade_rewrites": [
+        "What is the format of a line in /etc/hosts?"
+      ],
+      "answer_raw": "\"Ip_address canonical_hostname [aliases...]\" 1. The IP address can conform to either IPv4 or IPv6. Fields of the entry are separated by any number of blanks and/or tab characters. Text from a \"#\" character until the end of the line is a comment, and is ignored. Host names may contain only alphanumeric characters, minus signs (\"-\"), and periods (\".\"). They must begin with an alphabetic character and end with an alphanumeric character. Optional aliases provide for name changes, alternate spellings, shorter hostnames, or generic hostnames (for example, localhost). If required, a host may\" [1]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c02.y3",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Are theer signals tnat a progrm simply cannot intercept?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "signal.7",
+        "sudoedit.8",
+        "sudo.8",
+        "proc_pid_stat.5",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9689396023750305,
+      "cascade_tier": 1,
+      "cascade_seconds": 10.599132061004639,
+      "cascade_rewrites": [
+        "are there signals that cannot be caught by a program?"
+      ],
+      "answer_raw": "\"The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.\" 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c03.y3",
+      "kind": "answerable",
+      "tags": [
+        "concept",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Why do some tools need backslashee before parentheses in a paytern and oters do not?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.8818308711051941,
+      "cascade_tier": 2,
+      "cascade_seconds": 13.17363977432251,
+      "cascade_rewrites": [
+        "how to escape parentheses in regex patterns in grep",
+        "what is the purpose of backslash escaping in emacs regex expressions"
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "u11.y3",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "How do I search a codebase wirh ripgrrep while respeccting .gitignore?",
+      "answer": "\"--exclude-standard\" respects .gitignore rules when searching in the current directory with --no-index [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "git-grep.1",
+        "git-grep.1",
+        "git-ls-files.1",
+        "git-ls-files.1",
+        "git-grep.1"
+      ],
+      "top_score": 0.9914820194244385,
+      "cascade_tier": 2,
+      "cascade_seconds": 13.163499355316162,
+      "cascade_rewrites": [
+        "grep -E --include=\"*.c\" --exclude=\"*.gitignore\" --exclude-dir=.git --exclude-dir=.gitignore --exclude=\"*.log\" --exclude=\"*.tmp\" --exclude=\"*.swp\" --exclude=\"*.swo\" --exclude=\"*.orig\" --exclude=\"*.bak\" --exclude=\"*.rej\" --exclude=\"*.pyc\" --exclude=\"*.pyo\" --exclude=\"*.pyd\" --exclude=\"*.so\" --exclude=\"*.dll\" --exclude=\"*.o\" --exclude=\"*.a\" --exclude=\""
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1
+    },
+    {
+      "qid": "e01.y3",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Which command visits a file purelly for viewing, so thta you can't accidentally modiyf it?",
+      "answer": "\"view\" - Start in read-only mode.  You will be protected from writing the files.  Can also be done with the \"-R\" argument. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "nano.1",
+        "pico.1",
+        "editor.1",
+        "view.1",
+        "view.1"
+      ],
+      "top_score": 0.9897499680519104,
+      "cascade_tier": 1,
+      "cascade_seconds": 6.134785175323486,
+      "cascade_rewrites": [
+        "view-file --no-edit"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e25.y1",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo1"
+      ],
+      "variant_kind": "typo1",
+      "question": "Which Org command is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org fiels?",
+      "answer": "\"\u2018M-x org-agenda\u2019\" is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org files. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9997289776802063,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.269816160202026,
+      "cascade_rewrites": [
+        "org-agenda-global-key",
+        "org-agenda-mode-global-map"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e25.y3",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Which Org comamnd is cknventionally bound to a global key so the agenda is reachable from any buffr, not just Org files?",
+      "answer": "\"\u2018M-x org-agenda\u2019\" is conventionally bound to a global key so the agenda is reachable from any buffer, not just Org files. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9992858171463013,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.514068603515625,
+      "cascade_rewrites": [
+        "org-agenda-global-key",
+        "org-agenda-access-from-any-buffer"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e28.y3",
+      "kind": "answerable",
+      "tags": [
+        "syntax",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "Whzt short filename prefix opens a loacl file with root permissions through TRMAP's sudo method?",
+      "answer": "\"/sudo::\" is the short filename prefix that opens a local file with root permissions through TRAMP's sudo method. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9766295552253723,
+      "cascade_tier": 1,
+      "cascade_seconds": 6.315744638442993,
+      "cascade_rewrites": [
+        "trmap -f localfile --sudo"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "eu03.y1",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo1"
+      ],
+      "variant_kind": "typo1",
+      "question": "How do I toggle the treeemacs sidebar to browse my project's file tree?",
+      "answer": "\"window-toggle-side-windows\" is the command that toggles side windows on a specified frame, which includes the tree sidebar [2] \"This command toggles side windows on the specified FRAME.\" However, the manual does not explicitly state that this command toggles the treeemacs sidebar for browsing file trees. Therefore, based on the provided extracts, the exact command to toggle the treeemacs sidebar is not directly specified. I don't know. \u2705 (No direct match for \"toggle treeemacs sidebar\" in the extracts) [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "ebrowse.emacs",
+        "elisp.emacs",
+        "eieio.emacs",
+        "ebrowse.emacs",
+        "ebrowse.emacs"
+      ],
+      "top_score": 0.9155426025390625,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.066941738128662,
+      "cascade_rewrites": [
+        "treeemacs-toggle-sidebar-visibility"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 2
+    },
+    {
+      "qid": "eu17.y3",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-typo3"
+      ],
+      "variant_kind": "typo3",
+      "question": "How do I scan a project for TODO cojments wuth magi-todos?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "todo-mode.emacs",
+        "org.emacs",
+        "todo-mode.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9890963435173035,
+      "cascade_tier": 2,
+      "cascade_seconds": 11.455411672592163,
+      "cascade_rewrites": [
+        "how to use magitodos to scan a project for TODO entries",
+        "magitodos command to locate and report TODO comments in source files"
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0
+    },
+    {
+      "qid": "a08.c",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-casual"
+      ],
+      "variant_kind": "casual",
+      "question": "i need to find whatever files got changed sometime in the last week - how do i filter for that?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "find.1",
+        "find.1",
+        "git-blame.1",
+        "find.1",
+        "find.1"
+      ],
+      "top_score": 0.9967392086982727,
+      "cascade_tier": 2,
+      "cascade_seconds": 14.792125463485718,
+      "cascade_rewrites": [
+        "find / -type f -mtime -7 -print 2>/dev/null",
+        "find / -type f -mtime -7 -exec ls -l {} \\; 2>/dev/null"
+      ],
+      "answer_raw": "\"File's status was last changed less than, more than or exactly n minutes ago.\" is not relevant to a week-long time frame. [2] \"File was last accessed less than, more than or exactly n*24 hours ago.\" \u2014 this applies to hours, not weeks. [5] \"A numeric argument n can be specified to tests... as +n for greater than n, -n for less than n, n for exactly n.\" \u2014 this is general syntax. [4] \"Search for files in your home directory which have been modified in the last twenty-four hours.\" \u2014 only 24 hours. No extract specifies a week or uses a time unit like \"week\" or \"7 days\". I don't know. \u2705 (No extract provides a direct or indirect method to find files changed in the last week.) [2]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 4,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a18.s",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-synonym"
+      ],
+      "variant_kind": "synonym",
+      "question": "How do I check whether I've run out of file-table entries rather than out of storage space?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "proc_sys_fs.5",
+        "df.1",
+        "df.1",
+        "debugfs.8",
+        "proc_sys_fs.5"
+      ],
+      "top_score": 0.6752731800079346,
+      "cascade_tier": 1,
+      "cascade_seconds": 10.102226257324219,
+      "cascade_rewrites": [
+        "man -k file-table-limit sysctl fs.file-max sysctl -a | grep file-table-entries man -k file-descriptor-limit sysctl fs.file-max man -k file-table-size procfs man -k file-table-entries sysctl -a | grep -i file-table man -k file-descriptor-count procfs man -k file-table-usage sysctl fs.file-max man -k file-table-entries procfs man -k file-table-entries sysctl fs.file-max"
+      ],
+      "answer_raw": "\"this file defines a system-wide limit on the number of open files for all processes. System calls that fail when encountering this limit fail with the error ENFILE.\" 1. The error ENFILE indicates a limit on open file descriptors (file-table entries), not storage space. To check for file-table exhaustion, monitor /proc/sys/fs/file-nr, which shows allocated file handles and free file handles. If the allocated value approaches the file-max limit, you've likely run out of file-table entries. 1. \"This (read-only) file contains three numbers: the number of allocated file handles (i.e., the number of open file descriptions; see open(2)); the number of free file handles\" [1]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a31.k",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "curl save file server name",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1",
+        "curl.1"
+      ],
+      "top_score": 0.997032642364502,
+      "cascade_tier": 2,
+      "cascade_seconds": 21.676106452941895,
+      "cascade_rewrites": [
+        "curl --output file server name",
+        "curl -o file server name"
+      ],
+      "answer_raw": "\"I don't know.\" \u2705 (No extract mentions saving a file with the server name.) \ud83d\udeab (No relevant quote found.) \ud83d\udeab (No mention of \"server name\" in any extract.) \ud83d\udeab (All extracts discuss filename extraction from URL or headers, not server name.) \ud83d\udeab (No support for the claim.) \ud83d\udeab (No extract contains a sentence about saving a file with the server name.) \ud83d\udeab (No such option or feature described.) \ud83d\udeab (No direct or indirect support.) \ud83d\udeab (Final answer: I don't know.) \u2705 (Correctly follows instruction: only if extract supports it.) \ud83d\udeab (No extract supports it.) \ud83d\udeab (No mention of server name.) \ud83d\udeab (No option saves file with server name.) \ud83d\udeab (No such feature exists in the extracts.) \ud83d\udeab (Final: I don't know.) \u2705 (Correct.) \ud83d\udeab (No evidence.) \ud83d\udeab (No support.) \ud83d\udeab (No mention.) \ud83d\udeab (No option.) \ud83d\udeab (No feature.) \ud83d\udeab (No extract supports it.) \ud83d\udeab (Final: I don't know.) \u2705 (Correct.) \ud83d\udeab (No support.) \ud83d\udeab (No mention.) \ud83d\udeab (No feature.) \ud83d\udeab (No option.) \ud83d\udeab (No extract supports it.) \ud83d\udeab (Final: I don't know.) \u2705 (Correct.) \ud83d\udeab (No evidence.) \ud83d\udeab (No support.) \ud83d\udeab (No mention.) \ud83d\udeab (No feature.) \ud83d\udeab (No option.) \ud83d\udeab (No extract supports it.) \ud83d\udeab (Final: I don't know.) \u2705 (Correct.) \ud83d\udeab (No support.) \ud83d\udeab (No mention.) \ud83d\udeab (No feature.) \ud83d\udeab (No option.) \ud83d\udeab (",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "a35.m",
+      "kind": "answerable",
+      "tags": [
+        "flag",
+        "variant-no-name"
+      ],
+      "variant_kind": "no-name",
+      "question": "how do I set a background service to start automatically every time the machine boots",
+      "answer": "\"To activate your service on boot, make sure to add a WantedBy=multi-user.target or WantedBy=graphical.target directive.\" 1. This directive ensures the service starts automatically during boot. The service must be installed and enabled via systemd, typically by creating a unit file and using systemctl enable service-name. The exact mechanism is described in systemd.service(5) where \"WantedBy=multi-user.target\" is used to activate a service on boot. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "daemon.7",
+        "systemd.service.5",
+        "systemd.timer.5",
+        "daemon.7",
+        "systemd.service.5"
+      ],
+      "top_score": 0.9413040280342102,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.09322190284729,
+      "cascade_rewrites": [
+        "what is the correct way to configure a background service to start at boot time in systemd?"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "c12.k",
+      "kind": "answerable",
+      "tags": [
+        "config",
+        "cross-page",
+        "exact-token",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "systemd cap total memory usage",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5",
+        "systemd.resource-control.5"
+      ],
+      "top_score": 0.9967824220657349,
+      "cascade_tier": 2,
+      "cascade_seconds": 10.191819906234741,
+      "cascade_rewrites": [
+        "systemd-caps total-memory-usage",
+        "systemd memory-usage cap"
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "u07.k",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "gdb set breakpoint",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "idlwave.emacs"
+      ],
+      "top_score": 0.9856454730033875,
+      "cascade_tier": 2,
+      "cascade_seconds": 8.162427425384521,
+      "cascade_rewrites": [
+        "gdb breakpoint set",
+        "gdb set breakpoint"
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0
+    },
+    {
+      "qid": "e02.s",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-synonym"
+      ],
+      "variant_kind": "synonym",
+      "question": "Which command shuts down the document I currently have open, releasing the memory it was taking up?",
+      "answer": "\"\u2018C-x k\u2019 (\u2018kill-buffer\u2019) kills one buffer, whose name you specify in the minibuffer. The default, used if you type just <RET> in the minibuffer, is to kill the current buffer.\" 1,4.  [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "intro.1",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9701173901557922,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.336923122406006,
+      "cascade_rewrites": [
+        "kill-buffer RET"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e02.m",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-no-name"
+      ],
+      "variant_kind": "no-name",
+      "question": "How do I close the file I'm currently looking at so it stops using up memory?",
+      "answer": "\"kill-buffer\" kills the buffer visiting the file, freeing all its memory for other uses or to be returned to the operating system [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "less.1",
+        "pager.1",
+        "pager.1"
+      ],
+      "top_score": 0.8404791355133057,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.475858211517334,
+      "cascade_rewrites": [
+        "close current file buffer\tquit current file buffer\tkill current file buffer\tdestroy current file buffer\tterminate current file buffer\terase current file buffer\tkill current buffer\tdestroy current buffer\tquit current buffer\tkill current file\tkill current buffer contents"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e05.c",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-casual"
+      ],
+      "variant_kind": "casual",
+      "question": "I've got a word I want to blanket-swap for another word everywhere it shows up from my cursor onward, and I don't want to be asked to confirm each one - what's the command for that?",
+      "answer": "\"y or Y to accept the change, and n or N to ignore it and go to the next match.\"  This indicates that using 'Y' accepts the change without confirmation, and thus, to blanket-swap without confirmation, the command is 'Y' [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "xedit.1",
+        "bash.1",
+        "editline.7edit",
+        "editline.7edit"
+      ],
+      "top_score": 0.9769088625907898,
+      "cascade_tier": 0,
+      "cascade_seconds": 0.0,
+      "cascade_rewrites": [],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e06.s",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-synonym"
+      ],
+      "variant_kind": "synonym",
+      "question": "Which command walks through each hit of a search pattern one by one and checks with me before swapping it out?",
+      "answer": "\"C-x p r\" (\u2018project-query-replace-regexp\u2019) is similar to \u2018project-search\u2019, but it prompts you for whether to replace each match [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "pager.1",
+        "bzmore.1",
+        "less.1"
+      ],
+      "top_score": 0.6731982231140137,
+      "cascade_tier": 2,
+      "cascade_seconds": 15.133960008621216,
+      "cascade_rewrites": [
+        "man grep -o",
+        "emacs -batch -eval \"(setq search-case-fold-search t)\""
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e07.k",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "copy selection keep text clipboard",
+      "answer": "\"Specifies whether xterm will reuse the selection data which it copied to the clipboard rather than asking the clipboard for its current contents when told to provide the selection. The default is \u201cfalse\u201d.\" 2. This corresponds to the keepClipboard resource. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "xterm.1",
+        "xterm.1",
+        "xcutsel.1",
+        "elisp.emacs",
+        "xclipboard.1"
+      ],
+      "top_score": 0.98423171043396,
+      "cascade_tier": 2,
+      "cascade_seconds": 8.759670972824097,
+      "cascade_rewrites": [
+        "copy-selection --keep-text-clipboard",
+        "copy-selection keep-text-clipboard"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e17.c",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-casual"
+      ],
+      "variant_kind": "casual",
+      "question": "instead of clicking through the whole settings menu tree, I just want to jump straight to the options for one specific category - is there a command for that?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "gnome-control-center.1",
+        "xdg-desktop-menu.1",
+        "nvidia-settings.1",
+        "gpgconf.1",
+        "gnome-control-center.1"
+      ],
+      "top_score": 0.9616759419441223,
+      "cascade_tier": 2,
+      "cascade_seconds": 16.611101627349854,
+      "cascade_rewrites": [
+        "man -k \"jump to category settings\"",
+        "emacs --help | grep \"category-specific options\""
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e18.m",
+      "kind": "answerable",
+      "tags": [
+        "path",
+        "variant-no-name"
+      ],
+      "variant_kind": "no-name",
+      "question": "What's the one filename the documentation uses for short whenever it mentions the file that configures how the editor starts up?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "efaq.emacs",
+        "xedit.1",
+        "emacs.emacs",
+        "nanorc.5",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9719387292861938,
+      "cascade_tier": 1,
+      "cascade_seconds": 7.588320732116699,
+      "cascade_rewrites": [
+        "emacs-init-file"
+      ],
+      "answer_raw": "\"\u2018~/.emacs\u2019\" 3. This is the filename explicitly mentioned as the traditional init file in multiple extracts, including [3] \"Traditionally, file \u2018~/.emacs\u2019 is used as the init file...\" and [5] \"When you start Emacs, it loads your \u2018.emacs\u2019 file unless you tell it not to...\" The term \"short\" is supported by the context of the documentation using this filename as a shorthand. [3]",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 3,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e19.c",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-casual"
+      ],
+      "variant_kind": "casual",
+      "question": "I want to see the full writeup on whatever mode this file is currently in - what keys it changes and all that - is there a command that shows me that?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "calc.emacs"
+      ],
+      "top_score": 0.9966834187507629,
+      "cascade_tier": 1,
+      "cascade_seconds": 12.46989107131958,
+      "cascade_rewrites": [
+        "describe-mode-commands current-mode-name"
+      ],
+      "answer_raw": "\"Display documentation of the current major mode and minor modes (\u2018describe-mode\u2019).\" 2.0.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e22.s",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-synonym"
+      ],
+      "variant_kind": "synonym",
+      "question": "Which command launches the built-in hands-on lesson for learning the editor?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.1",
+        "emacs.emacs.1",
+        "emacs-pgtk.1",
+        "mh-e.emacs",
+        "bash-builtins.7"
+      ],
+      "top_score": 0.7065092921257019,
+      "cascade_tier": 2,
+      "cascade_seconds": 13.611482381820679,
+      "cascade_rewrites": [
+        "emacs --help",
+        "emacs -l hands-on"
+      ],
+      "quote_verified": false,
+      "quote_failed": false,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e26.m",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-no-name"
+      ],
+      "variant_kind": "no-name",
+      "question": "How do I get a menu of choices for turning the note file I'm working on into a different kind of document, like PDF or HTML?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "pdftohtml.1",
+        "pdftohtml.1",
+        "org.emacs"
+      ],
+      "top_score": 0.9759531617164612,
+      "cascade_tier": 1,
+      "cascade_seconds": 13.370679140090942,
+      "cascade_rewrites": [
+        "what are the available output formats for converting a note file to pdf or html in emacs org-mode?"
+      ],
+      "answer_raw": "\"To export the current buffer, type \u2018C-c C-e\u2019 (\u2018org-export-dispatch\u2019) anywhere in an Org buffer. This command prompts for an export format; currently supported formats include HTML, LaTeX, Texinfo, OpenDocument (\u2018.odt\u2019), iCalendar, Markdown, man-page, and PDF.\" 1.5.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.1.",
+      "quote_verified": false,
+      "quote_failed": true,
+      "n_quotes": 0,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e28.k",
+      "kind": "answerable",
+      "tags": [
+        "syntax",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tramp sudo prefix root file",
+      "answer": "\"tramp-revert-buffer-with-sudo\u2019 shows an alternate buffer. It defaults to \u2018sudo\u2019, other valid methods are \u2018su\u2019, \u2018doas\u2019, \u2018run0\u2019, and \u2018ksu\u2019.\" 2. This indicates that the 'sudo' method in TRAMP uses 'root' as the default user, and the prefix for the file when using 'sudo' would involve the user 'root'. However, the exact prefix string is not explicitly stated in the provided extracts. The closest relevant statement is: \"These methods apply the user \u2018root\u2019 as default.\" [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9997401833534241,
+      "cascade_tier": 0,
+      "cascade_seconds": 0.0,
+      "cascade_rewrites": [],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "e29.s",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-synonym"
+      ],
+      "variant_kind": "synonym",
+      "question": "What function do I hang on a mode's hook so the language-server client kicks in automatically for every file in that mode?",
+      "answer": "\"The function \u2018eglot-ensure\u2019 will start an Eglot session for each buffer in which \u2018foo-mode\u2019 is turned on, if there isn't already an Eglot session that handles the buffer.\" 2. This indicates that \u2018eglot-ensure\u2019 is used to initiate the language-server client automatically for files in a given mode. However, the exact function to hang on a mode's hook for automatic language-server client activation is not explicitly named in the provided extracts. The closest relevant function mentioned is 'eglot-ensure', which is used in conjunction with mode activation. Since the question asks for a function to hang on a mode's hook, and 'eglot-ensure' is the only one described as starting sessions for buffers in a mode, it is the best match. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.9985199570655823,
+      "cascade_tier": 1,
+      "cascade_seconds": 8.433929920196533,
+      "cascade_rewrites": [
+        "add-hook 'language-server-activate-hook' 'language-server-client-start' nil t"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "e42.k",
+      "kind": "answerable",
+      "tags": [
+        "command",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "open file guess from cursor text",
+      "answer": "\"S-mouse-3\" 'ffap-at-mouse' finds the file guessed from text around the position of a mouse click. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "pico.1",
+        "nano.1",
+        "editor.1",
+        "ccmode.emacs"
+      ],
+      "top_score": 0.9771232604980469,
+      "cascade_tier": 1,
+      "cascade_seconds": 5.5625855922698975,
+      "cascade_rewrites": [
+        "open-file-at-cursor-guess-text"
+      ],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "eu07.k",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed",
+        "variant-terse"
+      ],
+      "variant_kind": "terse",
+      "question": "tempel expand snippet cursor",
+      "answer": "\"\u2018M-x hippie-expand\u2019 is a single command providing a variety of completions and expansions. Called repeatedly, it tries all possible completions in succession.\" 2. This describes a feature related to expansion and cursor behavior in Emacs, matching the query about a template expand snippet with cursor interaction. The exact term \"tempel\" is not found, but \"Hippie Expand\" is the closest relevant feature. The manual refers to \"hippie-expand-try-functions-list\" for customization, which governs the order and type of expansions tried. Thus, the closest relevant extract is: \"\u2018M-x hippie-expand\u2019 is a single command providing a variety of completions and expansions. Called repeatedly, it tries all possible completions in succession.\" [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "xterm.1",
+        "autotype.emacs",
+        "xterm.1",
+        "xterm.1",
+        "speedbar.emacs"
+      ],
+      "top_score": 0.8460846543312073,
+      "cascade_tier": 0,
+      "cascade_seconds": 0.0,
+      "cascade_rewrites": [],
+      "quote_verified": true,
+      "quote_failed": false,
+      "n_quotes": 1
+    }
+  ]
+}

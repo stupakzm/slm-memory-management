@@ -95,6 +95,16 @@ The user authorised running this part by part, including commits and merges, wit
 (2026-09-27). Not covered: pushing to the remote, and ORCH's mandatory checkpoints (those
 still stop and ask).
 
+## Status 2026-09-29: plan complete
+
+Every item below is done or closed. Results and verdicts are in `docs/phase11-results.md` ("Phase 11
+closing"). Shipped: `asq --rewrites 0`. Not shipped, with their measured reasons: R8 (question
+vectors; +12 net, no side cost, misses significance by one row and latency by 0.28 s), R6 (quote;
+−258), R5b (adaptive depth; −4), R4a″ (English-only spelling; renames 4/160). Found: deterministic
+eval serving (setting C). Closed without a run: the term-menu arm (dominated on latency by R8).
+Natural next arm: a cheaper R8 (smaller question route, or replace rather than add candidates) on a
+pool with more target rows, generated under setting C.
+
 ## Next session: task list (written 2026-09-29, after R4a-R5, R4d and the term-menu check)
 
 Where things stand: every R4/R5 arm is run and written in `docs/phase11-results.md` (summary table
