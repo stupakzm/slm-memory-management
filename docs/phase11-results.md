@@ -810,3 +810,78 @@ after the Emacs arm passes, under their own pre-registration.
 - 3 questions per 1,000-character chunk may be too few for chunks that document several commands.
   Coverage is reported (share of chunks where a v2 card term appears in the chunk text but none of the
   chunk's questions retrieves the chunk in its top 5). It is not tuned against the eval.
+
+## Deterministic serving check, and a regenerated control (written 2026-09-29, before any run)
+
+**Why.** Identical reader input does not always give an identical answer: 1/40 answers were reworded
+in a byte-identity check, and R4d had 9 tier-0 answer/refuse flips on unchanged input. Every paired
+test above therefore carries a noise floor, charged to whichever arm happened to regenerate a row.
+
+**Check.** The first 40 rows of the seed-11 pool sample, generation only from R3's cached retrieval
+(`--stage generate --cache p11-pool`), 3 runs per serving setting:
+- A: today's generator (4 slots, prompt cache on);
+- B: `--parallel 1`.
+If B is not byte-identical on 40/40 across its 3 runs, C (B with prompt caching off) is tried the
+same way. The first setting that gives 40/40 identical answers in all 3 runs is **deterministic**.
+
+**Use.** Every generation run after this check, today, uses the deterministic setting, and so does a
+**regenerated control**: all 1,160 pool rows from R3's cached retrieval (`p11-pool-r3d`). This
+amends the R6 and R8 pre-registrations before either has run: their paired control becomes
+`p11-pool-r3d` instead of `p11-pool-answers.json`, so arm and control are generated under the same
+serving and the comparison measures the arm, not the server. For R8, rows whose reader input did
+not change still take the control's answer (identical by construction under deterministic
+serving). R3's original numbers stay as reported. If no setting is deterministic, the amendment is
+void and R6/R8 run exactly as first registered.
+
+## R4a″ pre-registration: spelling correction into ordinary English words only (written 2026-09-29, before the build and any run)
+
+**Why.** R4a recovered 27 typo answers but renamed 11/160 clean questions, turning names the corpus
+has never seen into names it has (`nmap`→`mmap`, `elpy`→`elpa`, `projectile`→`projectfile`). R4a′
+(the 4B corrects) recovered 29 and reworded 6/160 clean questions. Both failed rule 2. A rename
+always ends in a technical name. A real typo of an everyday word ends in an everyday word.
+
+**Mechanism.** R4a's normaliser unchanged (same distance limits, tie rules, vocabulary and token
+exclusions), with two restrictions using an English wordlist (`/usr/share/dict/american-english`,
+lowercased, entries with apostrophes dropped):
+1. a question word that is itself an English word is never changed;
+2. a correction is applied only if its target is an English word (and, as before, in the index
+   vocabulary).
+Typos in tool names (`tsr` for `tar`) are therefore **not** repaired. That is the price, stated now.
+
+**Arm.** R3's configuration plus the new mode. Only rows whose normalised question differs from the
+original are run (retrieval and generation). All other rows are identical inputs and take the
+control's result. The row list is fixed by a CPU pre-pass before any GPU run, and reported.
+
+**Decision rule:** R4a's four rules, unchanged.
+1. typo1 + typo3 paired correctness net ≥ +10, McNemar p < 0.05.
+2. The normaliser changes ≤ 3 of the 160 clean base questions, and clean correctness net ≥ −1.
+3. Abstention over unanswerable rows does not fall by 2 or more.
+4. Adds < 10 ms per question.
+Failing 2 or 3 means no ship, whatever 1 says. Rule 2's first half is known from the pre-pass. If it
+fails there, the GPU arm is not run.
+
+## R5b pre-registration: adaptive rerank depth — 20 first, 50 only when the gate would refuse (written 2026-09-29, before any run)
+
+**Why.** R5 cut retrieval p50 by 58 % with 20 candidates but lost 11 answers, 13 of them no-name
+(questions that need dense ranks 21-50). R5 suggested the cascade shape: stay shallow when the
+shallow pass is confident.
+
+**Mechanism.** Rerank dense top-20. If the reranked top-1 is below the gate (0.65), also rerank
+dense candidates 21-50 and merge. The cross-encoder scores each pair independently, so the merged
+list is exactly R3's 50-candidate list. The threshold is the gate and is not tuned: a deeper pass
+is spent exactly where the shallow one would refuse.
+
+**Evaluation, offline and exact.** Both depths are already cached for all 1,160 rows, in the same
+profile (R3 = 50, R5 = 20). Per row: if R5's cached top-1 ≥ 0.65, the arm's reader input is R5's
+top-5, otherwise R3's. The answer is the one already generated for that exact reader input: R3's
+where the input equals R3's, R5's otherwise. No new retrieval or generation. Latency is measured,
+not estimated: the fixed seed-11 100-row sample, run end to end in retrieval at 50 and adaptive,
+interleaved twice after a warm-up, in R5's profile.
+
+**Decision rule:** R5's four, unchanged (non-inferiority against R3):
+1. paired correctness over all answerable rows net ≥ −2;
+2. paired evidence@5 net ≥ −3;
+3. abstention does not fall by 2 or more;
+4. retrieval p50 falls by ≥ 30 %.
+Reported alongside: the escalation rate, and losses by qid. A sweep of the threshold is reported
+as a diagnostic only. It is chosen on the same rows, so it cannot ship.
