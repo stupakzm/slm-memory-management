@@ -729,3 +729,84 @@ What remains unshown is whether the 4B picks the right term from a 30-item menu,
 searching with it rescues answers. That is the pre-registered arm, not this check. The bar also
 still misses what no card can hold: e18 (`~/.emacs.d/init.el`) and e02 (`kill-buffer`, rank 28 or
 none).
+
+## R8 pre-registration: document expansion — plain-English questions as extra index vectors (written 2026-09-29, before the build and any run)
+
+**Why.** Every R4 arm that works at query time either rewrote good questions into worse ones
+(R4b: −41 to −47) or gave refused questions more chances to invent (R4d: abstention −6, p50 +11.8 s).
+The term-menu check found the gap is in the vocabulary: a question in a user's words does not embed
+near the manual's words. v3 closed part of it offline. 4B-written user-style questions put the right
+term in the top 30 for 13/22 held-out rows, against 45 % for manual-text cards. R8 moves that to
+where it costs nothing at query time: into the index. Nothing is rewritten, the model does not run
+before retrieval, and the reader and the gate see exactly what they see today.
+
+**Mechanism (build).**
+- **Offline, Emacs chunks only (19,046).** For each chunk, the 4B writes **3** questions a user might
+  ask when they want what the chunk says but do not know its names. The prompt is v3's system prompt
+  adapted from "one manual entry" to "one manual passage". It uses temperature 0, `max_tokens` 120, and 4
+  parallel slots, and is resumable. Each question is embedded **separately, document side** (as in v3)
+  and stored as its own vector that points at its chunk. The vectors go in new tables (`qvec`,
+  `chunk_questions`) in a **copy** of `phase11.db` (`phase11-qx.db`). `phase11.db` is not touched.
+  Man-page chunks get no questions in R8.
+- **Retrieval (`--question-vectors M`, default 0 = today's path, byte-for-byte).** Dense top-50 over
+  chunks, as today. In addition, the top **M = 30** question vectors by cosine similarity to the
+  question, mapped to their chunks, deduplicated, and **added** to the 50. The union (50 to 80
+  chunks) is reranked **against the original question**, the top 5 are kept, and the gate reads that
+  top-1 at 0.65, unchanged. A question vector can only bring a chunk into the pool. It never ranks
+  anything, so the gate keeps its calibrated meaning (same argument as R4d's widening).
+- No domain filter, as in R3. Man-page questions can therefore receive Emacs chunks through the
+  question vectors, and that is what the man-page rows guard against.
+
+**Rows and runs.** All 1,160 pool rows, in R3's configuration plus `--question-vectors 30`.
+Retrieval is run for every row. The reader is run **only for rows whose reader input changed**: a
+different top-5, or a different gate decision, compared with R3's cached retrieval
+(`p11-pool-retrieved.json`). Every other row carries R3's answer unchanged. The inputs there are
+identical, and re-generating them would only add server nondeterminism (1/40 reworded on identical
+input, and 9 tier-0 flips in R4d) to a paired test. Counted and reported: rows whose top-5 changed,
+split by domain, and how many of those had a question-routed chunk in their top 5.
+
+**Metrics.** These are paired per row against R3's control (`p11-pool-answers.json`), with the
+`r4b_compare.py` table:
+- correctness (aliased) and evidence@5 per kind, per domain
+- abstention on unanswerable rows
+- retrieval wall time per question, on a fixed sample of 100 pool rows (seed 11): with and without
+  `--question-vectors 30`, on the same servers one after the other, after a warm-up
+
+**Decision rule.** Question vectors ship, meaning `asq`'s index gains the Emacs question vectors and
+`ask.py` defaults to `--question-vectors 30`, only if all five hold:
+1. **Recovers answers where it was built to:** on Emacs no-name + synonym answerable rows (88; R3:
+   42 correct, 34 without evidence), paired correctness net ≥ +5 **and** McNemar p < 0.05.
+2. **Clean text unharmed:** clean answerable rows, both domains (132), paired net ≥ −1.
+3. **Nothing else pays for it:** all other answerable rows (751), paired net ≥ −2 (the same margin as
+   R5 and R6).
+4. **No new invention:** abstention over all 277 unanswerable rows does not fall by 2 or more.
+5. **Affordable:** retrieval p50 rises by ≤ 1.5 s per question. Offline generation cost is reported
+   but is not a rule, because it is paid once.
+
+Failing 4 means no ship, whatever 1 says. If 1 fails and 2-5 hold, the result is reported as null and
+nothing ships. Question vectors for man pages (56,567 chunks, about 5 h of generation) are built only
+after the Emacs arm passes, under their own pre-registration.
+
+**Diagnostics, reported but not rules:**
+- *Pool recall:* for answerable rows, is a gold chunk in the candidate pool at all? Reported for the
+  chunk route alone (R3's pool), the question route alone, and their union, split by kind and domain.
+  This separates "the question vectors found it" from "the reranker kept it".
+- *Leakage check:* the pool's variants were written by a model against the gold sections, and so were
+  these questions. The generated questions can therefore resemble the eval's wordings more than real
+  users' questions would. For every target-row gain, the nearest generated question (by token
+  Jaccard) to that row's wording is reported. Gains whose question-routed chunk came through a
+  generated question with Jaccard ≥ 0.8 to the pool row are counted separately. If rule 1 passes
+  **only** because of those gains, the verdict is "not shown".
+- The term-menu hard cases are listed row by row: e02 (`kill-buffer`), e03.m
+  (`delete-other-windows`, the one test-half row v3 lost against v1) and e18 (`init.el`).
+
+**Known limits, stated before the run.**
+- n = 88 target pairs. A McNemar test at this size needs about 6 net gains with no losses to reach
+  p < 0.05.
+- Emacs only. Nothing here is a claim about man pages, whose vocabulary gap (R3: linux no-name 45/72,
+  synonym 40/72) is different in kind: tool names there are short and are not in everyday words.
+- The questions are written by the 4B, which is also the reader. It is not a stronger model, so a
+  question it cannot phrase well is a real miss, not an artifact.
+- 3 questions per 1,000-character chunk may be too few for chunks that document several commands.
+  Coverage is reported (share of chunks where a v2 card term appears in the chunk text but none of the
+  chunk's questions retrieves the chunk in its top 5). It is not tuned against the eval.
