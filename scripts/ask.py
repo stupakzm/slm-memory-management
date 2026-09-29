@@ -125,6 +125,11 @@ def main() -> int:
                          "ignored under --cascade). Default off reproduces today's "
                          "behaviour exactly; a no-op under --retrieve-only, which "
                          "stays generator-free.")
+    ap.add_argument("--question-vectors", type=int, default=0,
+                    help="phase 11 R8: add the chunks of the M nearest generated-"
+                         "question vectors to the candidate pool (needs an index built "
+                         "by scripts/build_qvec.py). 0 (default) reproduces today's "
+                         "behaviour exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
     if args.rewrites is None:
@@ -178,8 +183,13 @@ def main() -> int:
             return 2
 
     db = store.connect(ROOT / args.db)
+    if args.question_vectors > 0 and not store.has_qvec(db):
+        print(f"{args.db} has no question vectors: build them with scripts/build_qvec.py",
+              file=sys.stderr)
+        return 2
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
-                  candidates=args.candidates, domain=args.domain)
+                  candidates=args.candidates, domain=args.domain,
+                  question_vectors=args.question_vectors)
 
     if args.cascade and not args.retrieve_only:
         # --retrieve-only stays generator-free (module docstring); --cascade
