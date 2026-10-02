@@ -128,3 +128,35 @@ phase 12's +7 on the realistic set at pool scale.
 Frozen outputs (committed): `p13-{ctl,oracle,r9}-answers.json` (sha256 `cd04ee56…`, `667cb943…`,
 `c77a8d09…`) and `p13-r9-routes.json` (`08f28984…`). Noise: setting C generation 0/40. Retrieval
 reorders about 1/50 rows between identical runs (drift check above), well inside these margins.
+
+## R10 pre-registration: per-domain candidate quotas (2026-10-03, before any code or run)
+
+**Hypothesis.** The oracle's +40 comes mostly from giving each domain's passages a fair share of the 50
+rerank slots. The man pages are 75 % of the index, and an open dense pool crowds Emacs out. If so, the
+fix needs no routing decision. Search every domain separately, give each an equal share of the
+candidates, and let the reranker choose among all of them. A quota cannot misroute, so it cannot
+reproduce R9's −31.
+
+**Arm `p13-quota`:** `--route quota`. For the index's domains (`store.domains`, sorted by name), each
+gets `n // D` candidates, with the remainder going one each to the first domains in that order. For 50
+candidates and 2 domains that is 25 + 25. Each comes from its own domain-filtered dense search, and the
+union of 50 is reranked as usual to k = 5. The gate is unchanged (0.65 on the reranked top-1). No knob
+is tuned: an equal split is the only split that does not presume which domain a question belongs to.
+
+**Rule: R9's four, unchanged, paired against `p13-ctl`.** R10 ships as `asq`'s default
+(`--route quota`) only if all of these hold:
+1. Emacs answerable (324): net ≥ +5 and p < 0.05.
+2. Man answerable (559): net ≥ −2.
+3. Abstention (277): net ≥ −1.
+4. Retrieval s/q ≤ the oracle's 3.58 + 0.5 = 4.08.
+
+Shipping means a code task that changes the default, left on a branch for the user to merge. It is
+never merged unattended.
+
+**Reported, not rules:**
+- Recovery fraction against the oracle: (R10 net) ÷ (oracle net), per domain.
+- The realistic Emacs set (100 rows, phase 12 labels): `p13-quota-real`, paired against open
+  `p12-ctl` and the domain-known `p12b-ctl`. This shows whether the effect holds where askers do not
+  name Emacs.
+- Unanswerable rows: the reranker now sees 25 candidates from a domain the question may have nothing to
+  do with. If abstention falls, this is where it shows.
