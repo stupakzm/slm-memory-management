@@ -1019,10 +1019,32 @@
         "line": "\u2018C-x r t STRING <RET>\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "string-insert-rectangle",
+        "line": "\u2018M-x string-insert-rectangle <RET> STRING <RET>\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#rectangles"
       }
     ]
   },
-  "er08": {},
+  "er08": {
+    "count-words": [
+      {
+        "alias": "count-words-region",
+        "line": "\u2018M-=\u2019 (\u2018count-words-region\u2019) displays a message reporting the number",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#position-info"
+      },
+      {
+        "alias": "M-=",
+        "line": "\u2018M-=\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#position-info",
+        "via": "count-words-region"
+      }
+    ]
+  },
   "er09": {
     "narrow-to-region": [
       {
@@ -1034,7 +1056,16 @@
     ]
   },
   "er10": {},
-  "er11": {},
+  "er11": {
+    "global-auto-revert-mode": [
+      {
+        "alias": "auto-revert-mode",
+        "line": "enable Auto Revert mode by typing \u2018M-x auto-revert-mode\u2019.  This",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#auto-revert"
+      }
+    ]
+  },
   "er12": {},
   "er13": {},
   "er14": {
@@ -1085,7 +1116,28 @@
       }
     ]
   },
-  "er17": {},
+  "er17": {
+    "text-scale-adjust": [
+      {
+        "alias": "text-scale-increase",
+        "line": "The commands \u2018text-scale-increase\u2019 and \u2018text-scale-decrease\u2019 increase",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      },
+      {
+        "alias": "C-x C-+",
+        "line": "type \u2018C-x C-+\u2019 or \u2018C-x C-=\u2019.  To decrease it, type \u2018C-x C--\u2019.  To",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      },
+      {
+        "alias": "C-x C-=",
+        "line": "type \u2018C-x C-+\u2019 or \u2018C-x C-=\u2019.  To decrease it, type \u2018C-x C--\u2019.  To",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      }
+    ]
+  },
   "er18": {},
   "er19": {},
   "er20": {},
@@ -1099,7 +1151,16 @@
       }
     ]
   },
-  "er22": {},
+  "er22": {
+    "quick-calc": [
+      {
+        "alias": "C-x * q",
+        "line": "make one or two quick calculations.  Type \u2018C-x * q\u2019 (or \u2018M-x",
+        "rule": "alternative",
+        "sec_id": "calc.emacs#quick-calculator"
+      }
+    ]
+  },
   "er23": {
     "org-table-create-or-convert-from-region": [
       {
@@ -1134,13 +1195,53 @@
         "line": "\u2018C-x C-q\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#misc-buffer"
+      },
+      {
+        "alias": "find-file-read-only",
+        "line": "(\u2018find-file-read-only\u2019) instead of \u2018C-x C-f\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#visiting"
+      },
+      {
+        "alias": "C-x C-r",
+        "line": "\u2018C-x C-r\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#visiting",
+        "via": "find-file-read-only"
       }
     ]
   },
   "er27": {},
-  "er28": {},
-  "er29": {},
-  "er30": {},
+  "er28": {
+    "rename-buffer": [
+      {
+        "alias": "C-x x r",
+        "line": "\u2018C-x x r\u2019 (\u2018rename-buffer\u2019 changes the name of the current buffer.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#misc-buffer"
+      }
+    ]
+  },
+  "er29": {
+    "rgrep": [
+      {
+        "alias": "grep-find",
+        "line": "\u2018M-x grep-find\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#grep-searching"
+      }
+    ]
+  },
+  "er30": {
+    "flush-lines": [
+      {
+        "alias": "kill-matching-lines",
+        "line": "\u2018M-x kill-matching-lines\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#other-repeating-search"
+      }
+    ]
+  },
   "er31": {},
   "er32": {},
   "er33": {},
@@ -1160,7 +1261,16 @@
       }
     ]
   },
-  "er35": {},
+  "er35": {
+    "show-paren-mode": [
+      {
+        "alias": "show-paren-local-mode",
+        "line": "current buffer, type \u2018M-x show-paren-local-mode\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#matching"
+      }
+    ]
+  },
   "er36": {},
   "er37": {},
   "er38": {},
@@ -1170,6 +1280,12 @@
         "alias": "C-x v =",
         "line": "\u2018C-x v =\u2019",
         "rule": "keybinding",
+        "sec_id": "emacs.emacs#old-revisions"
+      },
+      {
+        "alias": "vc-ediff",
+        "line": "\u2018M-x vc-ediff\u2019 works like \u2018C-x v =\u2019, except that it uses an Ediff",
+        "rule": "alternative",
         "sec_id": "emacs.emacs#old-revisions"
       }
     ]
@@ -1196,7 +1312,16 @@
   },
   "er42": {},
   "er43": {},
-  "er44": {},
+  "er44": {
+    "eglot-format": [
+      {
+        "alias": "eglot-format-buffer",
+        "line": "\u2018M-x eglot-format-buffer\u2019",
+        "rule": "alternative",
+        "sec_id": "eglot.emacs#eglot-commands"
+      }
+    ]
+  },
   "er45": {},
   "er46": {
     "balance-windows": [
@@ -1255,6 +1380,12 @@
         "line": "\u2018M-z CHAR\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#other-kill-commands"
+      },
+      {
+        "alias": "zap-up-to-char",
+        "line": "\u2018M-x zap-up-to-char CHAR\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#other-kill-commands"
       }
     ]
   },
@@ -1274,7 +1405,23 @@
       }
     ]
   },
-  "er53": {},
+  "er53": {
+    "just-one-space": [
+      {
+        "alias": "cycle-spacing",
+        "line": "The command \u2018cycle-spacing\u2019 (\u2018M-<SPC>\u2019) acts like a more flexible",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#deletion"
+      },
+      {
+        "alias": "M-<SPC>",
+        "line": "\u2018M-<SPC>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#deletion",
+        "via": "cycle-spacing"
+      }
+    ]
+  },
   "er54": {
     "vc-create-tag": [
       {
@@ -1309,11 +1456,26 @@
         "line": "\u2018C-c $\u2019 (\u2018org-archive-subtree\u2019)",
         "rule": "keybinding",
         "sec_id": "org.emacs#moving-subtrees"
+      },
+      {
+        "alias": "C-c C-x C-s",
+        "line": "\u2018C-c C-x C-s\u2019 or short \u2018C-c $\u2019 (\u2018org-archive-subtree\u2019)",
+        "rule": "alternative",
+        "sec_id": "org.emacs#moving-subtrees"
       }
     ]
   },
   "er58": {},
-  "er59": {},
+  "er59": {
+    "list-holidays": [
+      {
+        "alias": "holiday-list",
+        "line": "The command \u2018M-x holiday-list\u2019 displays the list of holidays for a",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#holidays"
+      }
+    ]
+  },
   "er60": {},
   "er61": {
     "highlight-regexp": [
@@ -1328,6 +1490,26 @@
         "line": "\u2018C-x w h REGEXP <RET> FACE <RET>\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "highlight-phrase",
+        "line": "Highlight matches of PHRASE, using face FACE (\u2018highlight-phrase\u2019).",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "M-s h p",
+        "line": "\u2018M-s h p PHRASE <RET> FACE <RET>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#highlight-interactively",
+        "via": "highlight-phrase"
+      },
+      {
+        "alias": "C-x w p",
+        "line": "\u2018C-x w p PHRASE <RET> FACE <RET>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#highlight-interactively",
+        "via": "highlight-phrase"
       }
     ]
   },
@@ -1338,6 +1520,12 @@
         "line": "\u2018C-x <TAB>\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#indentation-commands"
+      },
+      {
+        "alias": "indent-code-rigidly",
+        "line": "\u2018M-x indent-code-rigidly\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#multi-line-indent"
       }
     ]
   },
@@ -1348,6 +1536,19 @@
         "line": "\u2018C-x r k\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "delete-rectangle",
+        "line": "(\u2018delete-rectangle\u2019) to delete the text outright, or \u2018C-x r k\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "C-x r d",
+        "line": "\u2018C-x r d\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#rectangles",
+        "via": "delete-rectangle"
       }
     ]
   },
@@ -1364,6 +1565,25 @@
         "line": "\u2018M-;\u2019",
         "rule": "keybinding",
         "sec_id": "emacs.emacs#fortran-comments"
+      },
+      {
+        "alias": "comment-region",
+        "line": "\u2018M-x comment-region\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "comment-line",
+        "line": "Comment or uncomment the current line (\u2018comment-line\u2019).  If the",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "C-x C-;",
+        "line": "\u2018C-x C-;\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#comment-commands",
+        "via": "comment-line"
       }
     ]
   },
@@ -1382,8 +1602,26 @@
   "er68": {},
   "er69": {},
   "er70": {},
-  "er71": {},
-  "er72": {},
+  "er71": {
+    "c-set-style": [
+      {
+        "alias": "C-c .",
+        "line": "To set a buffer's style interactively, use the command \u2018C-c .\u2019 (*note",
+        "rule": "alternative",
+        "sec_id": "ccmode.emacs#choosing-a-style"
+      }
+    ]
+  },
+  "er72": {
+    "electric-pair-mode": [
+      {
+        "alias": "electric-pair-local-mode",
+        "line": "toggle the mode in a single buffer, use \u2018M-x electric-pair-local-mode\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#matching"
+      }
+    ]
+  },
   "er73": {},
   "er74": {
     "vc-region-history": [

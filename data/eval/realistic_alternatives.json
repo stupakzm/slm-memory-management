@@ -1,0 +1,279 @@
+{
+  "er01": [],
+  "er02": [],
+  "er03": [],
+  "er04": [],
+  "er05": [],
+  "er06": [],
+  "er07": [
+    {
+      "alias": "string-insert-rectangle",
+      "line": "‘M-x string-insert-rectangle <RET> STRING <RET>’",
+      "sec_id": "emacs.emacs#rectangles",
+      "token": "string-rectangle",
+      "why": "It inserts STRING at the start of each line of the rectangle, shifting the original text right, which is exactly putting the same string at the start of every rectangle line."
+    }
+  ],
+  "er08": [
+    {
+      "alias": "count-words-region",
+      "line": "‘M-=’ (‘count-words-region’) displays a message reporting the number",
+      "sec_id": "emacs.emacs#position-info",
+      "token": "count-words",
+      "why": "It reports the number of words in the highlighted region, which is the tally the asker wants."
+    }
+  ],
+  "er09": [],
+  "er10": [],
+  "er11": [
+    {
+      "alias": "auto-revert-mode",
+      "line": "enable Auto Revert mode by typing ‘M-x auto-revert-mode’.  This",
+      "sec_id": "emacs.emacs#auto-revert",
+      "token": "global-auto-revert-mode",
+      "why": "It automatically reverts the buffer when its visited file is changed on disk by another program."
+    }
+  ],
+  "er12": [],
+  "er13": [],
+  "er14": [],
+  "er15": [],
+  "er16": [],
+  "er17": [
+    {
+      "alias": "text-scale-increase",
+      "line": "The commands ‘text-scale-increase’ and ‘text-scale-decrease’ increase",
+      "sec_id": "emacs.emacs#text-scale",
+      "token": "text-scale-adjust",
+      "why": "It enlarges the font in the current buffer only, without touching saved settings."
+    },
+    {
+      "alias": "C-x C-+",
+      "line": "type ‘C-x C-+’ or ‘C-x C-=’.  To decrease it, type ‘C-x C--’.  To",
+      "sec_id": "emacs.emacs#text-scale",
+      "token": "text-scale-adjust",
+      "why": "The manual says this key enlarges the default face in the current buffer, via text-scale-adjust."
+    },
+    {
+      "alias": "C-x C-=",
+      "line": "type ‘C-x C-+’ or ‘C-x C-=’.  To decrease it, type ‘C-x C--’.  To",
+      "sec_id": "emacs.emacs#text-scale",
+      "token": "text-scale-adjust",
+      "why": "The manual says this key enlarges the default face in the current buffer, via text-scale-adjust."
+    }
+  ],
+  "er18": [],
+  "er19": [],
+  "er20": [],
+  "er21": [],
+  "er22": [
+    {
+      "alias": "C-x * q",
+      "line": "make one or two quick calculations.  Type ‘C-x * q’ (or ‘M-x",
+      "sec_id": "calc.emacs#quick-calculator",
+      "token": "quick-calc",
+      "why": "The manual gives this key as the way to run the Quick Calculator, which computes a formula in the echo area without opening the Calc window."
+    }
+  ],
+  "er23": [],
+  "er24": [],
+  "er25": [],
+  "er26": [
+    {
+      "alias": "find-file-read-only",
+      "line": "(‘find-file-read-only’) instead of ‘C-x C-f’.",
+      "sec_id": "emacs.emacs#visiting",
+      "token": "read-only-mode",
+      "why": "The manual says to visit a file with it to protect yourself from entering changes accidentally, which is the need stated."
+    }
+  ],
+  "er27": [],
+  "er28": [
+    {
+      "alias": "C-x x r",
+      "line": "‘C-x x r’ (‘rename-buffer’ changes the name of the current buffer.",
+      "sec_id": "emacs.emacs#misc-buffer",
+      "token": "rename-buffer",
+      "why": "The manual names this key as running rename-buffer, which gives the current buffer another name."
+    }
+  ],
+  "er29": [
+    {
+      "alias": "grep-find",
+      "line": "‘M-x grep-find’",
+      "sec_id": "emacs.emacs#grep-searching",
+      "token": "rgrep",
+      "why": "The manual lists it with rgrep as running grep via find over a whole directory tree, so it searches all files below a folder for a string."
+    }
+  ],
+  "er30": [
+    {
+      "alias": "kill-matching-lines",
+      "line": "‘M-x kill-matching-lines’",
+      "sec_id": "emacs.emacs#other-repeating-search",
+      "token": "flush-lines",
+      "why": "It deletes every line matching the regexp, exactly like flush-lines, and additionally saves them to the kill ring."
+    }
+  ],
+  "er31": [],
+  "er32": [],
+  "er33": [],
+  "er34": [],
+  "er35": [
+    {
+      "alias": "show-paren-local-mode",
+      "line": "current buffer, type ‘M-x show-paren-local-mode’.",
+      "sec_id": "emacs.emacs#matching",
+      "token": "show-paren-mode",
+      "why": "It turns on Show Paren mode in the current buffer, highlighting the matching delimiter next to point."
+    }
+  ],
+  "er36": [],
+  "er37": [],
+  "er38": [],
+  "er39": [
+    {
+      "alias": "vc-ediff",
+      "line": "‘M-x vc-ediff’ works like ‘C-x v =’, except that it uses an Ediff",
+      "sec_id": "emacs.emacs#old-revisions",
+      "token": "vc-diff",
+      "why": "It shows the differences between the work file and the revision you started from, in an Ediff session."
+    }
+  ],
+  "er40": [],
+  "er41": [],
+  "er42": [],
+  "er43": [],
+  "er44": [
+    {
+      "alias": "eglot-format-buffer",
+      "line": "‘M-x eglot-format-buffer’",
+      "sec_id": "eglot.emacs#eglot-commands",
+      "token": "eglot-format",
+      "why": "It reformats the whole current buffer according to the language server rules."
+    }
+  ],
+  "er45": [],
+  "er46": [],
+  "er47": [],
+  "er48": [],
+  "er49": [],
+  "er50": [],
+  "er51": [
+    {
+      "alias": "zap-up-to-char",
+      "line": "‘M-x zap-up-to-char CHAR’",
+      "sec_id": "emacs.emacs#other-kill-commands",
+      "token": "zap-to-char",
+      "why": "It kills from point up to the next occurrence of CHAR, which is cutting everything up to a chosen character."
+    }
+  ],
+  "er52": [],
+  "er53": [
+    {
+      "alias": "cycle-spacing",
+      "line": "The command ‘cycle-spacing’ (‘M-<SPC>’) acts like a more flexible",
+      "sec_id": "emacs.emacs#deletion",
+      "token": "just-one-space",
+      "why": "Its first invocation does the same as just-one-space, leaving a single space in place of the run of blanks."
+    }
+  ],
+  "er54": [],
+  "er55": [],
+  "er56": [],
+  "er57": [
+    {
+      "alias": "C-c C-x C-s",
+      "line": "‘C-c C-x C-s’ or short ‘C-c $’ (‘org-archive-subtree’)",
+      "sec_id": "org.emacs#moving-subtrees",
+      "token": "org-archive-subtree",
+      "why": "The manual gives this as the long key for org-archive-subtree, which moves the subtree to the archive file."
+    }
+  ],
+  "er58": [],
+  "er59": [
+    {
+      "alias": "holiday-list",
+      "line": "The command ‘M-x holiday-list’ displays the list of holidays for a",
+      "sec_id": "emacs.emacs#holidays",
+      "token": "list-holidays",
+      "why": "It displays the holidays for a range of years the user specifies, which covers the year asked about."
+    }
+  ],
+  "er60": [],
+  "er61": [
+    {
+      "alias": "highlight-phrase",
+      "line": "Highlight matches of PHRASE, using face FACE (‘highlight-phrase’).",
+      "sec_id": "emacs.emacs#highlight-interactively",
+      "token": "highlight-regexp",
+      "why": "The manual says PHRASE can be any regexp and matches of it are highlighted, which highlights text matching a regexp."
+    }
+  ],
+  "er62": [
+    {
+      "alias": "indent-code-rigidly",
+      "line": "‘M-x indent-code-rigidly’",
+      "sec_id": "emacs.emacs#multi-line-indent",
+      "token": "indent-rigidly",
+      "why": "It shifts all lines in the region rigidly sideways, which is what the asker wants."
+    }
+  ],
+  "er63": [
+    {
+      "alias": "delete-rectangle",
+      "line": "(‘delete-rectangle’) to delete the text outright, or ‘C-x r k’",
+      "sec_id": "emacs.emacs#rectangles",
+      "token": "kill-rectangle",
+      "why": "It deletes the text of the region-rectangle, which is deleting the rectangular region (without saving it)."
+    }
+  ],
+  "er64": [
+    {
+      "alias": "comment-region",
+      "line": "‘M-x comment-region’",
+      "sec_id": "emacs.emacs#comment-commands",
+      "token": "comment-dwim",
+      "why": "It adds comment delimiters to all lines in the region, which comments out the region."
+    },
+    {
+      "alias": "comment-line",
+      "line": "Comment or uncomment the current line (‘comment-line’).  If the",
+      "sec_id": "emacs.emacs#comment-commands",
+      "token": "comment-dwim",
+      "why": "Per the manual it comments the lines in the active region, which comments out the region."
+    }
+  ],
+  "er65": [],
+  "er66": [],
+  "er67": [],
+  "er68": [],
+  "er69": [],
+  "er70": [],
+  "er71": [
+    {
+      "alias": "C-c .",
+      "line": "To set a buffer's style interactively, use the command ‘C-c .’ (*note",
+      "sec_id": "ccmode.emacs#choosing-a-style",
+      "token": "c-set-style",
+      "why": "The manual gives this key as the interactive way to set the buffer's indentation style."
+    }
+  ],
+  "er72": [
+    {
+      "alias": "electric-pair-local-mode",
+      "line": "toggle the mode in a single buffer, use ‘M-x electric-pair-local-mode’.",
+      "sec_id": "emacs.emacs#matching",
+      "token": "electric-pair-mode",
+      "why": "It enables Electric Pair mode in the buffer, which inserts the matching closing delimiter automatically."
+    }
+  ],
+  "er73": [],
+  "er74": [],
+  "er75": [],
+  "er76": [],
+  "er77": [],
+  "er78": [],
+  "er79": [],
+  "er80": []
+}
