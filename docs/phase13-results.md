@@ -113,8 +113,8 @@ loses on the Emacs rows exactly what the oracle gains.
 
 **What the oracle says.** Knowing the domain is worth **+40 net answers on 883** (+4.5 points) and +43
 evidence, at +0.33 s/q. It also helps the man pages (+9), because Emacs chunks no longer crowd their
-candidate pool. This is the largest confirmed gain since phase 6, and it replicates phase 12's +7 on the
-realistic set at pool scale.
+candidate pool. It is several times larger than phase 11's best pool arm (R8: +12 net answers), and it replicates
+phase 12's +7 on the realistic set at pool scale.
 
 **Next (not yet pre-registered):**
 - **R10, per-domain candidate quotas, no routing decision.** Search each domain separately (e.g. 25 + 25
