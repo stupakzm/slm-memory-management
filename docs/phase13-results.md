@@ -74,3 +74,57 @@ The same 50 rows were then retrieved a second time today: 1 of 50 differs (a30, 
 the largest top-1 score difference is 0.00027. Retrieval therefore has a small noise floor of its own,
 about 2 % of rows reordering between identical runs, separate from the generator's (setting C:
 0/40). A paired net within ±2 on 500+ rows is inside that floor.
+
+## Results (run 2026-10-02/03)
+
+All three arms on the 1,160-row pool: full profile, generation under setting C on :8090 (an unrelated
+process holds :8080). Scored with `scripts/screen_report.py --group domain --group-default linux` over
+the five pool files, with today's aliases. The regenerated control `p13-ctl` scores 540/883 answerable,
+the same total as `p11-pool-r3d`.
+
+| arm | Emacs answerable (324) | man answerable (559) | abstention (277) | evidence (883) | retrieval s/q |
+|---|---|---|---|---|---|
+| control `p13-ctl` (open) | 202 | 338 | 254 | 711 | 3.25 |
+| **oracle** `p13-oracle` | 233: **+31** (37/6), p 1.6e-6 | 347: +9 (16/7), p 0.09 | 256: +2 | 754 | 3.58 |
+| **R9** `p13-r9` (dense-vote) | 171: **−31** (8/39), p 5.5e-6 | 345: +7 (16/9), p 0.23 | 252: −2 | 661 | 3.91 |
+
+(gained/lost in brackets; s/q is the retrieve stage's own wall time ÷ 1,160.)
+
+**R9 against the rule:**
+1. Emacs net ≥ +5 with p < 0.05: **fail** (−31, significantly *worse*).
+2. Man net ≥ −2: pass (+7).
+3. Abstention net ≥ −1: **fail** (−2).
+4. Router cost ≤ +0.5 s/q against the oracle: pass (+0.33).
+
+**R9 does not ship.** **The oracle passes rules 1 to 3** (+31, p 1.6e-6; +9; +2). As pre-registered, the
+verdict is "routing helps, this router doesn't". R9's recovery fraction is −31/+31 = **−1.0**: it
+loses on the Emacs rows exactly what the oracle gains.
+
+**Why the router fails (diagnostics):**
+- **It is biased toward man pages.** 75 % of the index is man pages, so their chunks win most open top-5
+  votes. R9 routed Emacs rows correctly only 281/432 times (65 %): clean 82 %, typo1 85 %, synonym 56 %,
+  casual 55 %, no-name 36 %. Man-page rows were 714/728 (98 %).
+- **A hard route is unforgiving.** A misrouted Emacs row loses every Emacs passage, while the open control
+  kept some. So each routing error is a likely loss (39 lost against 8 gained). The 14 man rows routed
+  to Emacs (6 answerable) cost little by comparison.
+- A vote over the *reranked* open top-5 would route better, but not well enough to fix this: majority
+  318/432 Emacs, top-1 342/432, linux 701 and 675 of 728 (computed from `p13-ctl`'s cached retrieval).
+  It would still send about 90 Emacs rows to the wrong domain.
+
+**What the oracle says.** Knowing the domain is worth **+40 net answers on 883** (+4.5 points) and +43
+evidence, at +0.33 s/q. It also helps the man pages (+9), because Emacs chunks no longer crowd their
+candidate pool. This is the largest confirmed gain since phase 6, and it replicates phase 12's +7 on the
+realistic set at pool scale.
+
+**Next (not yet pre-registered):**
+- **R10, per-domain candidate quotas, no routing decision.** Search each domain separately (e.g. 25 + 25
+  candidates) and let the reranker choose among both. The oracle's gain may come mostly from giving each
+  domain's passages a fair share of the 50 rerank slots. Under a fixed open pool, a 75 % man-page index
+  crowds Emacs out. A quota cannot misroute, so it cannot reproduce R9's −31.
+- **Usable today:** `asq --domain emacs` *is* the oracle. When the asker knows the domain, saying so is
+  worth this much. A caller that knows its context can pass it (Emacs exports `INSIDE_EMACS` to its
+  shells).
+
+Frozen outputs (committed): `p13-{ctl,oracle,r9}-answers.json` (sha256 `cd04ee56…`, `667cb943…`,
+`c77a8d09…`) and `p13-r9-routes.json` (`08f28984…`). Noise: setting C generation 0/40. Retrieval
+reorders about 1/50 rows between identical runs (drift check above), well inside these margins.
