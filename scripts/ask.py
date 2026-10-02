@@ -131,8 +131,17 @@ def main() -> int:
                          "question vectors to the candidate pool (needs an index built "
                          "by scripts/build_qvec.py). 0 (default) reproduces today's "
                          "behaviour exactly.")
+    ap.add_argument("--route", choices=("dense-vote",), default=None,
+                    help="phase 13 R9: infer the domain from the question (majority "
+                         "domain of the open search's top 5 chunks) and retrieve within "
+                         "it; exclusive with --domain. Default off reproduces today's "
+                         "behaviour exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
+    if args.route and args.domain:
+        print("--route and --domain are exclusive: a route chooses the domain",
+              file=sys.stderr)
+        return 2
 
     if args.normalize == "spell":
         vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
@@ -186,9 +195,11 @@ def main() -> int:
         print(f"{args.db} has no question vectors: build them with scripts/build_qvec.py",
               file=sys.stderr)
         return 2
+    # Only passed when set, so a default ask constructs Retriever exactly as before.
+    route_kw = {"route": args.route} if args.route else {}
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                   candidates=args.candidates, domain=args.domain,
-                  question_vectors=args.question_vectors)
+                  question_vectors=args.question_vectors, **route_kw)
 
     if args.cascade and not args.retrieve_only:
         # --retrieve-only stays generator-free (module docstring); --cascade

@@ -23,12 +23,18 @@ original question and the gate reads that top-1.
 from __future__ import annotations
 
 import sqlite3
+from collections import Counter
 
 from . import lexical, store
 
 RRF_K = 60          # standard constant; damps the influence of any single list's top
 CANDIDATES = 50     # what the reranker sees, per the briefing
 KEEP = 5            # what the model sees
+
+# Phase 13 R9 (docs/phase13-results.md): the open search's first ROUTE_VOTE_K hits
+# vote on the domain the real search then runs in. 5 is the reader's own k.
+ROUTES = ("dense-vote",)
+ROUTE_VOTE_K = 5
 
 # Two distinct per-variant knobs when fusing the question with rewrites - do not
 # collapse them into one, and do not reuse the caller's output `k` for either.
@@ -121,7 +127,18 @@ class Retriever:
     def __init__(self, db: sqlite3.Connection, embedder=None, reranker=None,
                  mode: str = "hybrid", candidates: int = CANDIDATES,
                  dense_weight: float = 1.0, bm25_weight: float = 1.0,
-                 domain: str | None = None, question_vectors: int = 0):
+                 domain: str | None = None, question_vectors: int = 0,
+                 route: str | None = None):
+        if route is not None:
+            # BM25 has no domain filter, so a hybrid route would be half-routed.
+            if route not in ROUTES:
+                raise ValueError(f"unknown route {route!r}; expected one of {ROUTES}")
+            if domain is not None:
+                raise ValueError("route and domain are exclusive: a route chooses the domain")
+            if question_vectors > 0:
+                raise ValueError("route does not compose with question_vectors")
+            if mode != "dense":
+                raise ValueError("route needs mode='dense' (BM25 has no domain filter)")
         self.db = db
         self.embedder = embedder
         self.reranker = reranker
@@ -133,9 +150,14 @@ class Retriever:
         self.domain = domain
         # R8: how many nearest question vectors join the pool; 0 is today's path.
         self.question_vectors = question_vectors
+        # R9: how candidates_for() picks its domain, and what it picked last.
+        self.route = route
+        self.last_route: str | None = None
 
     def candidates_for(self, question: str, n: int | None = None) -> list[dict]:
         n = n or self.candidates
+        if self.route == "dense-vote":
+            return self._routed(question, n)
         if self.question_vectors > 0 and self.mode != "bm25":
             return self._with_question_route(question, n)
         if self.mode == "dense":
@@ -147,6 +169,22 @@ class Retriever:
                              domain=self.domain)
         sparse = lexical.search(self.db, question, k=n)
         return rrf([dense, sparse], weights=list(self.weights))[:n]
+
+    def _routed(self, question: str, n: int) -> list[dict]:
+        """R9 dense-vote: one embedding, an open search, a majority vote over the
+        domains of its top ROUTE_VOTE_K hits, then the real search inside the
+        winner. A tie goes to the domain of the top-ranked hit."""
+        vec = self.embedder.embed_query(question)
+        open_hits = store.search(self.db, vec, k=n, domain=None)
+        votes = Counter(h["domain"] for h in open_hits[:ROUTE_VOTE_K] if h.get("domain"))
+        top = open_hits[0].get("domain") if open_hits else None
+        ranked = votes.most_common(2)
+        winner = (ranked[0][0] if ranked and (len(ranked) == 1 or ranked[0][1] > ranked[1][1])
+                  else top)
+        self.last_route = winner
+        if winner is None:
+            return open_hits         # nothing to route on: the open pool stands
+        return store.search(self.db, vec, k=n, domain=winner)
 
     def _with_question_route(self, question: str, n: int) -> list[dict]:
         """The chunk pool exactly as above, then the question route's new chunks,

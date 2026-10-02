@@ -33,6 +33,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
+# Phase 13: the man pages' domain in the index; their eval rows carry `domain: null`.
+ORACLE_NULL_DOMAIN = "linux"
+
 from smm import gold, grammar, lexical, store  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
 from smm.cascade import ABSTAIN_RE, abstained, run_cascade  # noqa: E402
@@ -111,6 +114,21 @@ def select_hits(hits: list, read_k: int, cap: int) -> list:
     if read_k > 0:
         return hits[:read_k]
     return hits
+
+
+def print_route_summary(rows: list, routes: dict) -> None:
+    """Routed domain against the row's true domain (`domain`, null meaning the man
+    pages' ORACLE_NULL_DOMAIN), as a count table plus the total routed correctly."""
+    counts: dict = defaultdict(int)
+    right = 0
+    for row in rows:
+        true, routed = row.get("domain") or ORACLE_NULL_DOMAIN, routes.get(row["qid"])
+        counts[(true, routed)] += 1
+        right += true == routed
+    print("\n  routing        true -> routed        n")
+    for (true, routed), n in sorted(counts.items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):
+        print(f"    {true:>16} -> {str(routed):12} {n:5}")
+    print(f"  routed correctly: {right} of {len(rows)}")
 
 
 def main() -> int:
@@ -195,8 +213,23 @@ def main() -> int:
                          "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
                          "cascade_rewrites ([] at tier 0). Default off reproduces "
                          "every existing run byte-for-byte.")
+    ap.add_argument("--route", choices=("dense-vote", "oracle"), default=None,
+                    help="phase 13 R9: choose each question's domain. 'dense-vote' is the "
+                         "retriever's own router (majority domain of the open search's top "
+                         "5 chunks); 'oracle' retrieves within the row's true domain (a "
+                         "ceiling, not a router). Writes NAME-routes.json at the retrieve "
+                         "stage. Default off reproduces every existing run byte-for-byte.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if args.route:
+        clash = [flag for flag, on in (
+            ("--domain", args.domain), ("--rewrites", args.rewrites > 0),
+            ("--cascade", args.cascade), ("--question-vectors", args.question_vectors > 0),
+            ("--mode (must be dense)", args.mode != "dense")) if on]
+        if clash:
+            print(f"--route does not compose with {', '.join(clash)}", file=sys.stderr)
+            return 2
 
     if args.cascade and args.stage != "both":
         print("--cascade requires --stage both (the tier depends on the reader's "
@@ -205,6 +238,8 @@ def main() -> int:
 
     # Only passed when set, so a default run constructs Retriever exactly as before.
     qv_kw = {"question_vectors": args.question_vectors} if args.question_vectors else {}
+    if args.route == "dense-vote":
+        qv_kw["route"] = args.route
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -263,9 +298,11 @@ def main() -> int:
         r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
                       candidates=args.candidates, domain=args.domain,
                       **qv_kw)
-        retrieved, t0 = {}, time.time()
+        retrieved, routes, t0 = {}, {}, time.time()
         for i, row in enumerate(rows, 1):
             qtext = query_text(row)
+            if args.route == "oracle":
+                r.domain = row.get("domain") or ORACLE_NULL_DOMAIN
             # --llm-correct composes with --normalize: normalize (above) runs
             # first, then the model correction, on the already-normalized text
             # (blk_normalize_spell_api's wiring pattern, extended). Cached here
@@ -281,6 +318,8 @@ def main() -> int:
             else:
                 hits = r.retrieve(qtext, k=args.k)
                 gate_hits = hits
+            if args.route:
+                routes[row["qid"]] = r.domain if args.route == "oracle" else r.last_route
             # Expansion changes what the model reads, not how anything ranked, so it
             # belongs here rather than inside the retriever - and `evidence_retrieved`
             # below then means what it says: the answer was in front of the model.
@@ -292,6 +331,9 @@ def main() -> int:
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_text(json.dumps(retrieved))
+        if args.route:
+            (cache.parent / f"{args.cache}-routes.json").write_text(json.dumps(routes))
+            print_route_summary(rows, routes)
         print(f"\n  cached retrieval for {len(retrieved)} questions in {time.time()-t0:.0f}s "
               f"(mode={args.mode}, rerank={args.rerank})")
         if args.stage == "retrieve":
@@ -474,6 +516,8 @@ def write_report(args, results: list, t0: float) -> int:
         config["cascade"] = True
     if args.question_vectors > 0:
         config["question_vectors"] = args.question_vectors
+    if args.route:
+        config["route"] = args.route
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
