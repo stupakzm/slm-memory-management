@@ -33,7 +33,7 @@ KEEP = 5            # what the model sees
 
 # Phase 13 R9 (docs/phase13-results.md): the open search's first ROUTE_VOTE_K hits
 # vote on the domain the real search then runs in. 5 is the reader's own k.
-ROUTES = ("dense-vote",)
+ROUTES = ("dense-vote", "quota")
 ROUTE_VOTE_K = 5
 
 # Two distinct per-variant knobs when fusing the question with rewrites - do not
@@ -153,9 +153,12 @@ class Retriever:
         # R9: how candidates_for() picks its domain, and what it picked last.
         self.route = route
         self.last_route: str | None = None
+        self._quota_domains: list[str] | None = None
 
     def candidates_for(self, question: str, n: int | None = None) -> list[dict]:
         n = n or self.candidates
+        if self.route == "quota":
+            return self._quota(question, n)
         if self.route == "dense-vote":
             return self._routed(question, n)
         if self.question_vectors > 0 and self.mode != "bm25":
@@ -169,6 +172,21 @@ class Retriever:
                              domain=self.domain)
         sparse = lexical.search(self.db, question, k=n)
         return rrf([dense, sparse], weights=list(self.weights))[:n]
+
+    def _quota(self, question: str, n: int) -> list[dict]:
+        """R10 quota: no routing decision. One embedding; each domain (sorted by
+        name) gets n // D candidates, the first n % D domains one more; the pools
+        are concatenated in domain order for the reranker."""
+        if self._quota_domains is None:
+            self._quota_domains = sorted(store.domains(self.db))
+        doms = self._quota_domains
+        vec = self.embedder.embed_query(question)
+        out: list[dict] = []
+        for i, d in enumerate(doms):
+            share = n // len(doms) + (1 if i < n % len(doms) else 0)
+            if share > 0:
+                out.extend(store.search(self.db, vec, k=share, domain=d))
+        return out
 
     def _routed(self, question: str, n: int) -> list[dict]:
         """R9 dense-vote: one embedding, an open search, a majority vote over the

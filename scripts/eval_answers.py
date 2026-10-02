@@ -116,6 +116,10 @@ def select_hits(hits: list, read_k: int, cap: int) -> list:
     return hits
 
 
+# routes that make a per-question decision worth recording
+ROUTED = ("dense-vote", "oracle")
+
+
 def print_route_summary(rows: list, routes: dict) -> None:
     """Routed domain against the row's true domain (`domain`, null meaning the man
     pages' ORACLE_NULL_DOMAIN), as a count table plus the total routed correctly."""
@@ -213,11 +217,11 @@ def main() -> int:
                          "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
                          "cascade_rewrites ([] at tier 0). Default off reproduces "
                          "every existing run byte-for-byte.")
-    ap.add_argument("--route", choices=("dense-vote", "oracle"), default=None,
+    ap.add_argument("--route", choices=("dense-vote", "oracle", "quota"), default=None,
                     help="phase 13 R9: choose each question's domain. 'dense-vote' is the "
                          "retriever's own router (majority domain of the open search's top "
                          "5 chunks); 'oracle' retrieves within the row's true domain (a "
-                         "ceiling, not a router). Writes NAME-routes.json at the retrieve "
+                         "ceiling, not a router); 'quota' (R10) takes an equal share of the candidates from every domain, no routing decision. Writes NAME-routes.json at the retrieve "
                          "stage. Default off reproduces every existing run byte-for-byte.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
@@ -238,7 +242,7 @@ def main() -> int:
 
     # Only passed when set, so a default run constructs Retriever exactly as before.
     qv_kw = {"question_vectors": args.question_vectors} if args.question_vectors else {}
-    if args.route == "dense-vote":
+    if args.route in ("dense-vote", "quota"):
         qv_kw["route"] = args.route
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
@@ -318,7 +322,7 @@ def main() -> int:
             else:
                 hits = r.retrieve(qtext, k=args.k)
                 gate_hits = hits
-            if args.route:
+            if args.route in ROUTED:
                 routes[row["qid"]] = r.domain if args.route == "oracle" else r.last_route
             # Expansion changes what the model reads, not how anything ranked, so it
             # belongs here rather than inside the retriever - and `evidence_retrieved`
@@ -331,7 +335,7 @@ def main() -> int:
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_text(json.dumps(retrieved))
-        if args.route:
+        if args.route in ROUTED:
             (cache.parent / f"{args.cache}-routes.json").write_text(json.dumps(routes))
             print_route_summary(rows, routes)
         print(f"\n  cached retrieval for {len(retrieved)} questions in {time.time()-t0:.0f}s "
