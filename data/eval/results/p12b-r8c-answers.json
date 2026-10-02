@@ -1,0 +1,2848 @@
+{
+  "name": "p12b-r8c",
+  "k": 5,
+  "n": 100,
+  "config": {
+    "mode": "dense",
+    "rerank": true,
+    "gate": 0.65,
+    "grammar": true,
+    "candidates": 50,
+    "expand": 0,
+    "db": "data/index/phase11-qc.db",
+    "domain": "emacs",
+    "rewrites": 0,
+    "aliases": true,
+    "cache": "p12b-r8c",
+    "read_k": 0,
+    "cap_per_doc": 0,
+    "answer_mode": "cite",
+    "qids": null,
+    "abstain_rule": "all-sentences",
+    "evidence_rule": "aliased"
+  },
+  "answer_accuracy": 0.375,
+  "accuracy_given_evidence": 0.47540983606557374,
+  "false_abstention_with_evidence": 0.16393442622950818,
+  "abstention_recall": 1.0,
+  "spoke_without_evidence": 0.5789473684210527,
+  "unsupported_rate": 0.11,
+  "results": [
+    {
+      "qid": "er01",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "show one long file across two side-by-side panes so the text flows from the left one into the right one",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "ediff.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.5586482286453247,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er02",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "undo the last change I made to my window layout, not to the text",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9905995726585388,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er03",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "swap the two words around the cursor",
+      "answer": "M-t [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9527407884597778,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er04",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "turn the word I'm on into ALL CAPS",
+      "answer": "\u2018M-- M-u\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9805995225906372,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er05",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "remove repeated lines from a chunk of text",
+      "answer": "M-x delete-duplicate-lines [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9818578958511353,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er06",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "strip the trailing spaces from the ends of all lines in the file",
+      "answer": "gnus-article-strip-trailing-space [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "gnus.emacs",
+        "gnus.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9952933192253113,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er07",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "put the same string at the start of every line in a rectangular block of text",
+      "answer": "Use \u2018M-x string-insert-rectangle <RET> STRING <RET>\u2019 to insert the same string at the start of every line in a rectangular block of text [2] (also supported by \u2018C-x r t STRING <RET>\u2019 for replacement, but insertion is specified in [2] for prefixing). The command inserts the string on each line, shifting the original text to the right [3] and is specifically designed for this purpose. The exact command to use is: `M-x string-insert-rectangle <RET> STRING <RET>`. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9951168298721313,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er08",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "my editor says nothing about length; what's the word tally for the chunk I've highlighted",
+      "answer": "The manual page extract [2] describes a function that counts words in a region and displays the result using `message`. It specifically states that if the region has no words, it messages \"The region does NOT have any words\", and if it has one word, it messages \"The region has 1 word\", otherwise it messages \"The region has %d words.\" [2] This indicates that the word tally is displayed directly in the message buffer when the function runs. Since your editor says nothing about length, and the function is designed to report the count, the word tally is likely not being shown because the function was not executed or the region is empty. However, based on the provided text, the word tally is generated and displayed via the `message` function when the count is performed [2] \u2014 so if the editor says nothing, it may be because the function was not invoked or the region has zero words. The tally is still computed, but not visible due to lack of execution or output. Therefore, the word tally is computed but not displayed \u2014 the answer is: **the word tally is computed but not displayed**. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "eintr.emacs",
+        "eintr.emacs",
+        "eintr.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9264916181564331,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er09",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "hide everything except the part of the file I'm working on",
+      "answer": "\u2018C-c C-o\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "eintr.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.996607780456543,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er10",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "make typing over a selected block replace it, like other editors do",
+      "answer": "\u2018<count> R\u2019 [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "viper.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "viper.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.6500623226165771,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er11",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "reload a file automatically when another program changes it on disk",
+      "answer": "1 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "modus-themes.emacs",
+        "autotype.emacs"
+      ],
+      "top_score": 0.9983147382736206,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er12",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "reopen all the files and windows I had when I quit last time",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.08832933008670807,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false
+    },
+    {
+      "qid": "er13",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "sort the selected lines of text alphabetically",
+      "answer": "\u2018M-x sort-lines\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9937401413917542,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er14",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "display a log of my most recent keystrokes, I did something weird and can't recall what",
+      "answer": "Use \u2018C-h l\u2019 (\u2018view-lossage\u2019). [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9548190832138062,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er15",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "find out which key sequence triggers a command I know the name of",
+      "answer": "Use the command `C-h k` (which is `describe-key`) to find out which key sequence triggers a command you know the name of. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "elisp.emacs",
+        "efaq.emacs",
+        "calc.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9893636107444763,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er16",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "pipe my highlighted text through sort or awk and swap in whatever comes back",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "eshell.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.03960084542632103,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false
+    },
+    {
+      "qid": "er17",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "make the text in this buffer bigger without changing my settings",
+      "answer": "C-x C-+ [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9923054575920105,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er18",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "compare two folders and see which files differ",
+      "answer": "Use the command `M-x ediff-directories`. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "ediff.emacs",
+        "ediff.emacs",
+        "emacs.emacs",
+        "ediff.emacs"
+      ],
+      "top_score": 0.9978127479553223,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er19",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "drop all the remote connections I've opened so they reconnect fresh",
+      "answer": "Use the command: `M-x tramp-cleanup-all-connections` [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9903429746627808,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er20",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "rename a symbol everywhere in my project through the language server",
+      "answer": "\u2018M-x eglot-rename\u2019 [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9969344139099121,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er21",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "put a due date on an agenda task",
+      "answer": "\u2018C-c C-d\u2019 (\u2018org-agenda-deadline\u2019) [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9971500635147095,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er22",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "do a quick sum without opening the full calculator",
+      "answer": "Yes, use `C-x * q` and type the formula (e.g., `2+3`). The result will be computed and displayed in the echo area without opening a full Calculator window [4] and [1] (also see [3] and [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "calc.emacs"
+      ],
+      "top_score": 0.9898549914360046,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4,
+        1,
+        3,
+        5
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er23",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "turn a highlighted block of comma separated lines into a table in my notes",
+      "answer": "Use \u2018C-c |\u2019 to convert the highlighted block of comma-separated lines into a table. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9914785027503967,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er24",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "rewrap a long paragraph so it fits the line width",
+      "answer": "\u2018M-q\u2019 [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "gnus.emacs",
+        "mh-e.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "efaq.emacs"
+      ],
+      "top_score": 0.8988046050071716,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er25",
+      "kind": "answerable",
+      "tags": [
+        "no-name"
+      ],
+      "variant_kind": null,
+      "question": "have a template inserted automatically whenever I create a new file of a given type",
+      "answer": "Yes, you can have a template inserted automatically whenever you create a new file of a given type using the `auto-insert-alist` variable in Emacs. When a file is created and is empty, Emacs checks `auto-insert-alist` to determine if a template should be inserted. Each entry in the list can match a mode or a file name regexp, and if a match is found, a predefined text or template is inserted [1] and [3] \u2014 this behavior is triggered when visiting a new empty file or when a file is created with a specific type. You can customize this behavior using `define-auto-insert` in your init file [3] to define templates for specific modes or file types. This is the mechanism for automatic template insertion based on file type. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "autotype.emacs",
+        "autotype.emacs",
+        "autotype.emacs",
+        "autotype.emacs",
+        "srecode.emacs"
+      ],
+      "top_score": 0.9955543875694275,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er26",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "ugh I keep accidentally changing files I only wanted to read, can emacs stop that",
+      "answer": "Yes, Emacs can stop accidental changes by visiting files in read-only mode. Use the command `C-x C-r` (\u2018find-file-read-only\u2019) to visit a file as read-only, which prevents you from making changes. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9990045428276062,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er27",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "my init file is broken and emacs won't start properly, how do I see where the error is",
+      "answer": "Start Emacs with the \u2018-Q\u2019 switch to prevent loading your initialization file. If the problem does not occur then, report the precise contents of any programs that you must load into the Lisp world in order to cause the problem to occur [2] . Also, copy the entire error message from the \u2018*Messages*\u2019 buffer into your bug report [2] . If you can reproduce the error, include a backtrace if available [2] . If the issue is in your init file, check for errors in the init file or system-wide file \u2018site-lisp/default.el\u2019; Emacs will show additional information in the \u2018*Messages*\u2019 buffer [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "efaq.emacs"
+      ],
+      "top_score": 0.9983896017074585,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er28",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I want a second shell going but emacs keeps reusing the same one, can I give this one another name",
+      "answer": "Yes, you can give the second shell a different name by using `M-x rename-uniquely` on the existing `*shell*` buffer, then running `M-x shell` again. This creates a new shell buffer named `*shell*` while the old one retains its new unique name. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "dbus.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9988264441490173,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er29",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I want to search all the .c files under a folder for a string, what should I use",
+      "answer": "Use `M-x find-grep-dired`. This command reads a directory and a regular expression, then finds files in that directory or subdirectories that contain the match for the regexp. It works by running `find` and `grep`, and is suitable for searching content of `.c` files under a folder for a string. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9552776217460632,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er30",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I want to delete every line containing DEBUG in this buffer, quickly",
+      "answer": "M-x flush-lines [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.989306628704071,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er31",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "my lines run off the screen, how do I get them to wrap at words instead of getting cut off",
+      "answer": "Turn on Visual Line mode using `M-x visual-line-mode`. This enables word wrapping instead of line truncation. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9875950813293457,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er32",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I'd love to see line numbers on the left while I code",
+      "answer": "Use the command `M-x display-line-numbers-mode` to turn on display of line numbers. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9723394513130188,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er33",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "total beginner here, want to grab an add-on from the official archive, what's the command",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "efaq.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.4939144253730774,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false
+    },
+    {
+      "qid": "er34",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I need to jump to line 340 fast",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "viper.emacs",
+        "vip.emacs"
+      ],
+      "top_score": 0.11518242955207825,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false
+    },
+    {
+      "qid": "er35",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "can I have the matching bracket highlighted when my cursor is next to one",
+      "answer": "Yes, you can have the matching bracket highlighted when your cursor is next to one using the option `show-paren-highlight-openparen`. This option, when set to a non-`nil` value (i.e., enabled), highlights an open paren when point is just before it. Since brackets are treated similarly to parentheses in this context, this setting will also apply to matching brackets when the cursor is next to them [1] (and further supported by the general behavior described in [3] for paren highlighting). The default is non-`nil`, so it is already enabled. Thus, highlighting occurs when the cursor is adjacent to a matching bracket. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9966601133346558,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er36",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "half of this email is misspelled, can emacs underline the bad words live while I write",
+      "answer": "Yes, Emacs can underline bad words live while you write using Flyspell mode. To enable this, you can use `M-x flyspell-mode` to toggle Flyspell mode in the current buffer, or add `'flyspell-mode'` to `'text-mode-hook'` to enable it in all text mode buffers [1] . Flyspell mode highlights misspelled words as you type or move across them, providing real-time feedback [1] . This functionality works for live spell checking during writing, including in email messages [3] . Therefore, if half of your email is misspelled, Flyspell will underline the bad words as you write. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "message.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9980085492134094,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er37",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I just fixed a bug and want to re-run the last build command without retyping it",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "idlwave.emacs"
+      ],
+      "top_score": 0.6484567523002625,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er38",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I keep retyping the same long macro after restarting, can I save it in my config",
+      "answer": "Yes, you can save a keyboard macro in your config. In Emacs, use `C-x C-k n` to name the last keyboard macro, which defines it as a command that can be called with `M-x` or bound to a key. If you save this macro in your init file (`~/.emacs`), it will be available every time you start Emacs [1] and [5] \u2014 making it permanent and avoiding retyping. For Viper, use `viper-record-kbd-macro` in your customization file to save the macro permanently [2] and [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "viper.emacs",
+        "emacs.emacs",
+        "viper.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9711072444915771,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        5,
+        2,
+        4
+      ],
+      "n_citations": 4,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er39",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "what exactly did I edit in this file since my last commit, show me the differences",
+      "answer": "\u2018C-x v g\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "pcl-cvs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9920175075531006,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er40",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I messed up this file and want to throw away my edits and go back to the committed one",
+      "answer": "C-x v u [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "pcl-cvs.emacs",
+        "emacs.emacs",
+        "pcl-cvs.emacs"
+      ],
+      "top_score": 0.9951486587524414,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er41",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "so I've got a todo in my notes and I want to file it under a different heading",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "todo-mode.emacs",
+        "todo-mode.emacs",
+        "todo-mode.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.996160626411438,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er42",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "I'd love browser-style tabs so I can keep different window arrangements",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.5876348614692688,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er43",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "this remote host keeps hanging on me, can I turn on more logging for the connection",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "emacs.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.26146918535232544,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er44",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "can I get eglot to clean up the formatting of my whole buffer",
+      "answer": "Yes, you can get eglot to clean up the formatting of your whole buffer using the command `M-x eglot-format-buffer`. This command reformats the current buffer in the same manner as `eglot-format` does, and if no region is active, it reformats the entire buffer [1] and [3] (see also [3] for confirmation of behavior). The exact command is `eglot-format-buffer`. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.9996798634529114,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er45",
+      "kind": "answerable",
+      "tags": [
+        "casual"
+      ],
+      "variant_kind": null,
+      "question": "how would I write a quick automated test for my elisp function",
+      "answer": "Use the `ert-deftest` macro to define a test, include a docstring describing the test, and write Lisp code that calls your function with various inputs and compares the output to an expected value using `should` and `eql` or `equal`. For example: `(ert-deftest my-function-test () (should (equal (my-function \"input\") \"expected\")))` [3] and [4] . This approach formalizes comments with expected outputs and allows automated testing within Emacs. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "elisp.emacs",
+        "elisp.emacs",
+        "ert.emacs",
+        "ert.emacs",
+        "ert.emacs"
+      ],
+      "top_score": 0.9945337772369385,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er46",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "make all the panes the same size",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.16776548326015472,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er47",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "move focus to the pane on the right with the arrow keys",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.38821840286254883,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er48",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "rename the document I'm editing so it is stored under a different name on disk",
+      "answer": "Use `M-x rename-file` to rename the document you're editing to a different name on disk. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.8663499355316162,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er49",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "switch between two typing languages on the fly",
+      "answer": "C-\\ [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "viper.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.945032000541687,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er50",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "put an unusual symbol into the text by its name, like a Greek letter",
+      "answer": "Use `?\\N{NAME}` where NAME is the Unicode name of the symbol, e.g., `?\\N{GREEK SMALL LETTER ALPHA}` for the Greek letter alpha [2] . \u2705 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9858680963516235,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er51",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "cut everything from here up to a chosen character",
+      "answer": "M-z (\u2018zap-to-char\u2019) combines killing with searching: it reads a character and kills from point up to (and including) the next occurrence of that character in the buffer. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "eintr.emacs",
+        "emacs.emacs",
+        "eintr.emacs",
+        "eintr.emacs"
+      ],
+      "top_score": 0.9088128805160522,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er52",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "attach this line to the end of the previous one",
+      "answer": "C-k [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "eintr.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.7680711150169373,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er53",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "squeeze a run of blanks down to a single blank",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9481407403945923,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er54",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "put a label on a revision in the repo to mark a release",
+      "answer": "\u2018C-x v r NAME <RET>\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "reftex.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9871042966842651,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er55",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "start the background service so outside programs can hand files to my running editor",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "eshell.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.8734875917434692,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er56",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "add a tickable box to a bullet in my outline and flip it on and off",
+      "answer": "Set the property \u2018COOKIE_DATA\u2019 to \u2018checkbox\u2019 to add a tickable box to a bullet in your outline and flip it on and off [2] . The checkbox will be in one of three states: not checked \u2018 [1] \u2019, partially checked \u2018 [1] \u2019, or checked \u2018 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "org.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9776467680931091,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        2,
+        1
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er57",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "move a finished item out of my notes into a separate storage file",
+      "answer": "The closest relevant functionality is in `todo-mode`, where the command `A d` archives a done item (or all done items in a category) into a separate file with the `.toda` extension, which acts as a todo archive [4] and [1] \u2014 this moves finished items out of the main todo file into a separate storage file. However, this is specific to todo items and not general \"notes\" as in the `remember` mode. Since the question refers to \"notes\" and moving finished items into a separate storage file, and given that `remember` does not provide a mechanism to move finished items (only to save or destroy notes), the correct answer based on the provided extracts is not directly available for \"notes\" in the context of moving finished items. Thus, the best match is the `todo-mode` archive feature, which is designed for this purpose, though it's not for \"notes\" per se. However, since the question specifically says \"notes\", and no such mechanism exists in the provided extracts for moving finished notes into a separate file, the answer is limited by the content provided. Therefore, based on the extracts, the only relevant command is from todo-mode, which handles archiving done items into a separate file. So, the answer is: `A d` [4] \u2014 but only if the context is todo items, not general notes. Since the question says \"notes\", and no such feature exists in the `remember` mode, the answer is not directly available. Hence, I don't know. [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "todo-mode.emacs",
+        "remember.emacs",
+        "org.emacs",
+        "todo-mode.emacs",
+        "remember.emacs"
+      ],
+      "top_score": 0.981526255607605,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        4,
+        1,
+        2
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er58",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "reading docs in the info viewer, how to return to the node I visited before this one",
+      "answer": "Use the 'l' command. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "info.emacs",
+        "info.emacs",
+        "info.emacs",
+        "info.emacs",
+        "info.emacs"
+      ],
+      "top_score": 0.9992132186889648,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er59",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "show the public celebration days for the year",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.14475476741790771,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true
+    },
+    {
+      "qid": "er60",
+      "kind": "answerable",
+      "tags": [
+        "synonym"
+      ],
+      "variant_kind": null,
+      "question": "change the permissions of the files I ticked in the directory editor",
+      "answer": "Use \u2018M MODESPEC <RET>\u2019 to change the permissions of the files you have ticked in the directory editor. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9567933082580566,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er61",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "emacs highlight text matching regexp",
+      "answer": "\u2018M-s h r REGEXP <RET> FACE <RET>\u2019 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9997848272323608,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er62",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "emacs shift block of lines sideways",
+      "answer": "In Emacs, to shift a block of lines sideways (left or right), you can use the following commands based on the manual extracts provided. However, the specific command for shifting a block of lines sideways in Emacs is not directly available in the provided extracts unless we refer to the `vip` mode, which is a variant of Emacs with additional features. In the `vip.emacs` manual (extract [3] and [4] ), the commands for shifting lines are described as follows: [3] and [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "viper.emacs",
+        "emacs.emacs",
+        "vip.emacs",
+        "vip.emacs",
+        "viper.emacs"
+      ],
+      "top_score": 0.9856115579605103,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        3,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er63",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "emacs delete rectangular region",
+      "answer": "\u2018C-x r d\u2019 [2]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9994475245475769,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er64",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "emacs comment out region",
+      "answer": "\u2018M-;\u2019 [1] or \u2018M-x comment-region\u2019 [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9992510676383972,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er65",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "emacs diff two buffers side by side",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "ediff.emacs",
+        "ediff.emacs",
+        "ediff.emacs",
+        "ediff.emacs"
+      ],
+      "top_score": 0.999336302280426,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er66",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "org start tracking time on task",
+      "answer": "To start tracking time on a task in Org mode, use `C-c C-x C-i` (or `org-clock-in`). This command starts the clock for the current task. For continuous clocking (resuming from the previous clock-out time), set `org-clock-continuously` to a non-nil value [3] or use three universal prefix arguments with `org-clock-in` [4] or two `C-u C-u` with `org-clock-in-last` [1] to force continuous clocking. The exact command to start tracking time is `org-clock-in`. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9993569254875183,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3,
+        4,
+        1
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er67",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "use-package lazy load bind key",
+      "answer": "The correct way to lazy-load a key binding in `use-package` is to use the `:defer t` keyword to delay loading the package until needed, combined with `:bind` to define the key binding. This ensures the package is not loaded immediately during startup, thus lazy-loading it, and the key binding is set up after the package is loaded. The binding itself is defined using the `:bind` keyword, and if the command is a keymap, use `:bind-keymap` instead [3] and [5] respectively. However, for standard function commands, `:bind` with `:defer t` achieves lazy loading of the key binding. Thus, the answer is: use `:defer t` with `:bind`. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs"
+      ],
+      "top_score": 0.9998425245285034,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3,
+        5,
+        4
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er68",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "eww copy url of current page",
+      "answer": "The command to copy the URL of the current page is `eww-copy-page-url` [1] (also referred to as pressing `w` when point is not on a link). This is explicitly mentioned in the manual page extract [1] as: \"If point is not on a link, pressing \u2018w\u2019 calls \u2018eww-copy-page-url\u2019, which will copy the current page's URL to the kill ring instead.\" \u2705 [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eww.emacs",
+        "eww.emacs",
+        "eww.emacs",
+        "eww.emacs",
+        "eww.emacs"
+      ],
+      "top_score": 0.9993956089019775,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er69",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "flymake check buffer now",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs",
+        "flymake.emacs"
+      ],
+      "top_score": 0.999875545501709,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er70",
+      "kind": "answerable",
+      "tags": [
+        "terse"
+      ],
+      "variant_kind": null,
+      "question": "tramp default protocol",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.999071478843689,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [],
+      "n_citations": 0,
+      "uncited": true,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er71",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I chnage the indentation style used for C code",
+      "answer": "To change the indentation style used for C code, you can set the style variable `c-default-style` in your `.emacs` file or use the interactive command `C-c . STYLE <RET>` to select a predefined style. The default style is \u2018gnu\u2019, which is recommended by the GNU Project. For example, to set the style to \u2018linux\u2019, you can add the following to your `.emacs` file: `(setq c-default-style '((other . \"linux\")))`. Alternatively, you can use `M-x c-guess` to let Emacs guess the style from sample code and then install it with `M-x c-guess-install`. [1] and [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "ccmode.emacs",
+        "ccmode.emacs",
+        "ccmode.emacs"
+      ],
+      "top_score": 0.9991593360900879,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1,
+        3
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er72",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I have emacs autmatically insert the closing parenthesis",
+      "answer": "Bind the opening parenthesis key to `skeleton-pair-insert-maybe` and set `skeleton-pair` to a non-nil value. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "efaq.emacs",
+        "emacs.emacs",
+        "autotype.emacs",
+        "autotype.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9989765286445618,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er73",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how can I encrpyt a file with GnuPG from inside the editor",
+      "answer": "Use the command `M-x epa-encrypt-file` to encrypt a file with GnuPG from inside the editor [2] or [5] (specifically, `epa-encrypt-file file recipients` [5] for file encryption with recipient selection). The command allows you to select recipients when encrypting a file. This is the correct method for encrypting a file from within Emacs. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "pgg.emacs",
+        "epa.emacs",
+        "message.emacs",
+        "epa.emacs",
+        "epa.emacs"
+      ],
+      "top_score": 0.9955820441246033,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        2,
+        5
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er74",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I see the histroy of just the selected lines in version control",
+      "answer": "Use the \u2018l\u2019 command to show the log of the current line's revision. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9960881471633911,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er75",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how can I find commmands by a keyword when I don't know the name",
+      "answer": "Use \u2018C-h a\u2019 followed by the keyword. This searches for commands whose names match the argument. [3]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "efaq.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9899083375930786,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        3
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er76",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I edit a remtoe file on another server through scp without copying it first",
+      "answer": "Use the `ssh` method in TRAMP with the file path directly, such as `/scp:username@host:/path/to/file`. TRAMP handles editing without copying the file first by establishing a direct SSH connection and allowing file access over the network. This is the standard and recommended way for editing remote files via SCP without requiring a local copy [1] and [4] (note: TRAMP's `scp` method supports direct editing without copying, as it uses remote shell access for file operations). The key is using the `scp` method in the TRAMP syntax, which enables direct editing without intermediate file copying. This behavior is consistent with TRAMP's design for remote file editing [1] and [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.9702656269073486,
+      "correct": true,
+      "correct_strict": true,
+      "evidence_retrieved": false,
+      "evidence_retrieved_strict": false,
+      "citations": [
+        1,
+        4
+      ],
+      "n_citations": 2,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er77",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I evalute the elisp expression right before the cursor",
+      "answer": "Use \u2018C-x C-e\u2019 to evaluate the Emacs Lisp expression before the cursor. [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "eintr.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.9986794590950012,
+      "correct": true,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er78",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I pop up a clickable outline of sections for my latex paper, I keep forgeting where things are",
+      "answer": "Use the command `C-c C-o C-e` to show the text content of a section, and `S-mouse-2` to hide it. For a clickable outline, use `C-c C-o C-e` to show content and `mouse-2` on a heading to toggle visibility. Additionally, configure `reftex-auto-recenter-toc t` to keep the table of contents updated and visible as you edit, helping you locate sections easily [4] and [5] respectively. For LaTeX export, ensure the outline levels are properly set using `org-latex-default-class` or `#+LATEX_CLASS` in your Org file [2] to maintain structure. However, the most direct solution for a clickable outline is to use the built-in outline functionality with `C-c C-o` and mouse interaction [4]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "nxml-mode.emacs",
+        "reftex.emacs"
+      ],
+      "top_score": 0.987633466720581,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        4,
+        5,
+        2
+      ],
+      "n_citations": 3,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "er79",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "how do I sotre a link to the place I'm at in my notes",
+      "answer": "Use the `store-link` protocol with a bookmark. Add a bookmark named, for example, 'Org: store-link' with the location set to: `javascript:location.href='org-protocol://store-link?url=' + encodeURIComponent(location.href);`. When you click it, Emacs will store a link to the current location in your Org file. [5]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "emacs.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.804111659526825,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        5
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": false
+    },
+    {
+      "qid": "er80",
+      "kind": "answerable",
+      "tags": [
+        "typo"
+      ],
+      "variant_kind": null,
+      "question": "make every use-package declerations install missing packages automatically",
+      "answer": "Use the `:ensure t` keyword in every `use-package` declaration to automatically install missing packages. [1]",
+      "abstained": false,
+      "gated": false,
+      "retrieved_docs": [
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs",
+        "use-package.emacs"
+      ],
+      "top_score": 0.9986615180969238,
+      "correct": false,
+      "correct_strict": false,
+      "evidence_retrieved": true,
+      "evidence_retrieved_strict": true,
+      "citations": [
+        1
+      ],
+      "n_citations": 1,
+      "uncited": false,
+      "out_of_range": 0,
+      "cite_supported": true
+    },
+    {
+      "qid": "eru01",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I show my org agenda entries in a month-grid view with calfw?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs",
+        "org.emacs"
+      ],
+      "top_score": 0.9963035583496094
+    },
+    {
+      "qid": "eru02",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I expand an abbreviation like ul>li*3 into HTML using emmet-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9960461258888245
+    },
+    {
+      "qid": "eru03",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I point Emacs at the right virtualenv with pyvenv-activate?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "gnus.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.22313743829727173
+    },
+    {
+      "qid": "eru04",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "Can aggressive-indent keep my Lisp code re-indented on every edit?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9982835650444031
+    },
+    {
+      "qid": "eru05",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "Can dumb-jump find the definition of a function when I have no tags file?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "eintr.emacs",
+        "emacs.emacs",
+        "semantic.emacs"
+      ],
+      "top_score": 0.9922783374786377
+    },
+    {
+      "qid": "eru06",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I get dockerfile-mode to build the image straight from the buffer?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.08962985128164291
+    },
+    {
+      "qid": "eru07",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I make rust-mode reformat my Rust buffer with rustfmt every time I save?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "eglot.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "eglot.emacs"
+      ],
+      "top_score": 0.12947236001491547
+    },
+    {
+      "qid": "eru08",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I turn on nix-mode for .nix files and format them?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "nxml-mode.emacs",
+        "calc.emacs",
+        "emacs.emacs",
+        "nxml-mode.emacs"
+      ],
+      "top_score": 0.045786187052726746
+    },
+    {
+      "qid": "eru09",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I list and restart Kubernetes pods from Emacs with kubel?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "tramp.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "ebrowse.emacs"
+      ],
+      "top_score": 0.9417245388031006
+    },
+    {
+      "qid": "eru10",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I bring up a docker-compose stack from docker-compose-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "tramp.emacs",
+        "calc.emacs",
+        "tramp.emacs",
+        "tramp.emacs",
+        "tramp.emacs"
+      ],
+      "top_score": 0.0022151554003357887
+    },
+    {
+      "qid": "eru11",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I get a dired-sidebar tree pane that follows the current file?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9957980513572693
+    },
+    {
+      "qid": "eru12",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I send my selected region to a chat model using gptel?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "pgg.emacs",
+        "emacs.emacs",
+        "url.emacs",
+        "pgg.emacs",
+        "rcirc.emacs"
+      ],
+      "top_score": 0.006327740382403135
+    },
+    {
+      "qid": "eru13",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I make magit-delta show syntax-highlighted diffs?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "ediff.emacs",
+        "modus-themes.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.9505298137664795
+    },
+    {
+      "qid": "eru14",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "Can beacon flash the cursor line whenever I scroll?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": false,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "efaq.emacs",
+        "emacs.emacs",
+        "viper.emacs"
+      ],
+      "top_score": 0.9210190176963806
+    },
+    {
+      "qid": "eru15",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I put the nyan-cat progress bar in my mode line?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "gnus.emacs",
+        "elisp.emacs",
+        "elisp.emacs",
+        "emacs.emacs",
+        "modus-themes.emacs"
+      ],
+      "top_score": 0.5373818278312683
+    },
+    {
+      "qid": "eru16",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I set a breakpoint and step through my program with dap-mode?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "idlwave.emacs",
+        "idlwave.emacs",
+        "idlwave.emacs",
+        "idlwave.emacs"
+      ],
+      "top_score": 0.6083022952079773
+    },
+    {
+      "qid": "eru17",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I get zig-mode to run zig fmt on save?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "calc.emacs",
+        "calc.emacs",
+        "emacs.emacs",
+        "ccmode.emacs"
+      ],
+      "top_score": 0.0020404737442731857
+    },
+    {
+      "qid": "eru18",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I turn on kotlin-mode and indent Kotlin with four spaces?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "emacs.emacs",
+        "emacs.emacs",
+        "ccmode.emacs",
+        "idlwave.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.02493434213101864
+    },
+    {
+      "qid": "eru19",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I set up scala-mode for sbt projects?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "modus-themes.emacs",
+        "eglot.emacs",
+        "modus-themes.emacs",
+        "emacs.emacs",
+        "emacs.emacs"
+      ],
+      "top_score": 0.002369424793869257
+    },
+    {
+      "qid": "eru20",
+      "kind": "unanswerable",
+      "tags": [
+        "tool-not-installed"
+      ],
+      "variant_kind": null,
+      "question": "How do I use evil-surround to change quotes around a word?",
+      "answer": "I don't know.",
+      "abstained": true,
+      "gated": true,
+      "retrieved_docs": [
+        "idlwave.emacs",
+        "emacs.emacs",
+        "vip.emacs",
+        "elisp.emacs",
+        "elisp.emacs"
+      ],
+      "top_score": 0.05538134649395943
+    }
+  ]
+}

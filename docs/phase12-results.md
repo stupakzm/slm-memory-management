@@ -132,3 +132,51 @@ aliases (`rescore_answers.py`). This shows how much of the 23/80 was label under
 bar. Only two things protect it from being a re-roll until something passes: the labels are fixed
 blind to every answer, and every arm is changed in the same way. If R8c passes by exactly +4, that is
 weak evidence, and the full-pool run is what decides. There is no third screen on this set.
+
+## Re-screen results (run 2026-10-02)
+
+Labels: `data/eval/realistic_alternatives.json` (tsk_20261002_altadj). 25 blind-adjudicated
+alternatives over 22 rows, plus 7 derived keys, merged into `gold_aliases.json`. The blind adjudicator
+accepted three of the five under-credited answers named above (`string-insert-rectangle`, `C-x C-+`,
+`find-file-read-only`). It rejected `rename-uniquely` ("frees the name, does not give another name") and
+did not list `C-x C-k n`. Those judgments stand: labels are not revised after seeing answers. Scorer:
+`scripts/screen_report.py` (tsk_20261002_screen), which reproduces the first screen's table byte for byte
+from the committed `p12-*` answers with the old aliases. Retrieval: full profile, `--domain emacs`.
+Generation: setting C. The generator ran on :8090 because an unrelated process holds :8080; the port
+does not affect outputs.
+
+| arm | correct /80 | lost | gained | **net** | p | evidence /80 | abstention /20 | retrieval wall /100 q |
+|---|---|---|---|---|---|---|---|---|
+| control `p12b-ctl` | 35 | – | – | – | – | 62 | 20 | 356 s |
+| R8 `p12b-r8` | 36 | 1 (er79) | 2 | **+1** | 1 | 60 | 20 | 468 s |
+| R8c `p12b-r8c` | 35 | 2 (er02, er79) | 2 | **+0** | 1 | 61 | 20 | 346 s |
+
+**Rule (net ≥ +4, lost ≤ 1, abstention held): neither arm advances.** As pre-registered, there is no
+third screen on this set, and R8 and R8c do not go to the full pool.
+
+**Informational (decides nothing), and the finding that matters:**
+
+| comparison (paired, same 100 rows, new labels) | correct | net | p | evidence |
+|---|---|---|---|---|
+| first-screen answers, open domain: control `p12-ctl` | 28 | – | – | 49 |
+| … R8 `p12-r8` vs that control | 32 | +4 (1 lost) | 0.22 | 53 |
+| … R8c `p12-r8c` vs that control | 31 | +3 (1 lost) | 0.375 | 53 |
+| **domain known: `p12b-ctl` vs `p12-ctl`** | **35** | **+7** (9 gained, 2 lost) | 0.065 | **62** |
+
+- **Label under-credit was real but modest.** Blind alternatives lift the open-domain control from 23 to
+  28 /80. They change no verdict on their own.
+- **Question vectors were mostly a domain signal.** In the open domain, R8 and R8c gain +3 to +4, largely
+  by pulling Emacs passages above man pages. Once retrieval knows the domain, they add +1 and +0. The
+  domain alone is worth +7 net and +13 evidence on realistic Emacs questions. That is the largest effect
+  this phase has seen, though at p = 0.065 on one 100-row set it is not yet a confirmed one.
+- **What it does not show:** every question here is an Emacs question, so `--domain emacs` is an oracle.
+  A real asker's domain has to be inferred. The open question for the next phase is how much of the +7 a
+  *router* can recover without costing the man-page rows. Only the full pool, which mixes both domains,
+  can measure that.
+
+**Verdict.** R8 and R8c are closed: neither is worth its build or latency once the domain is known.
+`phase11-qx.db` and `phase11-qc.db` stay on disk until the router experiment decides whether a domain
+signal is needed at all. Next: pre-register a domain-routing experiment on the full pool.
+
+Frozen outputs (committed): `p12b-{ctl,r8,r8c}-answers.json`, sha256 `e2af0abb…f93`, `88d19bcd…8fd`,
+`335b443d…645`. Noise: setting C, measured deterministic at 40/40 ×3 (2026-09-29).
