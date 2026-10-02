@@ -66,8 +66,8 @@ setting C) and used in place of `p11-pool-r3d`.
 
 The pool file is the five eval files concatenated in phase 11's order (1,160 rows; sha256 prefix
 `a5da3af88c1c6d94`). The sample is `random.Random(13).sample(pool qids, 50)`. Open-domain retrieval was
-run today and compared with `p11-pool-retrieved.json`: **3 of 50 rows differ** (a30 and a29.y3 differ in
-top-5 order; eu05.y3 in ids, both gated). That exceeds the limit of 2, so **the control is regenerated in
+run today and compared with `p11-pool-retrieved.json`: **3 of 50 rows differ** in their ordered top-5
+chunk ids (a30, a29.y3, eu05.y3), with no gate decision changed. That exceeds the limit of 2, so **the control is regenerated in
 full as `p13-ctl`**, as pre-registered.
 
 The same 50 rows were then retrieved a second time today: 1 of 50 differs (a30, a near-tie reorder), and
