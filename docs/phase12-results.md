@@ -92,3 +92,43 @@ well:
 2. either scope the screen to `--domain emacs` or accept man-page answers where they're genuinely
    right.
 R8c is the cheaper form of R8, with equal benefit on this set, and is the arm to carry forward.
+
+## Re-screen pre-registration (2026-10-02, before any label or run)
+
+The screen's verdict asked for two fixes to the set. Both are fixed here **before** any new label is
+written or any arm re-run, and are applied identically to control, R8 and R8c.
+
+**Fix 1: documented alternatives (labels).** A purely mechanical rule cannot do this. Of the five
+under-credited control answers named above, one is the gold command's own key, documented in prose the
+keybinding rule does not parse (`C-x C-+`). The other four are *different commands* in the same gold
+section, and "accept any command in the gold section" would also credit wrong neighbours (`find-file`
+for "stop me changing files I only want to read"). So:
+- `scripts/derive_gold_aliases.py --alternatives FILE` (tsk_20261002_altrule) merges adjudicated
+  alternatives as rule `alternative`, and adds each alternative command's documented keys mechanically
+  (`alternative-key`). `--check` enforces: every alternative is quoted verbatim from a line of the row's
+  own gold section, is not in the question text, and is command- or key-shaped.
+- `data/eval/realistic_alternatives.json` (tsk_20261002_altadj) is written by a fresh agent from the
+  question and its gold section(s) only. It does not open `data/eval/results/` or this document, and its
+  instructions name no example. It considers all 80 answerable rows and gives one reason per alternative.
+  An alternative counts only if it does what the asker asked, not a neighbouring task.
+
+**Fix 2: domain.** The re-screen runs with `--domain emacs` in every arm. The set is an Emacs set. Its
+20 unanswerable rows are Emacs tool-not-installed questions, so they are unaffected in kind. This
+measures what R8c changes *within* Emacs. Whether open-domain competition is acceptable is a separate
+question for the full pool, which keeps every domain.
+
+**Runs.** Retrieval and generation for control (`phase11.db`), R8 (`phase11-qx.db --question-vectors
+30`) and R8c (`phase11-qc.db`), all with `--domain emacs`, full profile, generation under setting C,
+named `p12b-{ctl,r8,r8c}`. Scored with the merged aliases.
+
+**Rule: unchanged from the first screen.** An arm advances to the full-pool confirmation only if, on
+the 100 rows paired against `p12b-ctl`: answerable net ≥ +4, lost ≤ 1, abstention net ≥ 0. Retrieval
+p50 is reported. The confirmation and its five rules are as pre-registered above.
+
+**Informational, decides nothing:** the existing open-domain `p12-*` answers rescored with the new
+aliases (`rescore_answers.py`). This shows how much of the 23/80 was label under-credit.
+
+**Stated now:** this is a second screen on the same 100 rows, run after R8c came up one short of the
+bar. Only two things protect it from being a re-roll until something passes: the labels are fixed
+blind to every answer, and every arm is changed in the same way. If R8c passes by exactly +4, that is
+weak evidence, and the full-pool run is what decides. There is no third screen on this set.
