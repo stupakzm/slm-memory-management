@@ -112,6 +112,10 @@ wait_ready() {
     if curl -sf "http://127.0.0.1:$port/health" > /dev/null 2>&1; then
       echo "$name ready on $port"; return 0
     fi
+    # The server already exited (e.g. port in use): no point polling on.
+    if [ -f "$RUN/$name.pid" ] && ! kill -0 "$(cat "$RUN/$name.pid")" 2>/dev/null; then
+      break
+    fi
     sleep 1
   done
   echo "$name did not come up; see $RUN/$name.log" >&2
@@ -145,7 +149,7 @@ case "${1:-status}" in
       rm -f "$f"
     done ;;
   status)
-    for p in 8080:generator 8081:embedder 8082:reranker; do
+    for p in "$GEN_PORT:generator" "$EMBED_PORT:embedder" "$RERANK_PORT:reranker"; do
       port=${p%%:*}; name=${p##*:}
       if curl -sf "http://127.0.0.1:$port/health" > /dev/null 2>&1; then
         echo "  $name  UP    :$port"
