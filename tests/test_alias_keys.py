@@ -205,6 +205,181 @@ def test_merge_leaves_other_qids_untouched():
               f"m01 should be freshly derived with alias C-c C-t, got {got}")
 
 
+_ALT_TEXT = (
+    "To kill a buffer use ‘C-x k’ (‘kill-buffer’).\n"
+    "To close it and its window together use ‘C-x 4 0’\n"
+    "(‘kill-buffer-and-window’) instead.\n"
+)
+_ALT_SEC = "t.emacs#sec"
+
+
+def _alt_fixture(question="how do I close a buffer and its window"):
+    docs = {"t.emacs": {"sections": {_ALT_SEC: _ALT_TEXT}}}
+    row = _row("a1", "t.emacs", "kill-buffer", [_ALT_SEC])
+    row["question"] = question
+    return docs, [row]
+
+
+def _alt(**kw):
+    e = {"token": "kill-buffer", "alias": "kill-buffer-and-window",
+         "sec_id": _ALT_SEC,
+         "line": "(‘kill-buffer-and-window’) instead.",
+         "why": "closes the buffer together with its window"}
+    e.update(kw)
+    return e
+
+
+def _check_alt(docs, rows, entries):
+    alts = {"a1": entries}
+    aliases, _ = derive_gold_aliases.derive_keybinding(docs, rows, alts)
+    return aliases, derive_gold_aliases.check_alternatives(alts, aliases, docs, rows)
+
+
+def test_alternative_command_licensed():
+    docs, rows = _alt_fixture()
+    aliases, viol = _check_alt(docs, rows, [_alt()])
+    check(viol == [], f"a licensed alternative should pass, got {viol}")
+    got = aliases["a1"]["kill-buffer"]
+    rules = [(e["alias"], e["rule"]) for e in got]
+    check(rules[0] == ("C-x k", "keybinding"),
+          f"keybinding entries must come first, got {rules}")
+    check(("kill-buffer-and-window", "alternative") in rules,
+          f"alternative missing: {rules}")
+    # alias equal to the token is dropped; duplicates deduped
+    aliases2, _ = derive_gold_aliases.derive_keybinding(
+        docs, rows, {"a1": [_alt(alias="kill-buffer"), _alt(), _alt()]})
+    n = [e for e in aliases2["a1"]["kill-buffer"] if e["rule"] == "alternative"]
+    check(len(n) == 1, f"expected one deduped alternative, got {n}")
+
+
+def test_alternative_line_not_verbatim_rejected():
+    docs, rows = _alt_fixture()
+    _, viol = _check_alt(docs, rows, [_alt(line="made up (‘kill-buffer-and-window’)")])
+    check(any("not verbatim" in v for v in viol), f"expected not-verbatim, got {viol}")
+    _, viol = _check_alt(docs, rows, [_alt(alias="other-command")])
+    check(any("not a substring" in v for v in viol), f"expected substring, got {viol}")
+    _, viol = _check_alt(docs, rows, [_alt(why="")])
+    check(any("no why" in v for v in viol), f"expected no-why, got {viol}")
+    _, viol = _check_alt(docs, rows, [_alt(token="nope")])
+    check(any("answer_contains" in v for v in viol), f"expected token, got {viol}")
+
+
+def test_alternative_outside_gold_section_rejected():
+    docs, rows = _alt_fixture()
+    docs["t.emacs"]["sections"]["t.emacs#other"] = _ALT_TEXT
+    _, viol = _check_alt(docs, rows, [_alt(sec_id="t.emacs#other")])
+    check(any("not in gold_sec_ids" in v for v in viol), f"got {viol}")
+    # a qid not in --eval, and a non-answerable row
+    alts = {"zz": [_alt()]}
+    check(any("not in this --eval" in v for v in
+              derive_gold_aliases.check_alternatives(alts, {}, docs, rows)), "qid")
+    rows2 = [dict(rows[0], kind="unanswerable")]
+    check(any("non-answerable" in v for v in derive_gold_aliases.check_alternatives(
+        {"a1": [_alt()]}, {}, docs, rows2)), "non-answerable")
+
+
+def test_alternative_in_question_rejected():
+    docs, rows = _alt_fixture(question="what does Kill-Buffer-And-Window do")
+    _, viol = _check_alt(docs, rows, [_alt()])
+    check(any("occurs in the question" in v for v in viol),
+          f"an alias echoing the question must be rejected, got {viol}")
+    # also for a derived alternative-key
+    docs, rows = _alt_fixture(question="what is C-x 4 0 for")
+    _, viol = _check_alt(docs, rows, [_alt()])
+    check(any("alternative-key" in v and "C-x 4 0" in v for v in viol),
+          f"alternative-key echo must be rejected, got {viol}")
+    # an alias that is not command- or key-shaped
+    _, viol = _check_alt(*_alt_fixture(), [_alt(alias="instead", line="instead.")])
+    check(any("neither command- nor key-shaped" in v for v in viol), f"got {viol}")
+
+
+def test_alternative_key_expansion():
+    docs, rows = _alt_fixture()
+    aliases, viol = _check_alt(docs, rows, [_alt()])
+    keys = [e for e in aliases["a1"]["kill-buffer"] if e["rule"] == "alternative-key"]
+    check(len(keys) == 1 and keys[0]["alias"] == "C-x 4 0"
+          and keys[0]["via"] == "kill-buffer-and-window"
+          and keys[0]["sec_id"] == _ALT_SEC,
+          f"expected the alternative's documented key, got {keys}")
+    check(keys[0]["line"] in _ALT_TEXT, "key line must be verbatim")
+    _, stats = derive_gold_aliases.derive_keybinding(docs, rows, {"a1": [_alt()]})
+    check(stats["per_rule"] == {"keybinding": 1, "alternative": 1,
+                                "alternative-key": 1}, f"{stats}")
+    # a key alternative expands nothing
+    a2, _ = _check_alt(docs, rows, [_alt(alias="C-x 4 0", line="‘C-x 4 0’")])
+    check(all(e["rule"] != "alternative-key" for e in a2["a1"]["kill-buffer"]),
+          "a key-shaped alternative must not expand")
+
+
+def _run_cli(*args):
+    return subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "derive_gold_aliases.py"), *args],
+        capture_output=True, text=True)
+
+
+def _cli_fixture(td, question="how do I close a buffer and its window"):
+    tmp = Path(td)
+    md = tmp / "md"
+    md.mkdir()
+    (md / "fixture.md").write_text(
+        "Intro.\n\n## Sec\n\n" + _ALT_TEXT, encoding="utf-8")
+    ev = tmp / "eval.jsonl"
+    ev.write_text(json.dumps({
+        "qid": "a1", "kind": "answerable", "doc": "fixture.emacs",
+        "question": question, "answer_contains": ["kill-buffer"],
+        "gold_sec_ids": ["fixture.emacs#sec"]}) + "\n", encoding="utf-8")
+    alt = tmp / "alt.json"
+    alt.write_text(json.dumps({"a1": [_alt(sec_id="fixture.emacs#sec")]}))
+    return md, ev, alt, tmp / "out.json"
+
+
+def test_check_flags_stale_merge():
+    with tempfile.TemporaryDirectory() as td:
+        md, ev, alt, out = _cli_fixture(td)
+        base = ["--md-corpus", str(md), "--eval", str(ev), "--out", str(out)]
+        r = _run_cli(*base, "--merge")
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        r = _run_cli(*base, "--check")
+        check(r.returncode == 0, f"fresh no-flag merge should check clean: {r.stdout}")
+        r = _run_cli(*base, "--alternatives", str(alt), "--check")
+        check(r.returncode == 1 and "stale" in r.stdout,
+              f"merge without alternatives is stale against them: {r.stdout}")
+        r = _run_cli(*base, "--alternatives", str(alt), "--merge")
+        check(r.returncode == 0 and "alternative-key aliases derived: 1" in r.stdout,
+              f"{r.stdout}{r.stderr}")
+        r = _run_cli(*base, "--alternatives", str(alt), "--check")
+        check(r.returncode == 0, f"{r.stdout}")
+        # no-flag check ignores the alternative entries
+        r = _run_cli(*base, "--check")
+        check(r.returncode == 0, f"no-flag check must compare keybinding only: {r.stdout}")
+        # tamper with the merged file: stale
+        data = json.loads(out.read_text())
+        data["a1"]["kill-buffer"][0]["alias"] = "C-x z"
+        out.write_text(json.dumps(data))
+        r = _run_cli(*base, "--check")
+        check(r.returncode == 1 and "stale" in r.stdout, f"{r.stdout}")
+
+
+def test_no_alternatives_flag_is_unchanged():
+    with tempfile.TemporaryDirectory() as td:
+        md, ev, alt, out = _cli_fixture(td)
+        base = ["--md-corpus", str(md), "--eval", str(ev), "--out", str(out)]
+        r = _run_cli(*base)
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        plain = out.read_bytes()
+        check("alternative" not in r.stdout, f"no alternative output expected: {r.stdout}")
+        r = _run_cli(*base, "--alternatives", str(alt))
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        check(out.read_bytes() != plain, "alternatives should change the output")
+        # an empty FILE changes nothing
+        empty = Path(td) / "empty.json"
+        empty.write_text(json.dumps({"a1": []}))
+        _run_cli(*base, "--alternatives", str(empty))
+        check(out.read_bytes() == plain, "empty alternatives must be byte-identical")
+        aliases, stats = derive_gold_aliases.derive_keybinding(*_alt_fixture())
+        check(stats["per_rule"] == {"keybinding": 1}, f"{stats}")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

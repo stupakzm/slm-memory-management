@@ -66,11 +66,38 @@ modifier (C-/M-/s-/H-/A-), be a function key (`<F3>`), or start with a
 prefix character (`%`, `*`) - a bare single character or plain word is
 never accepted as a key, so it can never inflate what counts correct.
 
+Alternatives (--alternatives FILE, --md-corpus mode only): a one-token label
+under-credits a correct answer that names a *different documented command*
+for the same need, or a key the keybinding rule cannot parse because it sits
+in prose. Deciding which neighbour really answers a question is judgment, so
+FILE is adjudicated by hand: a JSON object keyed by qid, each value a list of
+{"token", "alias", "sec_id", "line", "why"} (a row may map to []). It is
+merged as two rules, after that row's keybinding entries:
+
+  alternative      the FILE entry itself, licensed by `line`, a verbatim line
+                   of the row's own gold section `sec_id`.
+  alternative-key  mechanical: when an alternative alias is command-shaped,
+                   every keybinding pair in the row's gold sections whose
+                   command equals it adds its key (with `via` = the command).
+
+Deduped on (alias, sec_id) per token; an alias equal to the token is dropped.
+Without --alternatives the output is byte-identical to the keybinding mode.
+--check polices the FILE: the qid must be in --eval and answerable, `token`
+in answer_contains, `sec_id` in gold_sec_ids, `line` verbatim in that
+section, `alias` a substring of `line` and command- or key-shaped, `why`
+non-empty, and no alias (alternative or alternative-key) may occur in the
+question text (case-insensitive) - an answer echoing the question must never
+score. --check also flags a stale --out: for every qid in this --eval the
+--out entry must equal the fresh derivation (without --alternatives only the
+`keybinding` entries are compared). Merging with --alternatives refuses to
+write if any violation is found.
+
 Usage: derive_gold_aliases.py [--corpus data/corpus/man.jsonl]
                                [--eval data/eval/questions.jsonl]
                                [--out data/eval/gold_aliases.json]
        derive_gold_aliases.py --md-corpus DIR --eval EVAL.jsonl
-                               [--merge] [--check] [--out data/eval/gold_aliases.json]
+                               [--merge] [--check] [--alternatives FILE]
+                               [--out data/eval/gold_aliases.json]
 """
 
 from __future__ import annotations
@@ -461,10 +488,61 @@ def load_md_corpus(md_dir: Path) -> dict:
     return docs
 
 
-def derive_keybinding(docs: dict, rows: list[dict]) -> tuple[dict, dict]:
+def load_alternatives(path: Path) -> dict:
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def _valid_alt_entries(entries) -> list[dict]:
+    return [e for e in entries if isinstance(e, dict)
+            and all(isinstance(e.get(k), str) and e.get(k)
+                    for k in ("token", "alias", "sec_id", "line"))]
+
+
+def apply_alternatives(sections: dict, row: dict, entries: list,
+                       per_token: dict) -> None:
+    """Append `alternative` entries (and the mechanically derived
+    `alternative-key` ones) for `row` to per_token, after its keybinding
+    entries. Dedupe on (alias, sec_id) per token; alias == token is dropped.
+    Validation is --check's job; entries naming a token outside the row's
+    answer_contains are skipped here."""
+    answer = set(row.get("answer_contains", []))
+    for e in _valid_alt_entries(entries):
+        token, alias = e["token"], e["alias"]
+        if token not in answer or alias == token:
+            continue
+        got = per_token.setdefault(token, [])
+        seen = {(x["alias"], x["sec_id"]) for x in got}
+
+        def add(entry: dict) -> None:
+            k = (entry["alias"], entry["sec_id"])
+            if entry["alias"] != token and k not in seen:
+                seen.add(k)
+                got.append(entry)
+
+        add({"alias": alias, "rule": "alternative",
+             "sec_id": e["sec_id"], "line": e["line"]})
+        if _COMMAND_SHAPE_RE.match(alias):
+            for sec_id in row.get("gold_sec_ids", []):
+                text = sections.get(sec_id)
+                if text is None:
+                    continue
+                for p in keybinding_pairs_in_section(text):
+                    key = normalize_key(p["key_raw"])
+                    if p["command"] == alias and is_key_shaped(key):
+                        add({"alias": key, "rule": "alternative-key",
+                             "sec_id": sec_id, "line": p["key_line"],
+                             "via": alias})
+        if not got:
+            del per_token[token]
+
+
+def derive_keybinding(docs: dict, rows: list[dict],
+                      alternatives: dict | None = None) -> tuple[dict, dict]:
     """Returns (aliases, stats), same shape as derive()."""
     aliases: dict[str, dict] = {}
     per_rule = {"keybinding": 0}
+    if alternatives is not None:
+        per_rule.update({"alternative": 0, "alternative-key": 0})
     touched: set[str] = set()
 
     for row in rows:
@@ -475,14 +553,100 @@ def derive_keybinding(docs: dict, rows: list[dict]) -> tuple[dict, dict]:
             continue
         qid = row["qid"]
         per_token = keybinding_matches_for_row(doc["sections"], row)
+        if alternatives is not None and isinstance(alternatives.get(qid), list):
+            apply_alternatives(doc["sections"], row, alternatives[qid], per_token)
         if per_token:
             touched.add(qid)
             for entries in per_token.values():
-                per_rule["keybinding"] += len(entries)
+                for e in entries:
+                    per_rule[e["rule"]] += 1
         aliases[qid] = per_token
 
     stats = {"per_rule": per_rule, "questions_touched": len(touched)}
     return aliases, stats
+
+
+def check_alternatives(alternatives: dict, aliases: dict, docs: dict,
+                       rows: list[dict]) -> list[str]:
+    """Violations in the adjudicated FILE and in what it derived. `aliases`
+    is the fresh derivation (for the alternative-key question-echo check)."""
+    rows_by_qid = {r["qid"]: r for r in rows}
+    violations: list[str] = []
+    if not isinstance(alternatives, dict):
+        return ["alternatives file is not a JSON object keyed by qid"]
+    for qid, entries in alternatives.items():
+        row = rows_by_qid.get(qid)
+        if row is None:
+            violations.append(f"{qid}: alternatives for a qid not in this --eval")
+            continue
+        if row.get("kind") != "answerable":
+            violations.append(f"{qid}: alternatives for a non-answerable row")
+            continue
+        if not isinstance(entries, list):
+            violations.append(f"{qid}: alternatives value is not a list")
+            continue
+        sections = docs.get(row.get("doc"), {}).get("sections", {})
+        gold_secs = set(row.get("gold_sec_ids", []))
+        for e in entries:
+            if not isinstance(e, dict):
+                violations.append(f"{qid}: alternative entry is not an object")
+                continue
+            token, alias = e.get("token"), e.get("alias")
+            sec_id, line = e.get("sec_id"), e.get("line")
+            tag = f"{qid}/{token}"
+            if not all(isinstance(x, str) and x for x in (token, alias, sec_id, line)):
+                violations.append(f"{tag}: token/alias/sec_id/line must be non-empty strings")
+                continue
+            if token not in row.get("answer_contains", []):
+                violations.append(f"{tag}: token not in the row's answer_contains")
+            if not (isinstance(e.get("why"), str) and e["why"].strip()):
+                violations.append(f"{tag}: alias {alias!r} has no why")
+            if sec_id not in gold_secs:
+                violations.append(f"{tag}: sec_id {sec_id!r} not in gold_sec_ids")
+            else:
+                text = sections.get(sec_id)
+                if text is None:
+                    violations.append(f"{tag}: no such section {sec_id!r}")
+                elif line not in text:
+                    violations.append(
+                        f"{tag}: line {line!r} not verbatim in section {sec_id!r}")
+            if alias not in line:
+                violations.append(f"{tag}: alias {alias!r} not a substring of its line")
+            if not (_COMMAND_SHAPE_RE.match(alias)
+                    or is_key_shaped(normalize_key(alias))):
+                violations.append(
+                    f"{tag}: alias {alias!r} is neither command- nor key-shaped")
+    for qid, per_token in aliases.items():
+        question = rows_by_qid.get(qid, {}).get("question", "").lower()
+        for token, entries in per_token.items():
+            for e in entries:
+                if (e.get("rule") in ("alternative", "alternative-key")
+                        and e["alias"].lower() in question):
+                    violations.append(
+                        f"{qid}/{token}: {e['rule']} alias {e['alias']!r} "
+                        f"occurs in the question text")
+    return violations
+
+
+def check_stale(aliases: dict, existing: dict, rows: list[dict],
+                with_alternatives: bool) -> list[str]:
+    """For each qid in this --eval the --out entry must equal the fresh
+    derivation; without --alternatives only `keybinding` entries compare."""
+    def view(entry):
+        out = {}
+        for token, entries in (entry or {}).items():
+            if not with_alternatives:
+                entries = [e for e in entries if e.get("rule") == "keybinding"]
+            if entries:
+                out[token] = entries
+        return out
+
+    violations = []
+    for qid in sorted({r["qid"] for r in rows}):
+        if view(existing.get(qid)) != view(aliases.get(qid)):
+            violations.append(
+                f"{qid}: --out entry is stale (differs from a fresh derivation)")
+    return violations
 
 
 def check_keybinding(aliases: dict, docs: dict, rows: list[dict]) -> list[str]:
@@ -546,6 +710,9 @@ def main() -> int:
     ap.add_argument("--check", action="store_true",
                      help="validate derived keybinding aliases; exit 1 on any "
                           "violation (--md-corpus only)")
+    ap.add_argument("--alternatives", default=None,
+                     help="JSON file of adjudicated alternative answers "
+                          "(--md-corpus only)")
     args = ap.parse_args()
 
     eval_path = ROOT / args.eval
@@ -562,20 +729,48 @@ def main() -> int:
             return 2
         docs = load_md_corpus(md_dir)
         rows = load_questions(eval_path)
-        aliases, stats = derive_keybinding(docs, rows)
+        alternatives = None
+        if args.alternatives:
+            alt_path = ROOT / args.alternatives
+            if not alt_path.exists():
+                print(f"no alternatives file at {alt_path}", file=sys.stderr)
+                return 2
+            alternatives = load_alternatives(alt_path)
+        aliases, stats = derive_keybinding(docs, rows, alternatives)
 
         if args.check:
             violations = check_keybinding(aliases, docs, rows)
+            if alternatives is not None:
+                violations += check_alternatives(alternatives, aliases, docs, rows)
+            existing = (json.loads(out_path.read_text())
+                        if out_path.exists() else {})
+            violations += check_stale(aliases, existing, rows,
+                                      alternatives is not None)
             for v in violations:
                 print("VIOLATION: " + v)
             if violations:
                 print(f"\n{len(violations)} violation(s)")
                 return 1
+            extra = "".join(f", {stats['per_rule'][r]} {r}"
+                            for r in ("alternative", "alternative-key")
+                            if r in stats["per_rule"])
             print(f"check OK: {stats['per_rule']['keybinding']} keybinding "
-                  f"aliases, {stats['questions_touched']} questions, 0 violations")
+                  f"aliases{extra}, {stats['questions_touched']} questions, "
+                  f"0 violations")
             return 0
 
+        if alternatives is not None:
+            violations = check_alternatives(alternatives, aliases, docs, rows)
+            for v in violations:
+                print("VIOLATION: " + v)
+            if violations:
+                print(f"\n{len(violations)} violation(s); nothing written")
+                return 1
+
         print(f"keybinding aliases derived: {stats['per_rule']['keybinding']}")
+        if alternatives is not None:
+            for r in ("alternative", "alternative-key"):
+                print(f"{r} aliases derived: {stats['per_rule'][r]}")
         print(f"questions touched: {stats['questions_touched']}")
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
