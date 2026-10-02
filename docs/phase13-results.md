@@ -61,3 +61,16 @@ setting C) and used in place of `p11-pool-r3d`.
 - The pool's Emacs variants were written against the gold sections and often name Emacs. That makes
   routing easier here than for realistic askers, so a pass is an upper estimate for unnamed questions.
 - One pre-registered router is tested. If it fails, a second router is a new experiment, not a retune.
+
+## Control drift check (run 2026-10-02, before any arm)
+
+The pool file is the five eval files concatenated in phase 11's order (1,160 rows; sha256 prefix
+`a5da3af88c1c6d94`). The sample is `random.Random(13).sample(pool qids, 50)`. Open-domain retrieval was
+run today and compared with `p11-pool-retrieved.json`: **3 of 50 rows differ** (a30 and a29.y3 differ in
+top-5 order; eu05.y3 in ids, both gated). That exceeds the limit of 2, so **the control is regenerated in
+full as `p13-ctl`**, as pre-registered.
+
+The same 50 rows were then retrieved a second time today: 1 of 50 differs (a30, a near-tie reorder), and
+the largest top-1 score difference is 0.00027. Retrieval therefore has a small noise floor of its own,
+about 2 % of rows reordering between identical runs, separate from the generator's (setting C:
+0/40). A paired net within ±2 on 500+ rows is inside that floor.
