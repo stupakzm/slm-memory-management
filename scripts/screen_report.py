@@ -54,6 +54,18 @@ def load_eval(path) -> dict:
     return rows
 
 
+def load_evals(paths) -> dict:
+    """Merge several eval files by qid; a qid in two files is an error."""
+    rows = {}
+    for path in paths:
+        part = load_eval(path)
+        dup = sorted(set(rows) & set(part))
+        if dup:
+            raise ValueError(f"{path}: qid {dup[0]} is already in an earlier --eval file")
+        rows.update(part)
+    return rows
+
+
 def score_run(answers_path, eval_rows: dict, aliases: dict) -> dict:
     """{qid: {correct, evidence, abstained, answerable}} for one answers file."""
     out = {}
@@ -101,6 +113,20 @@ def compare(ctl: dict, arm: dict, min_net=4, max_lost=1, min_abstention_net=0) -
             "lost_qids": lost, "gained_qids": gained}
 
 
+def group_of(eval_row: dict, field: str, default: str) -> str:
+    return eval_row.get(field) or default
+
+
+def group_compare(ctl: dict, arm: dict, eval_rows: dict, field: str, default: str) -> dict:
+    """{group: compare() restricted to that group's rows}."""
+    names = sorted({group_of(eval_rows[q], field, default) for q in ctl})
+    out = {}
+    for g in names:
+        qs = [q for q in ctl if group_of(eval_rows[q], field, default) == g]
+        out[g] = compare({q: ctl[q] for q in qs}, {q: arm[q] for q in qs})
+    return out
+
+
 def format_report(control: str, cs: dict, arms: list) -> str:
     A, U = cs["answerable"], cs["unanswerable"]
     lines = [f"control {control}: correct {cs['correct']}/{A} "
@@ -116,15 +142,24 @@ def format_report(control: str, cs: dict, arms: list) -> str:
             lines.append("  lost: " + " ".join(r["lost_qids"]))
         if r["gained"]:
             lines.append("  gained: " + " ".join(r["gained_qids"]))
+        for g, gr in r.get("groups", {}).items():
+            lines.append(
+                f"  [{g}] correct {gr['correct']}/{gr['answerable']} "
+                f"lost {gr['lost']} gained {gr['gained']} net {signed(gr['net'])} "
+                f"p {gr['p']:.3g} evidence {gr['evidence']}/{gr['answerable']} "
+                f"abstained {gr['abstained']}/{gr['unanswerable']} "
+                f"abstention_net {signed(gr['abstention_net'])}")
     return "\n".join(lines) + "\n"
 
 
 def main(argv=None, results_dir=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--eval", required=True)
+    ap.add_argument("--eval", action="append", required=True)
     ap.add_argument("--control", required=True)
     ap.add_argument("--arm", action="append", required=True)
     ap.add_argument("--aliases", default=None)
+    ap.add_argument("--group", default=None)
+    ap.add_argument("--group-default", default="-")
     ap.add_argument("--json", default=None)
     ap.add_argument("--min-net", type=int, default=4)
     ap.add_argument("--max-lost", type=int, default=1)
@@ -134,16 +169,19 @@ def main(argv=None, results_dir=None) -> int:
     rdir = Path(results_dir) if results_dir else RESULTS
     aliases_path = Path(a.aliases) if a.aliases else ROOT / "data" / "eval" / "gold_aliases.json"
     aliases = gold.load_aliases(aliases_path)
-    eval_rows = load_eval(a.eval)
 
     def path_of(name):
         return rdir / f"{name}-answers.json"
 
     try:
+        eval_rows = load_evals(a.eval)
         ctl = score_run(path_of(a.control), eval_rows, aliases)
         arms = [(n, score_run(path_of(n), eval_rows, aliases)) for n in a.arm]
         results = [(n, compare(ctl, run, a.min_net, a.max_lost,
                                a.min_abstention_net)) for n, run in arms]
+        if a.group:
+            for (n, run), (_, r) in zip(arms, results):
+                r["groups"] = group_compare(ctl, run, eval_rows, a.group, a.group_default)
     except ValueError as e:
         print(str(e), file=sys.stderr)
         return 2
@@ -152,14 +190,15 @@ def main(argv=None, results_dir=None) -> int:
     sys.stdout.write(format_report(a.control, cs, results))
 
     if a.json:
-        hashes = {"eval": sha256(a.eval), a.control: sha256(path_of(a.control))}
+        hashes = {"eval": sha256(a.eval[0]) if len(a.eval) == 1
+                  else {str(e): sha256(e) for e in a.eval}, a.control: sha256(path_of(a.control))}
         for n in a.arm:
             hashes[n] = sha256(path_of(n))
         data = {"control": {"name": a.control, **cs},
                 "arms": {n: r for n, r in results},
                 "thresholds": {"min_net": a.min_net, "max_lost": a.max_lost,
                                "min_abstention_net": a.min_abstention_net},
-                "eval": str(a.eval),
+                "eval": str(a.eval[0]) if len(a.eval) == 1 else [str(e) for e in a.eval],
                 "aliases": str(aliases_path),
                 "aliases_exists": aliases_path.exists(),
                 "sha256": {"eval": hashes["eval"],

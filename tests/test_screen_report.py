@@ -183,6 +183,73 @@ def test_line_format():
         check(data["thresholds"]["min_net"] == 4, data["thresholds"])
 
 
+def test_repeatable_eval_merges_files():
+    with tempfile.TemporaryDirectory() as t:
+        ev1, al = setup(t, [erow("q1"), erow("q2")],
+                        {"c": [row("q1", "alpha"), row("q2", "x")],
+                         "a": [row("q1", "x"), row("q2", "alpha")]})
+        ev2 = Path(t) / "eval2.jsonl"
+        ev2.write_text(json.dumps(erow("q3")) + "\n")
+        for n in ("c", "a"):
+            p = Path(t) / f"{n}-answers.json"
+            rows = json.loads(p.read_text())["results"] + [row("q3", "alpha")]
+            p.write_text(json.dumps({"results": rows}))
+        argv = ["--eval", str(ev1), "--eval", str(ev2), "--control", "c",
+                "--arm", "a", "--aliases", str(al)]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = sr.main(argv, results_dir=t)
+        check(code == 0 and out.getvalue().startswith("control c: correct 2/3 "),
+              (code, out.getvalue(), err.getvalue()))
+        # the same qid in two files exits 2
+        argv = ["--eval", str(ev1), "--eval", str(ev1), "--control", "c",
+                "--arm", "a", "--aliases", str(al)]
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = sr.main(argv, results_dir=t)
+        check(code == 2 and err.getvalue() and not out.getvalue(), (code, out.getvalue()))
+
+
+def test_group_lines_partition_rows():
+    with tempfile.TemporaryDirectory() as t:
+        ev_rows = [erow("q1", domain="x"), erow("q2", domain="x"), erow("q3"),
+                   erow("u1", kind="unanswerable", domain="x"),
+                   erow("u2", kind="unanswerable")]
+        ctl = [row("q1", "alpha"), row("q2", "x"), row("q3", "alpha"),
+               row("u1", abstained=True), row("u2")]
+        arm = [row("q1", "x"), row("q2", "alpha"), row("q3", "alpha"),
+               row("u1"), row("u2", abstained=True)]
+        ev, al = setup(t, ev_rows, {"c": ctl, "a": arm})
+        out_json = Path(t) / "out.json"
+        code, out, err = run_main(t, ev, al, "c", ["a"],
+                                  ["--group", "domain", "--group-default", "dflt",
+                                   "--json", str(out_json)])
+        want = ("  [dflt] correct 1/1 lost 0 gained 0 net +0 p 1 evidence 1/1 "
+                "abstained 1/1 abstention_net +1\n"
+                "  [x] correct 1/2 lost 1 gained 1 net +0 p 1 evidence 2/2 "
+                "abstained 0/1 abstention_net -1\n")
+        check(code == 0 and out.endswith(want), f"\n{out}")
+        r = json.loads(out_json.read_text())["arms"]["a"]
+        gs = r["groups"].values()
+        for k in ("correct", "evidence", "abstained", "answerable", "unanswerable",
+                  "lost", "gained", "net", "abstention_net"):
+            check(sum(g[k] for g in gs) == r[k], (k, r))
+
+
+def test_no_group_output_unchanged():
+    with tempfile.TemporaryDirectory() as t:
+        ev, al = setup(t, [erow("q1", domain="x")],
+                       {"c": [row("q1", "alpha")], "a": [row("q1", "x")]})
+        out_json = Path(t) / "out.json"
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--json", str(out_json)])
+        want = ("control c: correct 1/1 evidence 1/1 abstained 0/0\n"
+                "a vs c: correct 0/1 lost 1 gained 0 net -1 p 1 evidence 1/1 "
+                "abstained 0/0 abstention_net +0 verdict FAIL\n"
+                "  lost: q1\n")
+        check(code == 0 and out == want, f"\n{out}")
+        check("groups" not in json.loads(out_json.read_text())["arms"]["a"], "no groups")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
