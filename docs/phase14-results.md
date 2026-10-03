@@ -77,3 +77,41 @@ the simulated top 5 (reported).
   realistic set is reported for the chosen F as a second, harder held-out check, but it does not
   decide.
 - Half the rows means less power. A real but small effect can fail rule 1 here.
+
+## Validation result (2026-10-03): the sweep is broken, and nothing is selected
+
+The dev sweep (576 rows, floors 0 to 25, one rerank per question over the candidate union) ran. Then the
+pre-registered check:
+
+| simulated arm vs real run | ordered top 5 | same top-5 set | same gate | required |
+|---|---|---|---|---|
+| F = 0 vs `p13-ctl` | 94.1 % | 97.2 % | 99.8 % | ≥ 95 %: **fail** (barely) |
+| F = 25 vs `p13-quota` | **56.9 %** | 76.7 % | 99.5 % | ≥ 95 %: **fail** |
+
+As pre-registered, the sweep stops. **No floor is selected, the test half is not touched, and R11 has no
+result.**
+
+**Why: reranker scores depend on batch composition.** For chunks present in both runs, the score
+difference is:
+- **F = 0:** median **0**, p90 0, 1.3 % of pairs over 0.01. The sweep's union starts with the same open
+  top 50 in the same order, so the batches of 16 mostly line up.
+- **F = 25:** median 5e-4, p90 **0.019**, max 0.119, **16.8 %** of pairs over 0.01. The same 50 chunks
+  arrive in a different order inside a larger union, so each pair shares its batch with different
+  documents.
+
+So `Reranker.rerank` (batches of 16 per request, `src/smm/rerank.py`) does not score a
+question–passage pair independently of its batch-mates on this server. Differences up to about 0.02
+reorder near-tied top-5 candidates.
+
+**What this means beyond phase 14:**
+- **Any two runs whose candidate pools differ carry this as noise:** phase 13's oracle, R9 and R10
+  against the open control, and phase 11's R8. It is noise, not bias: it does not favour either arm.
+  It is part of why about 1 in 50 rows reorders even between identical runs (the drift check). Those
+  comparisons stay paired and their verdicts stand. Margins of a few rows sit inside this noise.
+- **A rerank-score cache only works if each pair's score is batch-independent.** Two ways to get that:
+  - score pairs one per request (batch = 1, slower; cost unmeasured)
+  - fix the order and partners deterministically (e.g. sort candidates by chunk_id before batching), in
+    both the live path and the sweep.
+
+  Either changes the live system's scores, so it is a new, pre-registered change with its own
+  control.
