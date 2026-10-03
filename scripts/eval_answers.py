@@ -228,6 +228,9 @@ def main() -> int:
                          "own top FLOOR chunks and the rest of the candidates go to the "
                          "best by dense distance (0 = the open search). Required by, and "
                          "only valid with, --route floor.")
+    ap.add_argument("--rerank-batch", type=int, default=None,
+                    help="documents per reranker request (default unset = 16). Set 1 to "
+                         "score every document alone.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
 
@@ -295,7 +298,7 @@ def main() -> int:
                 return 2
         rr = None
         if args.rerank:
-            rr = Reranker()
+            rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
             if not rr.health():
                 print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
                 return 2
@@ -517,6 +520,8 @@ def write_report(args, results: list, t0: float) -> int:
               "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
               "qids": args.qids, "abstain_rule": "all-sentences",
               "evidence_rule": "aliased"}
+    if args.rerank_batch:
+        config["rerank_batch"] = args.rerank_batch
     # Only added under --normalize spell, so --normalize off's output stays
     # byte-identical to every run made before this flag existed.
     if args.normalize == "spell":
@@ -571,7 +576,7 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
     if not emb.health():
         print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
         return 2
-    rr = Reranker()
+    rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
     if not rr.health():
         print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
         return 2

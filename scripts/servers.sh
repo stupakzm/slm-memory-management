@@ -25,6 +25,7 @@ MODELS="${SMM_MODELS:-$ROOT/models}"
 # SMM_RERANK_MODEL picks which reranker weight `start_reranker` loads, e.g.
 # SMM_RERANK_MODEL=qwen3-reranker-4b-q4_k_m.gguf for the 4B conversion. All
 # unset, behaviour is exactly what it always was.
+# The full reranker profile's --parallel slot count is env-tunable (default 4), e.g. 1 for batch-independence checks.
 # SMM_GEN_MODEL picks which generator weight `start_generator` loads, e.g.
 # SMM_GEN_MODEL=Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf for the 30B reader.
 # SMM_GEN_ARGS adds extra llama-server args (word-split, appended), e.g.
@@ -128,7 +129,7 @@ case "${1:-status}" in
     case "${2:-embedder}" in
       embedder)  start_embedder;  wait_ready "$EMBED_PORT" embedder ;;
       generator) start_generator; wait_ready "$GEN_PORT" generator ;;
-      reranker)  start_reranker;  wait_ready "$RERANK_PORT" reranker ;;
+      reranker)  start_reranker 8192 2048 "${SMM_RERANK_PARALLEL:-4}"; wait_ready "$RERANK_PORT" reranker ;;
       serve)
         start_embedder_lean; wait_ready "$EMBED_PORT" embedder
         start_reranker 1024 768 1; wait_ready "$RERANK_PORT" reranker

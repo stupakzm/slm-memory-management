@@ -141,6 +141,9 @@ def main() -> int:
                          "own top FLOOR candidates and the rest go to the best by dense "
                          "distance (0 = the open search). Required by, and only valid "
                          "with, --route floor.")
+    ap.add_argument("--rerank-batch", type=int, default=None,
+                    help="documents per reranker request (default unset = 16). Set 1 to "
+                         "score every document alone.")
     args = ap.parse_args()
     question = " ".join(args.question)
     if (args.route == "floor") != (args.floor is not None):
@@ -193,7 +196,7 @@ def main() -> int:
         return 2
     rr = None
     if not args.no_rerank:
-        rr = Reranker()
+        rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
         if not rr.health():
             print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
             return 2

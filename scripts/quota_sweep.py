@@ -85,6 +85,9 @@ def main() -> int:
                     help="path to a JSON list of qids; restricts rows to those qids")
     ap.add_argument("--print-split", action="store_true",
                     help="print the dev and test base/row counts and exit")
+    ap.add_argument("--rerank-batch", type=int, default=None,
+                    help="documents per reranker request (default unset = 16). Set 1 to "
+                         "score every document alone.")
     args = ap.parse_args()
 
     rows: list[dict] = []
@@ -122,7 +125,7 @@ def main() -> int:
         qid_set = set(json.loads(Path(args.qids).read_text()))
         rows = [r for r in rows if r["qid"] in qid_set]
 
-    emb, rr = Embedder(), Reranker()
+    emb, rr = Embedder(), Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
     if not emb.health():
         print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
         return 2
