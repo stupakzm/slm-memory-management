@@ -154,3 +154,30 @@ under them, paired against `p13-ctl`, shows:
 3. retrieval s/q ≤ 3.25 + 1.0
 
 Otherwise the noise is documented and the defaults stay.
+
+## Reranker batch-independence: result (2026-10-03)
+
+The pre-registered 4-arm check (`scripts/rerank_check.py`, 50 dev questions, seed 18; code on
+`orch/tsk_20261003_rbatch`, 85aae8e):
+
+| arm | server `--parallel` | client batch | max drift | rerank s/question |
+|---|---|---|---|---|
+| A (today's eval) | 4 | 16 | 9.39e-2 | 3.166 |
+| B | 4 | 1 | **0** | 2.814 |
+| C (like live `asq`'s serve profile) | 1 | 16 | 9.39e-2 | 3.178 |
+| D | 1 | 1 | **0** | **2.799** |
+
+- **The cause is the client batch, not the server slots.** A and C drift by the same 0.094, while B and D
+  drift by exactly 0. Several documents in one request are scored together. One pair per request is
+  scored alone.
+- **One pair per request is also faster** (−11 to −12 %). The overflow and truncation fallback, which
+  re-scores documents one by one on an oversized batch, no longer triggers for whole batches.
+- **Live `asq` is affected too.** Its serve profile is arm C.
+- **Choice (pre-registered: the fastest independent arm): D.** It is 0.015 s faster than B, which is
+  noise. Client batch 1 is what matters, and the server setting is immaterial.
+
+**Next (pre-registered above):** the adoption run, the full pool under D's settings (client batch 1,
+reranker `--parallel 1`), paired against `p13-ctl` on v1 labels. Rules: answerable net ≥ −3,
+abstention net ≥ −1, retrieval s/q ≤ 4.25.
+
+Frozen per-question outputs: `data/eval/results/p14-rcheck-{A,B,C,D}.json`.
