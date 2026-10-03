@@ -90,3 +90,29 @@ What this does and does not change:
   question that does not say Emacs). That is domain ambiguity again, and labels cannot settle it.
 - **The scorer also over-credits** (B25, and audit 1's A04/A38: the token is present, the answer is
   wrong). That error runs in the other direction and is smaller (1 of 20 controls).
+
+## Relabelling done: `gold_aliases_v2.json` (2026-10-03)
+
+Versioned as the user decided. v1 (`gold_aliases.json`) is byte-identical, so every registered result
+still replays against it. v2 = v1 plus blind-adjudicated alternatives for the pool's 116 answerable base
+questions:
+- **Man pages** (`pool_alternatives_man.json`): 38 alternatives over 25 of 72 bases.
+- **Emacs** (`pool_alternatives_emacs.json`): 2 over 1 of 44.
+
+Each adjudicator saw only the question, the existing aliases and the gold section text. Each
+alternative is licensed by a verbatim line of its gold section (enforced by `derive_gold_aliases.py
+--check`). The coordinator did not edit the adjudications. Variants with their own alias entry received
+their base's alternatives (29 items), re-checked against their own wording. Code and data are on
+`orch/tsk_20261003_altv2` and `orch/tsk_20261003_v2build`.
+
+**Effect (informational, `screen_report.py --aliases`):**
+- `p13-ctl` scores **564/883** on v2 against 540 on v1 (+24, all man pages).
+- The audit estimated about 54 hidden correct answers (41–66), so v2 recovers roughly half. The rest
+  are answers no single-token label can credit: correct for another domain, phrased answers, or judged
+  correct on knowledge beyond the gold text.
+- Phase 13 under v2: the oracle +39 (v1 +40); R10 quota man −1, abstention −3 (v1 −3 / −3).
+
+R10's verdict is unchanged: it was pre-registered and judged on v1, and it fails rule 3 either way.
+
+**From now on:** new experiments are scored on v2 and say so. A comparison across the versions is never
+made.
