@@ -115,3 +115,42 @@ reorder near-tied top-5 candidates.
 
   Either changes the live system's scores, so it is a new, pre-registered change with its own
   control.
+
+## Reranker batch-independence: pre-registration (2026-10-03, before any code or run)
+
+**Goal:** a question–passage pair's rerank score must not depend on the other candidates. This is
+needed for score caching and sweeps, and it removes a noise source from every paired comparison.
+
+**Suspected causes.** Two mechanisms can couple a pair's score to its batch-mates:
+- the client sends 16 documents per request (`Reranker.rerank(batch=16)`)
+- the eval's "full" reranker server runs `--parallel 4` (`servers.sh start reranker`), so the server
+  evaluates several documents side by side
+
+`asq`'s serve profile runs the reranker with `--parallel 1`.
+
+**Arms**, each on the same 50 dev questions (`random.Random(18)` over the phase 14 dev half):
+- **A (today's eval):** server `--parallel 4`, client batch 16.
+- **B:** server `--parallel 4`, client batch 1.
+- **C:** server `--parallel 1`, client batch 16.
+- **D:** server `--parallel 1`, client batch 1.
+
+**Determinism test** (`scripts/rerank_check.py`, tracked). For each question, the same candidate pairs
+are scored in two contexts:
+- (i) the open top 50 in its own order
+- (ii) the union of open top 50 and both domains' top 25, shuffled with a fixed seed
+
+The statistic is max |score(i) − score(ii)| over the shared pairs. An arm is **batch-independent** if
+that max is ≤ 1e-4 over all 50 questions.
+
+**Cost:** mean seconds to rerank context (i) per question, per arm.
+
+**Choice:** the fastest batch-independent arm. If none is independent, stop and report.
+
+**Adoption** (a separate full-pool run, only if an arm is chosen). The chosen arm's settings become the
+eval default, and the live default if it differs from what `asq` already uses, only if a full-pool run
+under them, paired against `p13-ctl`, shows:
+1. answerable net ≥ −3
+2. abstention net ≥ −1
+3. retrieval s/q ≤ 3.25 + 1.0
+
+Otherwise the noise is documented and the defaults stay.
