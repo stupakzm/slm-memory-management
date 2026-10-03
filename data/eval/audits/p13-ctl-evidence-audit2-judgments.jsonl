@@ -1,0 +1,80 @@
+{"aid": "B01", "verdict": "WRONG", "reason": "The question asks how to find out the name for signal 9, but the answer only states the result (SIGKILL) and gives no method, while the text's method is kill -l/--list, which converts a signal number to a name."}
+{"aid": "B02", "verdict": "CORRECT", "reason": "It correctly says plain kill sends SIGTERM and kill -9 sends SIGKILL; the text lists SIGTERM as \"Termination signal\" and says SIGKILL \"cannot be caught, blocked, or ignored\"."}
+{"aid": "B03", "verdict": "CORRECT", "reason": "It correctly describes M-n as creating \"a new independent Info buffer\" that \"starts out as an exact copy of the old one\", which matches the text, though it does not name clone-buffer."}
+{"aid": "B04", "verdict": "CORRECT", "reason": "Leaving aside the garbled citation markers, it correctly says named character classes stand for predefined character sets \"defined by the LC_CTYPE category in the current locale\", as the text says."}
+{"aid": "B05", "verdict": "CORRECT", "reason": "The text has tail \"-f, --follow ... output appended data as the file grows\"."}
+{"aid": "B06", "verdict": "CORRECT", "reason": "/etc/login.defs is the right place: the text lists UMASK among the login.defs items that useradd uses."}
+{"aid": "B07", "verdict": "WRONG", "reason": "chacl -r changes ACLs. It is not the chmod \"-R, --recursive  change files and directories recursively\" that the text gives."}
+{"aid": "B08", "verdict": "CORRECT", "reason": "It correctly explains [:name:] inside brackets as a named character class, a predefined set of characters such as alnum, which matches the text's \"Named character classes, like [:alnum:] [:alpha:]...\"."}
+{"aid": "B09", "verdict": "UNCLEAR", "reason": "The question wants the remote file's name, and the text only says -O/--remote-name saves to a local file; --remote-header-name is not in the provided text (it is cut off), and in curl that option only has an effect together with -O."}
+{"aid": "B10", "verdict": "WRONG", "reason": "gh-codespace-cp is unrelated: the text is about scp, whose -r option copies directories recursively."}
+{"aid": "B11", "verdict": "WRONG", "reason": "\"Z\" is not an option that does this; the text gives chmod -R, --recursive."}
+{"aid": "B12", "verdict": "CORRECT", "reason": "It correctly says a class names the set of all characters in that class, interpreted by locale, which matches the text's named character classes \"defined by the LC_CTYPE category in the current locale\"."}
+{"aid": "B13", "verdict": "CORRECT", "reason": "The text is about mke2fs, and the answer's mkntfs -L is not in it; mkntfs -L really does set an NTFS label at creation, using the same -L the text gives for mke2fs (new-volume-label). Flagged: this relies on knowledge outside the text."}
+{"aid": "B14", "verdict": "CORRECT", "reason": "It correctly explains a named class as a locale-defined predefined character set (alnum = 0-9A-Za-z in the C locale), which matches the text."}
+{"aid": "B15", "verdict": "CORRECT", "reason": "The text covers Emacs vc-annotate, but the question does not mention Emacs, and git blame does annotate each line with the revision that last changed it. Flagged: this relies on knowledge outside the text."}
+{"aid": "B16", "verdict": "CORRECT", "reason": "The text says \"C-x C-k n  Give a command name ... to the most recently defined keyboard macro (kmacro-name-last-macro)\"."}
+{"aid": "B17", "verdict": "WRONG", "reason": "The text says ps -a selects all processes \"except both session leaders ... and processes not associated with a terminal\", and that BSD a alone lists only processes with a tty, so neither shows every process; the text's way is -A/-e."}
+{"aid": "B18", "verdict": "CORRECT", "reason": "The text is ls (-h, --human-readable), but du -h also shows sizes in K/M/G, and the question does not name a tool. Flagged: this relies on knowledge outside the text."}
+{"aid": "B19", "verdict": "CORRECT", "reason": "dd status=progress is the text's status=LEVEL operand set to show progress."}
+{"aid": "B20", "verdict": "CORRECT", "reason": "Borderline: it contains the resolv.conf \"nameserver\" method, but inside a dnsmasq-specific recipe (nameserver 127.0.0.1 plus --server), with unrelated FQDN text; valid only if dnsmasq is in use."}
+{"aid": "B21", "verdict": "CORRECT", "reason": "@reboot is the crontab nickname for running at startup."}
+{"aid": "B22", "verdict": "CORRECT", "reason": "The text names M-w (kill-ring-save), but copy-region-as-kill is a real Emacs command that copies the region to the kill ring without deleting it. Flagged: this relies on knowledge outside the text."}
+{"aid": "B23", "verdict": "CORRECT", "reason": "The text says \"R NEW <RET>  Rename the specified files (dired-do-rename)\" and that it works on marked files."}
+{"aid": "B24", "verdict": "CORRECT", "reason": "The text says \"typing C-M-w (append-next-kill) right beforehand\" makes the next kill combine with the last killed text."}
+{"aid": "B25", "verdict": "WRONG", "reason": "The recommended cp --preserve=timestamps,permissions uses an attribute name that does not exist: the text says the attributes are \"'mode' for permissions ... 'timestamps'\", so 'permissions' is invalid, and the install advice is also off."}
+{"aid": "B26", "verdict": "CORRECT", "reason": "The text has \"-p  same as --preserve=mode,ownership,timestamps\"."}
+{"aid": "B27", "verdict": "CORRECT", "reason": "The text has \"-A  Select all processes. Identical to -e\", and BSD a with x lists all processes."}
+{"aid": "B28", "verdict": "CORRECT", "reason": "DenyUsers in sshd_config blocks a named account; the text describes allow/deny users directives \"processed in the following order: DenyUsers, AllowUsers\"."}
+{"aid": "B29", "verdict": "CORRECT", "reason": "The text says to revert the changes and go back to the saved version \"type C-x x g\"."}
+{"aid": "B30", "verdict": "CORRECT", "reason": "sshd -p port is a real way to change the listening port (the text's sshd_config Port entry is cut off). Flagged: this relies on knowledge outside the text."}
+{"aid": "B31", "verdict": "CORRECT", "reason": "The text has \"-b ... --boot ... The argument may be empty, in which case logs for the current boot will be shown\"."}
+{"aid": "B32", "verdict": "CORRECT", "reason": "The text says \"The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored\"."}
+{"aid": "B33", "verdict": "WRONG", "reason": "The question is about changing the port, but the ListenAddress examples keep port 22 and only choose an interface, and the claim that the default binds to loopback only is false; the reference keyword is Port."}
+{"aid": "B34", "verdict": "CORRECT", "reason": "A null-character separator (xargs -0) is the mechanism the text describes: find -print0 prints \"followed by a null character ... This allows file names that contain newlines or other types of white space to be correctly interpreted\"."}
+{"aid": "B35", "verdict": "CORRECT", "reason": "mount -o ro mounts read-only, which is equivalent to -r/--read-only."}
+{"aid": "B36", "verdict": "WRONG", "reason": "Borderline: it names no command, and scp has no --recursive; the text gives \"-r  Recursively copy entire directories\"."}
+{"aid": "B37", "verdict": "CORRECT", "reason": "Borderline and muddled: it attributes -d to read rather than xargs, but its conclusion, \"-d with a delimiter ... such as newline or null\", matches the text's xargs \"--delimiter=delim, -d delim\" (and -0)."}
+{"aid": "B38", "verdict": "CORRECT", "reason": "mount -o ro mounts read-only, so nothing can write to it."}
+{"aid": "B39", "verdict": "WRONG", "reason": "Borderline: it correctly names /etc/shadow, but the field list is empty (garbled), so it never says what the aging fields mean, which was half the question."}
+{"aid": "B40", "verdict": "WRONG", "reason": "git diff --no-index compares two paths on disk, not unsaved editor changes against the saved file; the text is Emacs Ediff (ediff-current-file)."}
+{"aid": "B41", "verdict": "WRONG", "reason": "-B/--before-context prints only the lines before a match, and the question wants lines above and below; the text gives \"-C NUM, -NUM, --context\"."}
+{"aid": "B42", "verdict": "CORRECT", "reason": "sed -i edits files in place (--in-place)."}
+{"aid": "B43", "verdict": "CORRECT", "reason": "cut -d: -f3 uses the text's \"-d, --delimiter=DELIM\" and \"-f, --fields=LIST\"."}
+{"aid": "B44", "verdict": "CORRECT", "reason": "dd status=progress is the status=LEVEL operand that shows progress."}
+{"aid": "B45", "verdict": "WRONG", "reason": "It reads \"cont\" as \"control\" and gives head -n, which displays lines; counting lines is wc \"-l, --lines  print the newline counts\"."}
+{"aid": "B46", "verdict": "CORRECT", "reason": "It matches the text's line format \"IP_address canonical_hostname [aliases...]\"."}
+{"aid": "B47", "verdict": "CORRECT", "reason": "sshd -p port is a real way to change the listening port (the text's sshd_config Port entry is cut off). Flagged: this relies on knowledge outside the text."}
+{"aid": "B48", "verdict": "WRONG", "reason": "The text says plain undo can step into redoing; to avoid that \"use M-x undo-only ... will not redo changes you have just undone\", so the claim about C-/ contradicts the text."}
+{"aid": "B49", "verdict": "CORRECT", "reason": "The text says \"Since Linux 2.6.11, the pipe capacity is 16 pages\", which is 65,536 bytes with 4096-byte pages."}
+{"aid": "B50", "verdict": "WRONG", "reason": "It is truncated after three of the five fields (minute, hour, day of month) and never gives month or day of week."}
+{"aid": "B51", "verdict": "UNCLEAR", "reason": "-J/--remote-header-name (the server's Content-Disposition name) fits the wording, but the text only covers -O/--remote-name (its -J entry is cut off), and in curl -J only works together with -O, which the answer leaves out."}
+{"aid": "B52", "verdict": "WRONG", "reason": "It gives a sample path with no method prefix and never names the /ssh: prefix the question asks for; the text's form is \"/method:user@host:/path/to/file\"."}
+{"aid": "B53", "verdict": "WRONG", "reason": "It hedges and settles on sed s///g, which is not a command for replacing from point to the end; the text gives \"M-x replace-string ... Replace every occurrence of STRING with NEWSTRING\", applied after point."}
+{"aid": "B54", "verdict": "CORRECT", "reason": "It correctly contrasts SIGTERM (the default) with SIGKILL, which the text says \"cannot be caught, blocked, or ignored\"."}
+{"aid": "B55", "verdict": "CORRECT", "reason": "wget --content-disposition saves under the server-given filename on its own (knowledge outside the text). Its curl -J suggestion is incomplete without -O, and the text covers only -O/--remote-name. Flagged."}
+{"aid": "B56", "verdict": "WRONG", "reason": "It rambles to a contradictory recommendation (-ctime -168, treating ctime as hours), while the text gives -mtime/-ctime n in units of 24 hours, so -mtime -7 is the way; it mentions -mtime -7 only in passing, then rejects it."}
+{"aid": "B57", "verdict": "WRONG", "reason": "Borderline: \"ps -u *\" is not a valid user list, and \"ps -eo user,comm | sort -u\" deduplicates rather than listing processes; the text's way is -A/-e (or ax)."}
+{"aid": "B58", "verdict": "CORRECT", "reason": "%F is the text's date format for full date (YYYY-MM-DD); the question's \"YYYYY\" is a typo."}
+{"aid": "B59", "verdict": "CORRECT", "reason": "sshd -p 2222 is a real way to change the listening port (the text's sshd_config Port entry is cut off). Flagged: this relies on knowledge outside the text."}
+{"aid": "B60", "verdict": "WRONG", "reason": "It names /etc/shadow, but the field meanings are missing (only citation markers), so the second half of the question goes unanswered."}
+{"aid": "B61", "verdict": "CORRECT", "reason": "Restart=on-failure in the [Service] section is the systemd.service Restart= setting for restarting on crashes."}
+{"aid": "B62", "verdict": "CORRECT", "reason": "sed -i (--in-place) writes the changes back to the file."}
+{"aid": "B63", "verdict": "WRONG", "reason": "Borderline (terse query): the text is about binding org-store-link, org-capture and org-agenda \"to globally available keys\", and C-c C-s (org-schedule) is an Org-mode-local binding, not a global one as the answer claims."}
+{"aid": "B64", "verdict": "WRONG", "reason": "C-h k describes a single key, while the text says \"C-h m (describe-mode) displays documentation on the current major mode ... and also its key bindings\"."}
+{"aid": "B65", "verdict": "UNCLEAR", "reason": "\"022\" is the default UMASK value in reality, but the text's UMASK entry is cut off, and the terse query may be asking for the parameter name (UMASK) rather than its value."}
+{"aid": "B66", "verdict": "CORRECT", "reason": "The text has \"C-x C-r  Visit a file for viewing, without allowing changes to it (find-file-read-only)\"."}
+{"aid": "B67", "verdict": "CORRECT", "reason": "The text has uniq \"-c, --count  prefix lines by the number of occurrences\" (the answer gives the option without naming uniq)."}
+{"aid": "B68", "verdict": "WRONG", "reason": "The shell mv does not act on files marked in a Dired listing; the text's command is \"R NEW <RET>  Rename the specified files (dired-do-rename)\"."}
+{"aid": "B69", "verdict": "WRONG", "reason": "ntfssecaudit is the wrong tool: the text gives chmod \"-R, --recursive  change files and directories recursively\"."}
+{"aid": "B70", "verdict": "WRONG", "reason": "--max-depth only limits recursion depth; searching a whole tree needs grep -r/--recursive."}
+{"aid": "B71", "verdict": "WRONG", "reason": "Borderline (same as B36): it names no command, and scp has no --recursive; the text gives \"-r  Recursively copy entire directories\"."}
+{"aid": "B72", "verdict": "CORRECT", "reason": "The text has \"C-x 3  Split the selected window into two windows, positioned side by side (split-window-right)\"."}
+{"aid": "B73", "verdict": "CORRECT", "reason": "The text has \"C-h k KEY ... displays a help buffer containing the command's documentation string\"."}
+{"aid": "B74", "verdict": "CORRECT", "reason": "The text has journalctl -b \"The argument may be empty, in which case logs for the current boot will be shown\"."}
+{"aid": "B75", "verdict": "WRONG", "reason": "Piping cat into gzip does not compress an archive while tar creates it; the text gives tar's gzip filter option (-z, --gzip) among its compression options."}
+{"aid": "B76", "verdict": "CORRECT", "reason": "journalctl -b with no argument shows the current boot, per the text."}
+{"aid": "B77", "verdict": "CORRECT", "reason": "/etc/login.defs is the right place: the text lists UMASK among the login.defs items that useradd uses."}
+{"aid": "B78", "verdict": "CORRECT", "reason": "The text covers Emacs vc-annotate, but the question does not mention Emacs, and git blame does annotate each line with the revision that last changed it. Flagged: this relies on knowledge outside the text."}
+{"aid": "B79", "verdict": "CORRECT", "reason": "The text is ssh_config (client-side ServerAliveInterval), but sshd_config ClientAliveInterval is a real server-side keepalive that also stops idle drops. Flagged: this relies on knowledge outside the text."}
+{"aid": "B80", "verdict": "CORRECT", "reason": "Borderline: the text names M-w (kill-ring-save), but the answer quotes the Emacs manual's mouse method (\"press mouse-3 just once\") for copying text into the kill ring without deleting it, which is a valid alternative. Flagged: this relies on knowledge outside the text."}

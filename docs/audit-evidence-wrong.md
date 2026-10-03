@@ -64,3 +64,29 @@ controls, drawn with `random.Random(17)` from the real scorer's output, shuffled
 `B01`–`B80`. Gold text is now cut at 12,000 characters (audit 1's 6,000 hid the decisive entry in 3
 items). The rule is unchanged: controls ≥ 17/20, then u ≥ 20 % means relabel first. With 60 of 101
 sampled, u scales to the 101.
+
+## Audit 2 result (2026-10-03)
+
+- **Judge reliability:** 19 of 20 controls CORRECT. That passes (≥ 17). The one control called WRONG, B25,
+  uses `cp --preserve=timestamps,permissions`, where the attribute is called `mode`: the scorer credited
+  a wrong answer.
+- **Under-credit:** of the 60 truly-wrong-with-evidence answers, **32 CORRECT**, 25 WRONG, 3 UNCLEAR. So
+  **u = 53 %** (Wilson 95 %: 41–65 %), about **54 of the 101** (41–66).
+- **Strict reading:** the judge marked 11 answers CORRECT on knowledge beyond the gold text (e.g.
+  `sshd -p`, `du -h`, `git-blame`). Recounting all of them as UNCLEAR gives 23/60 = 38 % (27–51 %),
+  still above the bar.
+- **By domain:** man pages 25 of 46 CORRECT; Emacs 7 of 14.
+
+**Decision (pre-registered rule): u ≥ 20 %, so labels are a first-order problem.** About half the
+"wrong with evidence" answers are right. The project's true answer rate on the pool is closer to
+(540 + ~54)/883 ≈ 67 % than to the scored 61 %. Before any reader experiment, the pool needs blind
+alternative labels, built by phase 12's procedure and extended to man pages.
+
+What this does and does not change:
+- **Paired comparisons are unbiased by under-credit,** because every arm is scored by the same labels.
+  But they are noisier, and a gain made of correct alternatives is invisible. Phases 11 to 14's
+  verdicts stand as measured.
+- **Some "correct" answers are correct only for another domain** (e.g. `git-blame` for an Emacs
+  question that does not say Emacs). That is domain ambiguity again, and labels cannot settle it.
+- **The scorer also over-credits** (B25, and audit 1's A04/A38: the token is present, the answer is
+  wrong). That error runs in the other direction and is smaller (1 of 20 controls).
