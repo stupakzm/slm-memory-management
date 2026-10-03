@@ -665,6 +665,19 @@ def test_no_new_flags_output_unchanged():
         check(r.returncode == 0 and "propagated" not in r.stdout, f"{r.stdout}")
 
 
+def test_man_check_without_alternatives_never_writes():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        out = Path(td) / "curated.json"
+        out.write_text('{"hand": "curated"}')
+        before = out.read_bytes()
+        r = _run_cli("--corpus", str(corpus), "--eval", str(ev), "--out", str(out),
+                     "--check")
+        check(r.returncode == 2, f"{r.returncode} {r.stdout}{r.stderr}")
+        check("needs --alternatives" in r.stderr, r.stderr)
+        check(out.read_bytes() == before, "--out must be byte-identical")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

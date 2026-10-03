@@ -1104,6 +1104,10 @@ def main() -> int:
     if args.alternatives:
         return run_man_alternatives(args, corpus_path, eval_path, out_path,
                                     base_path, variant_rows)
+    if args.check:
+        print("--check in man mode needs --alternatives; refusing to "
+              "re-derive over --out", file=sys.stderr)
+        return 2
     if args.variants:
         print("--variants needs --alternatives", file=sys.stderr)
         return 2
