@@ -217,14 +217,23 @@ def main() -> int:
                          "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
                          "cascade_rewrites ([] at tier 0). Default off reproduces "
                          "every existing run byte-for-byte.")
-    ap.add_argument("--route", choices=("dense-vote", "oracle", "quota"), default=None,
+    ap.add_argument("--route", choices=("dense-vote", "oracle", "quota", "floor"), default=None,
                     help="phase 13 R9: choose each question's domain. 'dense-vote' is the "
                          "retriever's own router (majority domain of the open search's top "
                          "5 chunks); 'oracle' retrieves within the row's true domain (a "
                          "ceiling, not a router); 'quota' (R10) takes an equal share of the candidates from every domain, no routing decision. Writes NAME-routes.json at the retrieve "
                          "stage. Default off reproduces every existing run byte-for-byte.")
+    ap.add_argument("--floor", type=int, default=None,
+                    help="phase 14 R11: with --route floor, each domain is guaranteed its "
+                         "own top FLOOR chunks and the rest of the candidates go to the "
+                         "best by dense distance (0 = the open search). Required by, and "
+                         "only valid with, --route floor.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if (args.route == "floor") != (args.floor is not None):
+        print("--route floor and --floor go together", file=sys.stderr)
+        return 2
 
     if args.route:
         clash = [flag for flag, on in (
@@ -242,8 +251,10 @@ def main() -> int:
 
     # Only passed when set, so a default run constructs Retriever exactly as before.
     qv_kw = {"question_vectors": args.question_vectors} if args.question_vectors else {}
-    if args.route in ("dense-vote", "quota"):
+    if args.route in ("dense-vote", "quota", "floor"):
         qv_kw["route"] = args.route
+    if args.floor is not None:
+        qv_kw["floor"] = args.floor
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -522,6 +533,8 @@ def write_report(args, results: list, t0: float) -> int:
         config["question_vectors"] = args.question_vectors
     if args.route:
         config["route"] = args.route
+    if args.floor is not None:
+        config["floor"] = args.floor
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,

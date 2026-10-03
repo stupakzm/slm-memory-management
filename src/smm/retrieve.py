@@ -33,7 +33,7 @@ KEEP = 5            # what the model sees
 
 # Phase 13 R9 (docs/phase13-results.md): the open search's first ROUTE_VOTE_K hits
 # vote on the domain the real search then runs in. 5 is the reader's own k.
-ROUTES = ("dense-vote", "quota")
+ROUTES = ("dense-vote", "quota", "floor")
 ROUTE_VOTE_K = 5
 
 # Two distinct per-variant knobs when fusing the question with rewrites - do not
@@ -76,6 +76,40 @@ def rrf(lists: list[list[dict]], k: int = RRF_K, weights: list[float] | None = N
     out = list(agg.values())
     out.sort(key=lambda c: -c["rrf"])
     return out
+
+
+def floor_pool(open_hits: list[dict], per_domain: dict[str, list[dict]], n: int,
+               floor: int) -> list[dict]:
+    """Phase 14 R11 floor quota (docs/phase14-results.md): every domain is guaranteed
+    its own top `floor` chunks, and the rest of the n slots go to the best remaining
+    chunks by dense distance, wherever they come from.
+
+    `open_hits` is an open dense search, best first; `per_domain` maps each domain to
+    its own filtered search, best first. The result is each domain's first `floor`
+    chunks (domains in sorted name order), then the fill: the smallest `distance`
+    (ties by chunk_id) across `open_hits` and every `per_domain` list, skipping any
+    chunk already taken, until there are n or nothing is left. floor == 0 is the open
+    top-n; with two domains and floor == n // 2 it is the R10 quota's chunk set.
+    """
+    if floor < 0:
+        raise ValueError(f"floor must be >= 0, got {floor}")
+    if len(per_domain) * floor > n:
+        raise ValueError(f"{len(per_domain)} domains x floor {floor} exceeds {n} candidates")
+    out: list[dict] = []
+    seen: set[str] = set()
+    for d in sorted(per_domain):
+        for h in per_domain[d][:floor]:
+            if h["chunk_id"] not in seen:
+                seen.add(h["chunk_id"])
+                out.append(h)
+    rest: dict[str, dict] = {}
+    for lst in [open_hits, *(per_domain[d] for d in sorted(per_domain))]:
+        for h in lst:
+            if h["chunk_id"] not in seen:
+                rest.setdefault(h["chunk_id"], h)
+    fill = sorted(rest.values(), key=lambda h: (h["distance"], h["chunk_id"]))
+    out.extend(fill[: max(n - len(out), 0)])
+    return out[:n]
 
 
 def fuse_variants(retrieve_fn, variants: list[str], k: int = KEEP) -> tuple[list[dict], int]:
@@ -128,7 +162,9 @@ class Retriever:
                  mode: str = "hybrid", candidates: int = CANDIDATES,
                  dense_weight: float = 1.0, bm25_weight: float = 1.0,
                  domain: str | None = None, question_vectors: int = 0,
-                 route: str | None = None):
+                 route: str | None = None, floor: int | None = None):
+        if (route == "floor") != (floor is not None):
+            raise ValueError("floor goes with route='floor', and route='floor' needs floor")
         if route is not None:
             # BM25 has no domain filter, so a hybrid route would be half-routed.
             if route not in ROUTES:
@@ -154,6 +190,9 @@ class Retriever:
         self.route = route
         self.last_route: str | None = None
         self._quota_domains: list[str] | None = None
+        # R11: the guaranteed per-domain minimum, and the cached domain list.
+        self.floor = floor
+        self._floor_domains: list[str] | None = None
 
     def candidates_for(self, question: str, n: int | None = None) -> list[dict]:
         n = n or self.candidates
@@ -161,6 +200,8 @@ class Retriever:
             return self._quota(question, n)
         if self.route == "dense-vote":
             return self._routed(question, n)
+        if self.route == "floor":
+            return self._floor(question, n)
         if self.question_vectors > 0 and self.mode != "bm25":
             return self._with_question_route(question, n)
         if self.mode == "dense":
@@ -187,6 +228,19 @@ class Retriever:
             if share > 0:
                 out.extend(store.search(self.db, vec, k=share, domain=d))
         return out
+
+    def _floor(self, question: str, n: int) -> list[dict]:
+        """R11 floor quota: no routing decision. One embedding, the open search, and
+        (when floor > 0) each domain's own top `floor`; floor_pool() assembles them."""
+        vec = self.embedder.embed_query(question)
+        open_hits = store.search(self.db, vec, k=n, domain=None)
+        per_domain: dict[str, list[dict]] = {}
+        if self.floor > 0:
+            if self._floor_domains is None:
+                self._floor_domains = sorted(store.domains(self.db))
+            for d in self._floor_domains:
+                per_domain[d] = store.search(self.db, vec, k=self.floor, domain=d)
+        return floor_pool(open_hits, per_domain, n, self.floor)
 
     def _routed(self, question: str, n: int) -> list[dict]:
         """R9 dense-vote: one embedding, an open search, a majority vote over the
