@@ -92,17 +92,71 @@ score. --check also flags a stale --out: for every qid in this --eval the
 `keybinding` entries are compared). Merging with --alternatives refuses to
 write if any violation is found.
 
+Versioned relabelling (tsk_20261003_altv2): a blind audit found that about
+half of the "wrong with evidence" answers are correct alternatives the
+one-token labels reject, so the pool is relabelled as a NEW file
+(gold_aliases_v2.json = v1 plus adjudicated alternatives). v1 must never
+change - registered results replay against it. Three additions, both modes:
+
+  --base FILE         with --merge (or --check), read the existing entries
+                      from FILE instead of --out and write the merged result to
+                      --out. FILE is never written (naming the same file as
+                      --out is refused). Without --base: behaviour as before.
+  --alternatives, man mode (no --md-corpus). FILE has the same format as md
+                      mode: {qid: [{token, alias, sec_id, line, why}]}. The
+                      section text of a sec_id (`doc#path`) is that man.jsonl
+                      document's section: its `heading`, a newline, its
+                      `text`; `line` must be a verbatim substring of it. The
+                      alias must contain no whitespace, be at least 2
+                      characters, and be flag-shaped (`-l`, `--listening`,
+                      `--color=WHEN`) or an identifier/path (`DenyUsers`,
+                      `getfacl`, `/etc/shadow`). Everything else md mode
+                      checks applies (qid answerable in --eval, token in
+                      answer_contains, sec_id in gold_sec_ids, alias in line,
+                      non-empty `why`, alias not in the question). Man
+                      aliases are hand-curated and re-deriving them is not
+                      reproducible, so the merge is APPEND-ONLY and derive()
+                      never runs: each qid in FILE gets its --base entry
+                      unchanged plus {"alias", "rule": "alternative",
+                      "sec_id", "line"} items appended under the token
+                      (deduped on (alias, sec_id)); every other qid is copied
+                      from --base unchanged. Requires --merge or --check; with
+                      --check it requires --base, validates FILE, and checks
+                      that --out equals that append-only merge (stale check).
+                      A merge with violations writes nothing.
+  --variants FILE     (repeatable, both modes) more eval files whose rows may
+                      be variants of --eval's rows. A row's root is the last
+                      qid reached following variant_of/paraphrase_of (it need
+                      not be a loaded row). For every row R in --eval or
+                      --variants that already has its own entry in the merge
+                      base, is not its own root, and whose root has
+                      alternatives in FILE: the root's alternatives whose
+                      token is in R's answer_contains are appended to R's
+                      entry as {"alias", "rule": "alternative", "sec_id",
+                      "line", "via_base": root}, deduped on (alias, sec_id).
+                      An alternative whose alias occurs in R's own question
+                      (case-insensitive) is skipped and counted. Rows without
+                      their own entry need nothing: scoring falls back to the
+                      base (src/smm/gold.aliases_for). --check verifies the
+                      propagated entries the same way.
+
 Usage: derive_gold_aliases.py [--corpus data/corpus/man.jsonl]
                                [--eval data/eval/questions.jsonl]
                                [--out data/eval/gold_aliases.json]
+       derive_gold_aliases.py --corpus data/corpus/man.jsonl --eval EVAL.jsonl
+                               --alternatives FILE (--merge | --check)
+                               [--base BASE.json] [--variants EVAL2.jsonl ...]
+                               [--out data/eval/gold_aliases_v2.json]
        derive_gold_aliases.py --md-corpus DIR --eval EVAL.jsonl
                                [--merge] [--check] [--alternatives FILE]
+                               [--base BASE.json] [--variants EVAL2.jsonl ...]
                                [--out data/eval/gold_aliases.json]
 """
 
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import sys
@@ -566,10 +620,37 @@ def derive_keybinding(docs: dict, rows: list[dict],
     return aliases, stats
 
 
+_MAN_FLAG_RE = re.compile(r"^--?[A-Za-z0-9][A-Za-z0-9_-]*(=\S+)?$")
+_MAN_IDENT_RE = re.compile(r"^/?[A-Za-z_][A-Za-z0-9_.+:/-]*$")
+
+
+def is_man_alias_shaped(alias) -> bool:
+    """Man-mode alias shape: no whitespace, at least 2 characters, and either
+    flag-shaped (`-l`, `--listening`, `--color=WHEN`) or an identifier or
+    path (`DenyUsers`, `getfacl`, `/etc/shadow`). Not the md-mode
+    _COMMAND_SHAPE_RE, which requires a hyphen."""
+    if not isinstance(alias, str) or len(alias) < 2 or re.search(r"\s", alias):
+        return False
+    return bool(_MAN_FLAG_RE.match(alias) or _MAN_IDENT_RE.match(alias))
+
+
+def load_man_docs(path: Path) -> dict:
+    """{doc_id: {"sections": {sec_id: heading + "\\n" + text}}} for a
+    man.jsonl - the section text an alternative's `line` must appear in."""
+    docs = {}
+    for doc_id, d in load_corpus(Path(path)).items():
+        docs[doc_id] = {"sections": {
+            s.get("sec_id", ""): f"{s.get('heading', '')}\n{s.get('text', '')}"
+            for s in d.get("sections", [])}}
+    return docs
+
+
 def check_alternatives(alternatives: dict, aliases: dict, docs: dict,
-                       rows: list[dict]) -> list[str]:
+                       rows: list[dict], man: bool = False) -> list[str]:
     """Violations in the adjudicated FILE and in what it derived. `aliases`
-    is the fresh derivation (for the alternative-key question-echo check)."""
+    is the fresh derivation (for the alternative-key question-echo check).
+    `man=True` applies the man alias shape rule and checks every FILE alias
+    (not a derived `aliases`) against its question."""
     rows_by_qid = {r["qid"]: r for r in rows}
     violations: list[str] = []
     if not isinstance(alternatives, dict):
@@ -612,8 +693,17 @@ def check_alternatives(alternatives: dict, aliases: dict, docs: dict,
                         f"{tag}: line {line!r} not verbatim in section {sec_id!r}")
             if alias not in line:
                 violations.append(f"{tag}: alias {alias!r} not a substring of its line")
-            if not (_COMMAND_SHAPE_RE.match(alias)
-                    or is_key_shaped(normalize_key(alias))):
+            if man:
+                if not is_man_alias_shaped(alias):
+                    violations.append(
+                        f"{tag}: alias {alias!r} is neither flag- nor "
+                        f"identifier-shaped (no whitespace, >= 2 chars)")
+                if alias.lower() in row.get("question", "").lower():
+                    violations.append(
+                        f"{tag}: alternative alias {alias!r} occurs in the "
+                        f"question text")
+            elif not (_COMMAND_SHAPE_RE.match(alias)
+                      or is_key_shaped(normalize_key(alias))):
                 violations.append(
                     f"{tag}: alias {alias!r} is neither command- nor key-shaped")
     for qid, per_token in aliases.items():
@@ -626,6 +716,105 @@ def check_alternatives(alternatives: dict, aliases: dict, docs: dict,
                         f"{qid}/{token}: {e['rule']} alias {e['alias']!r} "
                         f"occurs in the question text")
     return violations
+
+
+def _parent_of(row: dict):
+    return row.get("variant_of") or row.get("paraphrase_of")
+
+
+def root_of(qid: str, parents: dict) -> str:
+    """Follow variant_of/paraphrase_of to the end: the last qid reached,
+    whether or not it is a loaded row."""
+    cur, seen = qid, {qid}
+    while parents.get(cur):
+        nxt = parents[cur]
+        if nxt in seen:
+            break
+        seen.add(nxt)
+        cur = nxt
+    return cur
+
+
+def propagate_to_variants(target: dict, rows: list[dict], alternatives: dict,
+                          eligible: set) -> tuple[dict, set]:
+    """Append each root's alternatives to its variants' own entries, in place
+    in `target` ({qid: {token: [alias-dict, ...]}}). A row R takes part only
+    if its qid is in `eligible` (it already has its own entry in the merge
+    base), it is not its own root, and its root has alternatives in
+    `alternatives`. Only alternatives whose token is in R's answer_contains
+    are appended, as {"alias","rule":"alternative","sec_id","line",
+    "via_base": root}, deduped on (alias, sec_id) per token; one whose alias
+    occurs in R's own question (case-insensitive) is skipped and counted.
+    Returns (stats, touched qids)."""
+    parents: dict = {}
+    for r in rows:
+        parents.setdefault(r["qid"], _parent_of(r))
+    stats = {"propagated": 0, "skipped_in_question": 0}
+    touched: set = set()
+    seen: set = set()
+    for r in rows:
+        qid = r["qid"]
+        if qid in seen:
+            continue
+        seen.add(qid)
+        if qid not in eligible or not isinstance(target.get(qid), dict):
+            continue
+        root = root_of(qid, parents)
+        entries = alternatives.get(root) if root != qid else None
+        if not isinstance(entries, list):
+            continue
+        answer = r.get("answer_contains", [])
+        question = (r.get("question") or "").lower()
+        picked = [e for e in _valid_alt_entries(entries) if e["token"] in answer]
+        if not picked:
+            continue
+        touched.add(qid)
+        entry = target[qid]
+        for e in picked:
+            token, alias = e["token"], e["alias"]
+            if alias == token:
+                continue
+            if alias.lower() in question:
+                stats["skipped_in_question"] += 1
+                continue
+            got = entry.get(token, [])
+            if any((x["alias"], x["sec_id"]) == (alias, e["sec_id"]) for x in got):
+                continue
+            entry[token] = got + [{
+                "alias": alias, "rule": "alternative", "sec_id": e["sec_id"],
+                "line": e["line"], "via_base": root}]
+            stats["propagated"] += 1
+    return stats, touched
+
+
+def merge_man_alternatives(base: dict, alternatives: dict,
+                           rows: list[dict]) -> tuple[dict, int]:
+    """Append-only man-mode merge: a deep copy of `base`, with each FILE
+    alternative appended under its token as {"alias","rule":"alternative",
+    "sec_id","line"}, deduped on (alias, sec_id); alias == token is dropped.
+    Entries (and qids) not in FILE are untouched. Returns (merged, added)."""
+    merged = copy.deepcopy(base)
+    rows_by_qid = {r["qid"]: r for r in rows}
+    added = 0
+    for qid, entries in alternatives.items():
+        row = rows_by_qid.get(qid)
+        if row is None or not isinstance(entries, list):
+            continue
+        answer = set(row.get("answer_contains", []))
+        for e in _valid_alt_entries(entries):
+            token, alias = e["token"], e["alias"]
+            if token not in answer or alias == token:
+                continue
+            ent = merged.get(qid)
+            if not isinstance(ent, dict):
+                ent = merged[qid] = {}
+            got = ent.get(token, [])
+            if any((x["alias"], x["sec_id"]) == (alias, e["sec_id"]) for x in got):
+                continue
+            ent[token] = got + [{"alias": alias, "rule": "alternative",
+                                 "sec_id": e["sec_id"], "line": e["line"]}]
+            added += 1
+    return merged, added
 
 
 def check_stale(aliases: dict, existing: dict, rows: list[dict],
@@ -697,6 +886,63 @@ def check_keybinding(aliases: dict, docs: dict, rows: list[dict]) -> list[str]:
     return violations
 
 
+def run_man_alternatives(args, corpus_path: Path, eval_path: Path, out_path: Path,
+                         base_path: Path | None, variant_rows: list[dict]) -> int:
+    """Man mode with --alternatives: append-only merge (or its --check) of the
+    adjudicated FILE onto --base (default --out), never re-running derive()."""
+    if not (args.merge or args.check):
+        print("man-mode --alternatives needs --merge or --check", file=sys.stderr)
+        return 2
+    if args.check and base_path is None:
+        print("man-mode --alternatives --check needs --base", file=sys.stderr)
+        return 2
+    alt_path = ROOT / args.alternatives
+    if not alt_path.exists():
+        print(f"no alternatives file at {alt_path}", file=sys.stderr)
+        return 2
+    alternatives = load_alternatives(alt_path)
+    if not isinstance(alternatives, dict):
+        print("VIOLATION: alternatives file is not a JSON object keyed by qid")
+        return 1
+    docs = load_man_docs(corpus_path)
+    rows = load_questions(eval_path)
+
+    violations = check_alternatives(alternatives, {}, docs, rows, man=True)
+    base = json.loads((base_path or out_path).read_text()) \
+        if (base_path or out_path).exists() else {}
+    merged, added = merge_man_alternatives(base, alternatives, rows)
+    prop, prop_touched = propagate_to_variants(
+        merged, rows + variant_rows, alternatives, set(base))
+    summary = (f"{added} alternatives merged, {prop['propagated']} propagated "
+               f"to variants, {prop['skipped_in_question']} skipped as in question")
+
+    if args.check:
+        existing = json.loads(out_path.read_text()) if out_path.exists() else {}
+        for qid in sorted(set(alternatives) | prop_touched):
+            if existing.get(qid) != merged.get(qid):
+                violations.append(
+                    f"{qid}: --out entry is stale (differs from --base plus "
+                    f"its alternatives)")
+        for v in violations:
+            print("VIOLATION: " + v)
+        if violations:
+            print(f"\n{len(violations)} violation(s)")
+            return 1
+        print(f"check OK: {summary}, 0 violations")
+        return 0
+
+    for v in violations:
+        print("VIOLATION: " + v)
+    if violations:
+        print(f"\n{len(violations)} violation(s); nothing written")
+        return 1
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(merged, indent=2, sort_keys=True))
+    print(summary)
+    print(f"merged into {out_path}")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--corpus", default="data/corpus/man.jsonl")
@@ -712,7 +958,16 @@ def main() -> int:
                           "violation (--md-corpus only)")
     ap.add_argument("--alternatives", default=None,
                      help="JSON file of adjudicated alternative answers "
-                          "(--md-corpus only)")
+                          "(--md-corpus: keybinding mode; otherwise man mode, "
+                          "append-only, needs --merge or --check)")
+    ap.add_argument("--base", default=None,
+                     help="with --merge/--check: read the existing entries from "
+                          "this file instead of --out; it is never written")
+    ap.add_argument("--variants", action="append", default=[],
+                     help="more eval files whose rows may be variants of "
+                          "--eval's rows (repeatable); with --alternatives the "
+                          "roots' alternatives propagate to variants that "
+                          "have their own entry")
     args = ap.parse_args()
 
     eval_path = ROOT / args.eval
@@ -721,6 +976,30 @@ def main() -> int:
     if not eval_path.exists():
         print(f"no eval set at {eval_path}", file=sys.stderr)
         return 2
+
+    base_path = None
+    if args.base:
+        base_path = ROOT / args.base
+        if not (args.merge or args.check):
+            print("--base needs --merge or --check", file=sys.stderr)
+            return 2
+        if not base_path.exists():
+            print(f"no base file at {base_path}", file=sys.stderr)
+            return 2
+        if base_path.resolve() == out_path.resolve():
+            print("--base and --out are the same file; --base is never written",
+                  file=sys.stderr)
+            return 2
+    variant_rows: list[dict] = []
+    for v in args.variants:
+        v_path = ROOT / v
+        if not v_path.exists():
+            print(f"no variants file at {v_path}", file=sys.stderr)
+            return 2
+        variant_rows += load_questions(v_path)
+
+    def load_existing(path: Path) -> dict:
+        return json.loads(path.read_text()) if path.exists() else {}
 
     if args.md_corpus:
         md_dir = ROOT / args.md_corpus
@@ -738,14 +1017,41 @@ def main() -> int:
             alternatives = load_alternatives(alt_path)
         aliases, stats = derive_keybinding(docs, rows, alternatives)
 
+        # Propagation (--alternatives only) mutates the entries of `merged` in
+        # place; for this --eval's own qids those are the very objects in
+        # `aliases`, so the stale check and the plain write both see them.
+        merged = None
+        prop = {"propagated": 0, "skipped_in_question": 0}
+        prop_touched: set = set()
+        if alternatives is not None:
+            if args.merge or args.check:
+                eval_qids = {r["qid"] for r in rows}
+                existing_base = load_existing(base_path or out_path)
+                merged = {k: v for k, v in existing_base.items()
+                          if k not in eval_qids}
+                merged.update(aliases)
+            else:
+                merged = dict(aliases)
+            prop, prop_touched = propagate_to_variants(
+                merged, rows + variant_rows, alternatives, set(merged))
+        prop_msg = ""
+        if args.variants or prop["propagated"] or prop["skipped_in_question"]:
+            prop_msg = (f"{prop['propagated']} propagated to variants, "
+                        f"{prop['skipped_in_question']} skipped as in question")
+
         if args.check:
             violations = check_keybinding(aliases, docs, rows)
             if alternatives is not None:
                 violations += check_alternatives(alternatives, aliases, docs, rows)
-            existing = (json.loads(out_path.read_text())
-                        if out_path.exists() else {})
+            existing = load_existing(out_path)
             violations += check_stale(aliases, existing, rows,
                                       alternatives is not None)
+            eval_qids = {r["qid"] for r in rows}
+            for qid in sorted(prop_touched - eval_qids):
+                if existing.get(qid) != merged.get(qid):
+                    violations.append(
+                        f"{qid}: --out entry is stale (differs from the "
+                        f"propagated alternatives)")
             for v in violations:
                 print("VIOLATION: " + v)
             if violations:
@@ -756,7 +1062,7 @@ def main() -> int:
                             if r in stats["per_rule"])
             print(f"check OK: {stats['per_rule']['keybinding']} keybinding "
                   f"aliases{extra}, {stats['questions_touched']} questions, "
-                  f"0 violations")
+                  f"{prop_msg + ', ' if prop_msg else ''}0 violations")
             return 0
 
         if alternatives is not None:
@@ -772,13 +1078,16 @@ def main() -> int:
             for r in ("alternative", "alternative-key"):
                 print(f"{r} aliases derived: {stats['per_rule'][r]}")
         print(f"questions touched: {stats['questions_touched']}")
+        if prop_msg:
+            print(prop_msg)
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
         if args.merge:
-            existing = json.loads(out_path.read_text()) if out_path.exists() else {}
-            eval_qids = {r["qid"] for r in rows}
-            merged = {k: v for k, v in existing.items() if k not in eval_qids}
-            merged.update(aliases)
+            if merged is None:  # no --alternatives: nothing to propagate
+                existing = load_existing(base_path or out_path)
+                eval_qids = {r["qid"] for r in rows}
+                merged = {k: v for k, v in existing.items() if k not in eval_qids}
+                merged.update(aliases)
             out_path.write_text(json.dumps(merged, indent=2, sort_keys=True))
             print(f"merged into {out_path}")
         else:
@@ -790,6 +1099,13 @@ def main() -> int:
 
     if not corpus_path.exists():
         print(f"no corpus at {corpus_path}", file=sys.stderr)
+        return 2
+
+    if args.alternatives:
+        return run_man_alternatives(args, corpus_path, eval_path, out_path,
+                                    base_path, variant_rows)
+    if args.variants:
+        print("--variants needs --alternatives", file=sys.stderr)
         return 2
 
     aliases, stats = derive(corpus_path, eval_path)
