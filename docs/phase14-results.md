@@ -106,7 +106,7 @@ reorder near-tied top-5 candidates.
 **What this means beyond phase 14:**
 - **Any two runs whose candidate pools differ carry this as noise:** phase 13's oracle, R9 and R10
   against the open control, and phase 11's R8. It is noise, not bias: it does not favour either arm.
-  It is part of why about 1 in 50 rows reorders even between identical runs (the drift check). Those
+  (Identical runs share their batches, so their 1-in-50 reorders are a separate server noise.) Those
   comparisons stay paired and their verdicts stand. Margins of a few rows sit inside this noise.
 - **A rerank-score cache only works if each pair's score is batch-independent.** Two ways to get that:
   - score pairs one per request (batch = 1, slower; cost unmeasured)
