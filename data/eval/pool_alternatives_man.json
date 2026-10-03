@@ -1,0 +1,365 @@
+{
+  "a01": [],
+  "a02": [],
+  "a03": [],
+  "a04": [
+    {
+      "alias": "-R",
+      "line": "-R, --dereference-recursive",
+      "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+      "token": "--recursive",
+      "why": "-R reads all files under each directory recursively, so it searches every file in the folder and its subfolders."
+    },
+    {
+      "alias": "--dereference-recursive",
+      "line": "-R, --dereference-recursive",
+      "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+      "token": "--recursive",
+      "why": "--dereference-recursive reads all files under each directory recursively (also following symlinks), searching the whole tree."
+    }
+  ],
+  "a05": [],
+  "a06": [],
+  "a07": [],
+  "a08": [
+    {
+      "alias": "-mmin",
+      "line": "-mmin n",
+      "sec_id": "find.1#EXPRESSION/TESTS",
+      "token": "-mtime n",
+      "why": "-mmin selects files whose data was modified less than n minutes ago, so -mmin -10080 lists files modified within the last week."
+    }
+  ],
+  "a09": [],
+  "a10": [
+    {
+      "alias": "--sort=time",
+      "line": "       with -l, WORD determines which time to show; with --sort=time, sort by WORD (newest",
+      "sec_id": "ls.1#DESCRIPTION",
+      "token": "-t",
+      "why": "--sort=time is the long form of -t: it sorts by modification time, newest first."
+    }
+  ],
+  "a11": [
+    {
+      "alias": "--si",
+      "line": "--si   likewise, but use powers of 1000 not 1024",
+      "sec_id": "ls.1#DESCRIPTION",
+      "token": "--human-readable",
+      "why": "--si prints sizes with K/M/G suffixes like -h, only using powers of 1000."
+    }
+  ],
+  "a12": [
+    {
+      "alias": "-p",
+      "line": "-p     same as --preserve=mode,ownership,timestamps",
+      "sec_id": "cp.1#DESCRIPTION",
+      "token": "--preserve",
+      "why": "-p is the same as --preserve=mode,ownership,timestamps, keeping permissions and timestamps."
+    },
+    {
+      "alias": "-a",
+      "line": "-a, --archive",
+      "sec_id": "cp.1#DESCRIPTION",
+      "token": "--preserve",
+      "why": "-a implies --preserve=all, so copies keep their timestamps and permissions."
+    },
+    {
+      "alias": "--archive",
+      "line": "-a, --archive",
+      "sec_id": "cp.1#DESCRIPTION",
+      "token": "--preserve",
+      "why": "--archive is the same as -dR --preserve=all, so copies keep their timestamps and permissions."
+    }
+  ],
+  "a13": [],
+  "a14": [],
+  "a15": [],
+  "a16": [],
+  "a17": [
+    {
+      "alias": "--max-depth=0",
+      "line": "       below the command line argument;  --max-depth=0 is the same as --summarize",
+      "sec_id": "du.1#DESCRIPTION",
+      "token": "--summarize",
+      "why": "The text states --max-depth=0 is the same as --summarize, printing one total for the folder."
+    }
+  ],
+  "a18": [],
+  "a19": [],
+  "a20": [
+    {
+      "alias": "-L",
+      "line": "-L, --table",
+      "sec_id": "kill.1#OPTIONS",
+      "token": "--list",
+      "why": "-L lists the signal names in a table (with their numbers), from which signal 9's name can be read."
+    },
+    {
+      "alias": "--table",
+      "line": "-L, --table",
+      "sec_id": "kill.1#OPTIONS",
+      "token": "--list",
+      "why": "--table lists the signal names in a table (with their numbers), from which signal 9's name can be read."
+    }
+  ],
+  "a21": [
+    {
+      "alias": "-g",
+      "line": "-g, --general-numeric-sort",
+      "sec_id": "sort.1#DESCRIPTION",
+      "token": "--numeric-sort",
+      "why": "-g compares by general numerical value, so 9 sorts before 10."
+    },
+    {
+      "alias": "--general-numeric-sort",
+      "line": "-g, --general-numeric-sort",
+      "sec_id": "sort.1#DESCRIPTION",
+      "token": "--numeric-sort",
+      "why": "--general-numeric-sort compares by numerical value, so 9 sorts before 10."
+    },
+    {
+      "alias": "-h",
+      "line": "-h, --human-numeric-sort",
+      "sec_id": "sort.1#DESCRIPTION",
+      "token": "--numeric-sort",
+      "why": "-h compares numbers by value (also accepting K/M/G suffixes), so 9 sorts before 10."
+    },
+    {
+      "alias": "--human-numeric-sort",
+      "line": "-h, --human-numeric-sort",
+      "sec_id": "sort.1#DESCRIPTION",
+      "token": "--numeric-sort",
+      "why": "--human-numeric-sort compares numbers by value (also accepting suffixes), so 9 sorts before 10."
+    }
+  ],
+  "a22": [],
+  "a23": [],
+  "a24": [],
+  "a25": [
+    {
+      "alias": "-i",
+      "line": "-i[SUFFIX], --in-place[=SUFFIX]",
+      "sec_id": "sed.1#DESCRIPTION",
+      "token": "--in-place",
+      "why": "-i is the short form of --in-place: edit files in place."
+    }
+  ],
+  "a26": [],
+  "a27": [
+    {
+      "alias": "-f",
+      "line": "-f, --follow[={name|descriptor}]",
+      "sec_id": "tail.1#DESCRIPTION",
+      "token": "--follow",
+      "why": "-f is the short form of --follow: output appended data as the file grows."
+    },
+    {
+      "alias": "-F",
+      "line": "-F     same as --follow=name --retry",
+      "sec_id": "tail.1#DESCRIPTION",
+      "token": "--follow",
+      "why": "-F is the same as --follow=name --retry, following the log as it grows (and across rotation)."
+    }
+  ],
+  "a28": [
+    {
+      "alias": "IdentityFile",
+      "line": "              IdentityFile",
+      "sec_id": "ssh.1#DESCRIPTION",
+      "token": "identity_file",
+      "why": "IdentityFile is the ssh config option (usable via -o) that names the private key file to use."
+    }
+  ],
+  "a29": [],
+  "a30": [
+    {
+      "alias": "--location-trusted",
+      "line": "--location-trusted",
+      "sec_id": "curl.1#ALL OPTIONS",
+      "token": "--location",
+      "why": "--location-trusted makes curl follow HTTP redirects like -L (additionally sending credentials on)."
+    }
+  ],
+  "a31": [
+    {
+      "alias": "--remote-name-all",
+      "line": "--remote-name-all",
+      "sec_id": "curl.1#ALL OPTIONS",
+      "token": "--remote-name",
+      "why": "--remote-name-all makes every URL be saved as if -O were given, i.e. under the remote file's name."
+    }
+  ],
+  "a32": [
+    {
+      "alias": "-c",
+      "line": "            wget -c ftp://sunsite.doc.ic.ac.uk/ls-lR.Z",
+      "sec_id": "wget.1#OPTIONS/Download Options",
+      "token": "--continue",
+      "why": "-c is the short form of --continue: continue getting a partially-downloaded file."
+    }
+  ],
+  "a33": [
+    {
+      "alias": "USR1",
+      "line": "Sending a USR1 signal to a running 'dd' process makes it print I/O statistics to standard",
+      "sec_id": "dd.1#DESCRIPTION",
+      "token": "status=LEVEL",
+      "why": "Sending USR1 to the running dd makes it print its I/O statistics, showing how far along it is."
+    }
+  ],
+  "a34": [
+    {
+      "alias": "--delimiter",
+      "line": "--delimiter=delim, -d delim",
+      "sec_id": "xargs.1#OPTIONS",
+      "token": "--null",
+      "why": "--delimiter (e.g. '\\n') makes each whole line one item with every character literal, so spaces no longer split filenames."
+    },
+    {
+      "alias": "-d",
+      "line": "--delimiter=delim, -d delim",
+      "sec_id": "xargs.1#OPTIONS",
+      "token": "--null",
+      "why": "-d (e.g. '\\n') makes each whole line one item with every character literal, so spaces no longer split filenames."
+    },
+    {
+      "alias": "-I",
+      "line": "-I replace-str",
+      "sec_id": "xargs.1#OPTIONS",
+      "token": "--null",
+      "why": "With -I, unquoted blanks do not terminate input items (the separator is newline), so filenames with spaces stay intact."
+    }
+  ],
+  "a35": [
+    {
+      "alias": "reenable",
+      "line": "reenable UNIT...",
+      "sec_id": "systemctl.1#COMMANDS/Unit File Commands",
+      "token": "enable UNIT",
+      "why": "reenable is disable followed by enable, leaving the unit enabled per its [Install] section so it starts at boot."
+    }
+  ],
+  "a36": [
+    {
+      "alias": "-b",
+      "line": "-b [[ID][±offset]|all], --boot[=[ID][±offset]|all]",
+      "sec_id": "journalctl.1#FILTERING OPTIONS",
+      "token": "--boot",
+      "why": "-b is the short form of --boot; with an empty argument it shows logs from the current boot."
+    }
+  ],
+  "a37": [
+    {
+      "alias": "ro",
+      "line": "    Mount the filesystem read-only. A synonym is -o ro.",
+      "sec_id": "mount.8#COMMAND-LINE OPTIONS",
+      "token": "--read-only",
+      "why": "The text names -o ro as a synonym for --read-only."
+    }
+  ],
+  "a38": [],
+  "a39": [],
+  "a40": [],
+  "a41": [],
+  "a42": [
+    {
+      "alias": "-c",
+      "line": "-c  --format=FORMAT",
+      "sec_id": "stat.1#DESCRIPTION",
+      "token": "--format",
+      "why": "-c is the short form of --format; with %s it prints only the size."
+    },
+    {
+      "alias": "--printf",
+      "line": "--printf=FORMAT",
+      "sec_id": "stat.1#DESCRIPTION",
+      "token": "--format",
+      "why": "--printf is like --format (without forced newline); with %s it prints only the size."
+    }
+  ],
+  "a43": [
+    {
+      "alias": "--iso-8601",
+      "line": "-I[FMT], --iso-8601[=FMT]",
+      "sec_id": "date.1#DESCRIPTION",
+      "token": "%F",
+      "why": "--iso-8601 defaults to date-only ISO 8601 output, i.e. YYYY-MM-DD."
+    },
+    {
+      "alias": "-I",
+      "line": "-I[FMT], --iso-8601[=FMT]",
+      "sec_id": "date.1#DESCRIPTION",
+      "token": "%F",
+      "why": "-I defaults to date-only ISO 8601 output, i.e. YYYY-MM-DD."
+    }
+  ],
+  "a44": [],
+  "b01": [],
+  "b02": [],
+  "b03": [],
+  "b04": [],
+  "b05": [
+    {
+      "alias": "DenyUsers",
+      "line": "DenyUsers",
+      "sec_id": "sshd_config.5#DESCRIPTION",
+      "token": "PermitRootLogin",
+      "why": "DenyUsers root disallows ssh login for the root user name."
+    }
+  ],
+  "b06": [
+    {
+      "alias": "ListenAddress",
+      "line": "              ListenAddress hostname:port [rdomain domain]",
+      "sec_id": "sshd_config.5#DESCRIPTION",
+      "token": "Port",
+      "why": "ListenAddress with an address:port form makes sshd listen on the given non-22 port."
+    }
+  ],
+  "b07": [
+    {
+      "alias": "ProtocolKeepAlives",
+      "line": "        ProtocolKeepAlives is a Debian-specific compatibility alias for this option.",
+      "sec_id": "ssh_config.5#DESCRIPTION",
+      "token": "ServerAliveInterval",
+      "why": "ProtocolKeepAlives is documented as an alias for ServerAliveInterval."
+    }
+  ],
+  "b08": [],
+  "b09": [],
+  "b10": [],
+  "b11": [],
+  "b12": [],
+  "b13": [],
+  "b14": [],
+  "b15": [],
+  "c01": [],
+  "c02": [
+    {
+      "alias": "SIGKILL",
+      "line": "The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.",
+      "sec_id": "signal.7#DESCRIPTION/Standard signals",
+      "token": "cannot be caught",
+      "why": "Naming SIGKILL answers the question: the text says it cannot be caught, blocked or ignored."
+    },
+    {
+      "alias": "SIGSTOP",
+      "line": "The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.",
+      "sec_id": "signal.7#DESCRIPTION/Standard signals",
+      "token": "cannot be caught",
+      "why": "Naming SIGSTOP answers the question: the text says it cannot be caught, blocked or ignored."
+    }
+  ],
+  "c03": [],
+  "c04": [],
+  "c05": [],
+  "c06": [],
+  "c07": [],
+  "c08": [],
+  "c09": [],
+  "c10": [],
+  "c11": [],
+  "c12": [],
+  "u22": []
+}

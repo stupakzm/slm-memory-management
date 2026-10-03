@@ -380,6 +380,304 @@ def test_no_alternatives_flag_is_unchanged():
         check(stats["per_rule"] == {"keybinding": 1}, f"{stats}")
 
 
+# --- tsk_20261003_altv2: man-mode --alternatives, --base, --variants ---
+
+_MAN_SEC = "ss.8#OPTIONS"
+_MAN_TEXT = (
+    "       -l, --listening\n"
+    "              Display only listening sockets.\n"
+    "       -a, --all\n"
+    "              Display both listening and non-listening sockets.\n"
+)
+
+
+def _man_fixture(td, extra_rows=()):
+    """man.jsonl with one doc/section, an eval with q1 (+ extra rows), and the
+    v1-style base derived from it (q1 gets `-l`; q2 is an unrelated row)."""
+    tmp = Path(td)
+    corpus = tmp / "man.jsonl"
+    corpus.write_text(json.dumps({
+        "doc_id": "ss.8", "sections": [{
+            "sec_id": _MAN_SEC, "heading": "OPTIONS", "level": 1,
+            "parent": None, "text": _MAN_TEXT}]}) + "\n", encoding="utf-8")
+    rows = [
+        {"qid": "q1", "kind": "answerable", "doc": "ss.8",
+         "question": "show only the sockets waiting for connections",
+         "answer_contains": ["--listening"], "gold_sec_ids": [_MAN_SEC]},
+        {"qid": "q2", "kind": "answerable", "doc": "ss.8",
+         "question": "show only the sockets waiting for connections please",
+         "answer_contains": ["--listening"], "gold_sec_ids": [_MAN_SEC]},
+        *extra_rows,
+    ]
+    ev = tmp / "eval.jsonl"
+    ev.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    return corpus, ev, rows
+
+
+def _man_alt(**kw):
+    e = {"token": "--listening", "alias": "--all", "sec_id": _MAN_SEC,
+         "line": "-a, --all", "why": "lists listening sockets too"}
+    e.update(kw)
+    return e
+
+
+def _man_check(rows, entries, qid="q1"):
+    docs = {"ss.8": {"sections": {_MAN_SEC: "OPTIONS\n" + _MAN_TEXT}}}
+    return derive_gold_aliases.check_alternatives(
+        {qid: entries}, {}, docs, rows, man=True)
+
+
+def test_man_alternative_licensed_by_option_line():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        docs = derive_gold_aliases.load_man_docs(corpus)
+        text = docs["ss.8"]["sections"][_MAN_SEC]
+        check(text == "OPTIONS\n" + _MAN_TEXT,
+              f"section text is heading, newline, text: {text!r}")
+        alts = {"q1": [_man_alt()]}
+        check(derive_gold_aliases.check_alternatives(
+            alts, {}, docs, rows, man=True) == [], "licensed alternative must pass")
+        base, _ = derive_gold_aliases.derive(corpus, ev)
+        check(base["q1"]["--listening"][0]["alias"] == "-l", f"{base}")
+        merged, added = derive_gold_aliases.merge_man_alternatives(base, alts, rows)
+        got = merged["q1"]["--listening"]
+        check(got[:1] == base["q1"]["--listening"],
+              f"the base entry must come first, unchanged: {got}")
+        check(got[1:] == [{"alias": "--all", "rule": "alternative",
+                           "sec_id": _MAN_SEC, "line": "-a, --all"}] and added == 1,
+              f"one appended alternative expected: {got}")
+        check(merged["q2"] == base["q2"], "a qid not in FILE must be unchanged")
+        merged2, added2 = derive_gold_aliases.merge_man_alternatives(
+            merged, {"q1": [_man_alt(), _man_alt(alias="--listening")]}, rows)
+        check(merged2 == merged and added2 == 0,
+              "re-merging dedupes on (alias, sec_id); alias == token is dropped")
+    # rejections: each licensed field is policed
+    cases = [
+        (dict(line="-a, --everything"), "not verbatim"),
+        (dict(alias="--other", line="-a, --all"), "not a substring"),
+        (dict(sec_id="ss.8#OTHER"), "not in gold_sec_ids"),
+        (dict(token="--tcp"), "answer_contains"),
+        (dict(why=" "), "no why"),
+    ]
+    for kw, want in cases:
+        viol = _man_check(rows, [_man_alt(**kw)])
+        check(any(want in v for v in viol), f"{kw}: expected {want!r}, got {viol}")
+    rows_q = [dict(rows[0], question="what does --ALL do")]
+    check(any("occurs in the question" in v for v in _man_check(rows_q, [_man_alt()])),
+          "an alias echoing the question must be rejected (case-insensitive)")
+    check(any("not in this --eval" in v for v in _man_check(rows, [_man_alt()], "zz")),
+          "a qid not in --eval must be rejected")
+
+
+def test_man_alternative_shape_rules():
+    shaped = derive_gold_aliases.is_man_alias_shaped
+    for good in ("-l", "--listening", "--color=WHEN", "DenyUsers", "getfacl",
+                 "/etc/shadow"):
+        check(shaped(good), f"{good!r} must be accepted")
+    for bad in ("ss -l", "x", "!!", "", "-", "--", "a b", "-l\n", "--x y"):
+        check(not shaped(bad), f"{bad!r} must be rejected")
+    # and through the checker: the shape rule is reported, whatever the line
+    rows = [{"qid": "q1", "kind": "answerable", "doc": "ss.8", "question": "q",
+             "answer_contains": ["--listening"], "gold_sec_ids": [_MAN_SEC]}]
+    for alias, line in (("ss -l", "-l, --listening"), ("x", "Display"),
+                        ("!!", "Display")):
+        viol = _man_check(rows, [_man_alt(alias=alias, line=line)])
+        check(any("neither flag- nor identifier-shaped" in v for v in viol),
+              f"{alias!r} should violate the shape rule, got {viol}")
+    check(_man_check(rows, [_man_alt(alias="-l", line="-l, --listening")]) == [],
+          "a flag alias is accepted")
+
+
+def _digest(entry):
+    return json.dumps(entry, indent=2, sort_keys=True)
+
+
+def test_base_flag_leaves_base_file_untouched():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        tmp = Path(td)
+        base_obj, _ = derive_gold_aliases.derive(corpus, ev)
+        base_obj["other"] = {"--foo": [{"alias": "-f", "rule": "synonym",
+                                        "sec_id": "x#y", "line": "-f, --foo"}]}
+        base = tmp / "base.json"
+        base.write_text(json.dumps(base_obj, indent=2, sort_keys=True))
+        before = base.read_bytes()
+        alt = tmp / "alt.json"
+        alt.write_text(json.dumps({"q1": [_man_alt()]}))
+        out = tmp / "v2.json"
+        args = ["--corpus", str(corpus), "--eval", str(ev), "--alternatives",
+                str(alt), "--base", str(base), "--out", str(out)]
+        r = _run_cli(*args, "--merge")
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        check("1 alternatives merged" in r.stdout and "0 propagated" in r.stdout
+              and "0 skipped as in question" in r.stdout, r.stdout)
+        check(base.read_bytes() == before, "--base must never be written")
+        got = json.loads(out.read_text())
+        for qid in base_obj:
+            if qid != "q1":
+                check(_digest(got[qid]) == _digest(base_obj[qid]),
+                      f"{qid} not in FILE must be byte-identical to --base")
+        check(got["q1"]["--listening"][:1] == base_obj["q1"]["--listening"]
+              and got["q1"]["--listening"][1]["alias"] == "--all",
+              f"q1 is the base entry plus the alternative: {got['q1']}")
+        r = _run_cli(*args, "--check")
+        check(r.returncode == 0, f"fresh merge checks clean: {r.stdout}")
+        got["q1"]["--listening"][1]["alias"] = "--tampered"
+        out.write_text(json.dumps(got))
+        r = _run_cli(*args, "--check")
+        check(r.returncode == 1 and "stale" in r.stdout, f"{r.stdout}")
+        # --check needs --base; --base must not be --out; no flags, no write
+        r = _run_cli("--corpus", str(corpus), "--eval", str(ev), "--alternatives",
+                     str(alt), "--out", str(out), "--check")
+        check(r.returncode == 2, f"man --check without --base: {r.returncode}")
+        r = _run_cli(*args[:-2], "--out", str(base), "--merge")
+        check(r.returncode == 2 and base.read_bytes() == before,
+              f"--base == --out must be refused: {r.returncode}")
+        # a merge with violations writes nothing
+        bad = tmp / "bad.json"
+        bad.write_text(json.dumps({"q1": [_man_alt(alias="ss -l", line="x")]}))
+        out2 = tmp / "never.json"
+        r = _run_cli("--corpus", str(corpus), "--eval", str(ev), "--alternatives",
+                     str(bad), "--base", str(base), "--out", str(out2), "--merge")
+        check(r.returncode == 1 and not out2.exists()
+              and base.read_bytes() == before, f"{r.stdout}{r.stderr}")
+
+
+def _variant_rows():
+    return [
+        {"qid": "q1.t1", "kind": "answerable", "doc": "ss.8",
+         "question": "show only the sockets waiting for connectoins",
+         "answer_contains": ["--listening"], "gold_sec_ids": [_MAN_SEC],
+         "variant_of": "q1"},
+        {"qid": "q1.t1.p", "kind": "answerable", "doc": "ss.8",
+         "question": "which sockets are in the listen state",
+         "answer_contains": ["--listening", "--tcp"], "gold_sec_ids": [_MAN_SEC],
+         "paraphrase_of": "q1.t1"},
+        {"qid": "q1.t2", "kind": "answerable", "doc": "ss.8",
+         "question": "sockets waiting for connections", "variant_of": "q1",
+         "answer_contains": ["--listening"], "gold_sec_ids": [_MAN_SEC]},
+    ]
+
+
+def test_propagates_to_variants_with_own_entry():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        tmp = Path(td)
+        var = tmp / "variants.jsonl"
+        var.write_text("".join(json.dumps(r) + "\n" for r in _variant_rows()))
+        base_obj, _ = derive_gold_aliases.derive(corpus, ev)
+        own = [{"alias": "-l", "rule": "synonym", "sec_id": _MAN_SEC,
+                "line": "-l, --listening"}]
+        base_obj["q1.t1"] = {"--listening": list(own)}
+        base_obj["q1.t1.p"] = {}  # explicit empty entry is still "its own"
+        # q1.t2 has no entry: scoring falls back to q1, nothing is written for it
+        base = tmp / "base.json"
+        base.write_text(json.dumps(base_obj, indent=2, sort_keys=True))
+        alt = tmp / "alt.json"
+        alt.write_text(json.dumps({"q1": [_man_alt()]}))
+        out = tmp / "v2.json"
+        args = ["--corpus", str(corpus), "--eval", str(ev), "--variants", str(var),
+                "--alternatives", str(alt), "--base", str(base), "--out", str(out)]
+        r = _run_cli(*args, "--merge")
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        check("1 alternatives merged, 2 propagated to variants, 0 skipped as in "
+              "question" in r.stdout, r.stdout)
+        got = json.loads(out.read_text())
+        want = {"alias": "--all", "rule": "alternative", "sec_id": _MAN_SEC,
+                "line": "-a, --all", "via_base": "q1"}
+        check(got["q1.t1"]["--listening"] == own + [want],
+              f"variant keeps its entry and gains the root's: {got['q1.t1']}")
+        check(got["q1.t1.p"] == {"--listening": [want]},
+              f"a grandchild's root is followed to the end, and only tokens in "
+              f"its answer_contains: {got['q1.t1.p']}")
+        check("q1.t2" not in got, "a row without its own entry gets none")
+        check("via_base" not in json.dumps(got["q1"]), "the root itself is not a variant")
+        r = _run_cli(*args, "--check")
+        check(r.returncode == 0, f"{r.stdout}")
+        got["q1.t1"]["--listening"].pop()
+        out.write_text(json.dumps(got))
+        r = _run_cli(*args, "--check")
+        check(r.returncode == 1 and "q1.t1: --out entry is stale" in r.stdout,
+              f"a missing propagated entry is stale: {r.stdout}")
+    # a root that is not a loaded row is still the root
+    target = {"v": {}}
+    stats, touched = derive_gold_aliases.propagate_to_variants(
+        target, [{"qid": "v", "variant_of": "ghost", "question": "q",
+                  "answer_contains": ["--listening"]}],
+        {"ghost": [_man_alt()]}, {"v"})
+    check(stats["propagated"] == 1 and touched == {"v"}
+          and target["v"]["--listening"][0]["via_base"] == "ghost", f"{target}")
+
+
+def test_propagation_revalidates_variant_question():
+    rows = [
+        {"qid": "q1.t1", "question": "does --ALL show listening sockets",
+         "answer_contains": ["--listening"], "variant_of": "q1"},
+        {"qid": "q1.t2", "question": "which sockets are listening",
+         "answer_contains": ["--listening"], "variant_of": "q1"},
+    ]
+    target = {"q1.t1": {}, "q1.t2": {}}
+    stats, _ = derive_gold_aliases.propagate_to_variants(
+        target, rows, {"q1": [_man_alt()]}, set(target))
+    check(target["q1.t1"] == {}, f"alias in the variant's question: {target['q1.t1']}")
+    check(target["q1.t2"]["--listening"][0]["alias"] == "--all", f"{target}")
+    check(stats == {"propagated": 1, "skipped_in_question": 1}, f"{stats}")
+    # md mode: same rule, end to end through the CLI
+    with tempfile.TemporaryDirectory() as td:
+        md, ev, alt, out = _cli_fixture(td)
+        tmp = Path(td)
+        var = tmp / "variants.jsonl"
+        var.write_text(json.dumps({
+            "qid": "a1.t", "kind": "answerable", "doc": "fixture.emacs",
+            "question": "what does Kill-Buffer-And-Window do?",
+            "answer_contains": ["kill-buffer"], "gold_sec_ids": ["fixture.emacs#sec"],
+            "variant_of": "a1"}) + "\n")
+        base = tmp / "base.json"
+        base.write_text(json.dumps({"a1.t": {}}))
+        r = _run_cli("--md-corpus", str(md), "--eval", str(ev), "--variants",
+                     str(var), "--alternatives", str(alt), "--base", str(base),
+                     "--out", str(out), "--merge")
+        check(r.returncode == 0 and "0 propagated to variants, 1 skipped as in "
+              "question" in r.stdout, f"{r.stdout}{r.stderr}")
+        check(json.loads(out.read_text())["a1.t"] == {}, "nothing propagated")
+
+
+def test_no_new_flags_output_unchanged():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        out = Path(td) / "out.json"
+        r = _run_cli("--corpus", str(corpus), "--eval", str(ev), "--out", str(out))
+        check(r.returncode == 0, f"{r.stdout}{r.stderr}")
+        want = {qid: {"--listening": [{
+            "alias": "-l", "rule": "synonym", "sec_id": _MAN_SEC,
+            "line": "-l, --listening"}]} for qid in ("q1", "q2")}
+        check(out.read_text() == json.dumps(want, indent=2, sort_keys=True),
+              f"man mode without the new flags must write the derive() output: "
+              f"{out.read_text()}")
+        check(r.stdout.startswith(f"wrote {out}\nquestions touched: 2\n"
+                                  "aliases per rule:\n")
+              and "alternative" not in r.stdout and "propagated" not in r.stdout,
+              f"stdout unchanged: {r.stdout}")
+        # an md-mode --merge without the new flags is still the old merge
+        md, ev2, alt, out2 = _cli_fixture(td)
+        r = _run_cli("--md-corpus", str(md), "--eval", str(ev2), "--out", str(out2),
+                     "--merge")
+        check(r.returncode == 0 and "propagated" not in r.stdout, f"{r.stdout}")
+
+
+def test_man_check_without_alternatives_never_writes():
+    with tempfile.TemporaryDirectory() as td:
+        corpus, ev, rows = _man_fixture(td)
+        out = Path(td) / "curated.json"
+        out.write_text('{"hand": "curated"}')
+        before = out.read_bytes()
+        r = _run_cli("--corpus", str(corpus), "--eval", str(ev), "--out", str(out),
+                     "--check")
+        check(r.returncode == 2, f"{r.returncode} {r.stdout}{r.stderr}")
+        check("needs --alternatives" in r.stderr, r.stderr)
+        check(out.read_bytes() == before, "--out must be byte-identical")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

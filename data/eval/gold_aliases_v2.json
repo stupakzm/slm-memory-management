@@ -1,0 +1,2209 @@
+{
+  "a01": {
+    "--exclude-from": [
+      {
+        "alias": "-X",
+        "line": "-X, --exclude-from=FILE",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Local file selection"
+      }
+    ]
+  },
+  "a01.n": {
+    "--exclude-from": [
+      {
+        "alias": "-X",
+        "line": "-X, --exclude-from=FILE",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Local file selection"
+      }
+    ]
+  },
+  "a01.t": {
+    "--exclude-from": [
+      {
+        "alias": "-X",
+        "line": "-X, --exclude-from=FILE",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Local file selection"
+      }
+    ]
+  },
+  "a01.z": {
+    "--exclude-from": [
+      {
+        "alias": "-X",
+        "line": "-X, --exclude-from=FILE",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Local file selection"
+      }
+    ]
+  },
+  "a02": {
+    "--gzip": [
+      {
+        "alias": "-z",
+        "line": "-z, --gzip, --gunzip, --ungzip",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Compression options"
+      },
+      {
+        "alias": "--gunzip",
+        "line": "-z, --gzip, --gunzip, --ungzip",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Compression options"
+      },
+      {
+        "alias": "--ungzip",
+        "line": "-z, --gzip, --gunzip, --ungzip",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Compression options"
+      }
+    ]
+  },
+  "a03": {
+    "--context": [
+      {
+        "alias": "-C",
+        "line": "-C NUM, -NUM, --context=NUM",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/Context Line Control"
+      },
+      {
+        "alias": "-NUM",
+        "line": "-C NUM, -NUM, --context=NUM",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/Context Line Control"
+      }
+    ]
+  },
+  "a04": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, --recursive",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "-R",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "--dereference-recursive",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      }
+    ]
+  },
+  "a04.n": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, --recursive",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "-R",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      },
+      {
+        "alias": "--dereference-recursive",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      }
+    ]
+  },
+  "a04.t": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, --recursive",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "-R",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      },
+      {
+        "alias": "--dereference-recursive",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      }
+    ]
+  },
+  "a04.z": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, --recursive",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "-R",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      },
+      {
+        "alias": "--dereference-recursive",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      }
+    ]
+  },
+  "a05": {
+    "--files-with-matches": [
+      {
+        "alias": "-l",
+        "line": "-l, --files-with-matches",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/General Output Control"
+      }
+    ]
+  },
+  "a06": {
+    "--invert-match": [
+      {
+        "alias": "-v",
+        "line": "-v, --invert-match",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/Matching Control"
+      }
+    ]
+  },
+  "a07": {
+    "Delete files": [
+      {
+        "alias": "-delete",
+        "line": "-delete",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  },
+  "a08": {
+    "-mtime n": [
+      {
+        "alias": "-mmin",
+        "line": "-mmin n",
+        "rule": "alternative",
+        "sec_id": "find.1#EXPRESSION/TESTS"
+      }
+    ]
+  },
+  "a09": {
+    "null character": [
+      {
+        "alias": "-print0",
+        "line": "-print0",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  },
+  "a09.n": {
+    "null character": [
+      {
+        "alias": "-print0",
+        "line": "-print0",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  },
+  "a09.t": {
+    "null character": [
+      {
+        "alias": "-print0",
+        "line": "-print0",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  },
+  "a09.z": {
+    "null character": [
+      {
+        "alias": "-print0",
+        "line": "-print0",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  },
+  "a10": {
+    "-t": [
+      {
+        "alias": "--sort=time",
+        "line": "       with -l, WORD determines which time to show; with --sort=time, sort by WORD (newest",
+        "rule": "alternative",
+        "sec_id": "ls.1#DESCRIPTION"
+      }
+    ],
+    "sort by time": [
+      {
+        "alias": "-t",
+        "line": "-t     sort by time, newest first; see --time",
+        "rule": "description",
+        "sec_id": "ls.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a11": {
+    "--human-readable": [
+      {
+        "alias": "-h",
+        "line": "-h, --human-readable",
+        "rule": "synonym",
+        "sec_id": "ls.1#DESCRIPTION"
+      },
+      {
+        "alias": "--si",
+        "line": "--si   likewise, but use powers of 1000 not 1024",
+        "rule": "alternative",
+        "sec_id": "ls.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a11.n": {
+    "--human-readable": [
+      {
+        "alias": "-h",
+        "line": "-h, --human-readable",
+        "rule": "synonym",
+        "sec_id": "ls.1#DESCRIPTION"
+      },
+      {
+        "alias": "--si",
+        "line": "--si   likewise, but use powers of 1000 not 1024",
+        "rule": "alternative",
+        "sec_id": "ls.1#DESCRIPTION",
+        "via_base": "a11"
+      }
+    ]
+  },
+  "a11.t": {
+    "--human-readable": [
+      {
+        "alias": "-h",
+        "line": "-h, --human-readable",
+        "rule": "synonym",
+        "sec_id": "ls.1#DESCRIPTION"
+      },
+      {
+        "alias": "--si",
+        "line": "--si   likewise, but use powers of 1000 not 1024",
+        "rule": "alternative",
+        "sec_id": "ls.1#DESCRIPTION",
+        "via_base": "a11"
+      }
+    ]
+  },
+  "a11.z": {
+    "--human-readable": [
+      {
+        "alias": "-h",
+        "line": "-h, --human-readable",
+        "rule": "synonym",
+        "sec_id": "ls.1#DESCRIPTION"
+      },
+      {
+        "alias": "--si",
+        "line": "--si   likewise, but use powers of 1000 not 1024",
+        "rule": "alternative",
+        "sec_id": "ls.1#DESCRIPTION",
+        "via_base": "a11"
+      }
+    ]
+  },
+  "a12": {
+    "--preserve": [
+      {
+        "alias": "-p",
+        "line": "-p     same as --preserve=mode,ownership,timestamps",
+        "rule": "alternative",
+        "sec_id": "cp.1#DESCRIPTION"
+      },
+      {
+        "alias": "-a",
+        "line": "-a, --archive",
+        "rule": "alternative",
+        "sec_id": "cp.1#DESCRIPTION"
+      },
+      {
+        "alias": "--archive",
+        "line": "-a, --archive",
+        "rule": "alternative",
+        "sec_id": "cp.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a13": {
+    "--no-clobber": [
+      {
+        "alias": "-n",
+        "line": "-n, --no-clobber",
+        "rule": "synonym",
+        "sec_id": "cp.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a14": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, -R, --recursive",
+        "rule": "synonym",
+        "sec_id": "rm.1#OPTIONS"
+      },
+      {
+        "alias": "-R",
+        "line": "-r, -R, --recursive",
+        "rule": "synonym",
+        "sec_id": "rm.1#OPTIONS"
+      }
+    ]
+  },
+  "a15": {
+    "--recursive": [
+      {
+        "alias": "-R",
+        "line": "-R, --recursive",
+        "rule": "synonym",
+        "sec_id": "chmod.1#OPTIONS"
+      }
+    ]
+  },
+  "a15.n": {
+    "--recursive": [
+      {
+        "alias": "-R",
+        "line": "-R, --recursive",
+        "rule": "synonym",
+        "sec_id": "chmod.1#OPTIONS"
+      }
+    ]
+  },
+  "a15.t": {
+    "--recursive": [
+      {
+        "alias": "-R",
+        "line": "-R, --recursive",
+        "rule": "synonym",
+        "sec_id": "chmod.1#OPTIONS"
+      }
+    ]
+  },
+  "a15.z": {
+    "--recursive": [
+      {
+        "alias": "-R",
+        "line": "-R, --recursive",
+        "rule": "synonym",
+        "sec_id": "chmod.1#OPTIONS"
+      }
+    ]
+  },
+  "a16": {
+    "--recursive": [
+      {
+        "alias": "-R",
+        "line": "-R, --recursive",
+        "rule": "synonym",
+        "sec_id": "chown.1#OPTIONS"
+      }
+    ]
+  },
+  "a17": {
+    "--summarize": [
+      {
+        "alias": "-s",
+        "line": "-s, --summarize",
+        "rule": "synonym",
+        "sec_id": "du.1#DESCRIPTION"
+      },
+      {
+        "alias": "--max-depth=0",
+        "line": "       below the command line argument;  --max-depth=0 is the same as --summarize",
+        "rule": "alternative",
+        "sec_id": "du.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a18": {
+    "--inodes": [
+      {
+        "alias": "-i",
+        "line": "-i, --inodes",
+        "rule": "synonym",
+        "sec_id": "df.1#OPTIONS"
+      }
+    ]
+  },
+  "a19": {
+    "Select all processes": [
+      {
+        "alias": "-A",
+        "line": "-A     Select all processes.  Identical to -e.",
+        "rule": "description",
+        "sec_id": "ps.1#SIMPLE PROCESS SELECTION"
+      },
+      {
+        "alias": "-e",
+        "line": "-e     Select all processes.  Identical to -A.",
+        "rule": "description",
+        "sec_id": "ps.1#SIMPLE PROCESS SELECTION"
+      }
+    ]
+  },
+  "a20": {
+    "--list": [
+      {
+        "alias": "-l",
+        "line": "-l, --list [signal]",
+        "rule": "synonym",
+        "sec_id": "kill.1#OPTIONS"
+      },
+      {
+        "alias": "-L",
+        "line": "-L, --table",
+        "rule": "alternative",
+        "sec_id": "kill.1#OPTIONS"
+      },
+      {
+        "alias": "--table",
+        "line": "-L, --table",
+        "rule": "alternative",
+        "sec_id": "kill.1#OPTIONS"
+      }
+    ]
+  },
+  "a21": {
+    "--numeric-sort": [
+      {
+        "alias": "-n",
+        "line": "-n, --numeric-sort",
+        "rule": "synonym",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "-g",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "--general-numeric-sort",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "-h",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "--human-numeric-sort",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a21.n": {
+    "--numeric-sort": [
+      {
+        "alias": "-n",
+        "line": "-n, --numeric-sort",
+        "rule": "synonym",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "-g",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--general-numeric-sort",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "-h",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--human-numeric-sort",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      }
+    ]
+  },
+  "a21.t": {
+    "--numeric-sort": [
+      {
+        "alias": "-n",
+        "line": "-n, --numeric-sort",
+        "rule": "synonym",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "-g",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--general-numeric-sort",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "-h",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--human-numeric-sort",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      }
+    ]
+  },
+  "a21.z": {
+    "--numeric-sort": [
+      {
+        "alias": "-n",
+        "line": "-n, --numeric-sort",
+        "rule": "synonym",
+        "sec_id": "sort.1#DESCRIPTION"
+      },
+      {
+        "alias": "-g",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--general-numeric-sort",
+        "line": "-g, --general-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "-h",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      },
+      {
+        "alias": "--human-numeric-sort",
+        "line": "-h, --human-numeric-sort",
+        "rule": "alternative",
+        "sec_id": "sort.1#DESCRIPTION",
+        "via_base": "a21"
+      }
+    ]
+  },
+  "a22": {
+    "--unique": [
+      {
+        "alias": "-u",
+        "line": "-u, --unique",
+        "rule": "synonym",
+        "sec_id": "sort.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a23": {
+    "--count": [
+      {
+        "alias": "-c",
+        "line": "-c, --count",
+        "rule": "synonym",
+        "sec_id": "uniq.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a24": {
+    "--delimiter": [
+      {
+        "alias": "-d",
+        "line": "-d, --delimiter=DELIM",
+        "rule": "synonym",
+        "sec_id": "cut.1#DESCRIPTION"
+      }
+    ],
+    "--fields": [
+      {
+        "alias": "-f",
+        "line": "-f, --fields=LIST",
+        "rule": "synonym",
+        "sec_id": "cut.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a25": {
+    "--in-place": [
+      {
+        "alias": "-i",
+        "line": "-i[SUFFIX], --in-place[=SUFFIX]",
+        "rule": "alternative",
+        "sec_id": "sed.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a26": {
+    "--lines": [
+      {
+        "alias": "-l",
+        "line": "-l, --lines",
+        "rule": "synonym",
+        "sec_id": "wc.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a27": {
+    "--follow": [
+      {
+        "alias": "-f",
+        "line": "-f, --follow[={name|descriptor}]",
+        "rule": "alternative",
+        "sec_id": "tail.1#DESCRIPTION"
+      },
+      {
+        "alias": "-F",
+        "line": "-F     same as --follow=name --retry",
+        "rule": "alternative",
+        "sec_id": "tail.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a28": {
+    "identity_file": [
+      {
+        "alias": "-i",
+        "line": "-i identity_file",
+        "rule": "argument",
+        "sec_id": "ssh.1#DESCRIPTION"
+      },
+      {
+        "alias": "IdentityFile",
+        "line": "              IdentityFile",
+        "rule": "alternative",
+        "sec_id": "ssh.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a29": {
+    "Recursively copy": [
+      {
+        "alias": "-r",
+        "line": "-r      Recursively copy entire directories.  Note that scp follows symbolic links",
+        "rule": "description",
+        "sec_id": "scp.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a30": {
+    "--location": [
+      {
+        "alias": "-L",
+        "line": "-L, --location",
+        "rule": "synonym",
+        "sec_id": "curl.1#ALL OPTIONS"
+      },
+      {
+        "alias": "--location-trusted",
+        "line": "--location-trusted",
+        "rule": "alternative",
+        "sec_id": "curl.1#ALL OPTIONS"
+      }
+    ]
+  },
+  "a30.n": {
+    "--location": [
+      {
+        "alias": "-L",
+        "line": "-L, --location",
+        "rule": "synonym",
+        "sec_id": "curl.1#ALL OPTIONS"
+      },
+      {
+        "alias": "--location-trusted",
+        "line": "--location-trusted",
+        "rule": "alternative",
+        "sec_id": "curl.1#ALL OPTIONS",
+        "via_base": "a30"
+      }
+    ]
+  },
+  "a30.t": {
+    "--location": [
+      {
+        "alias": "-L",
+        "line": "-L, --location",
+        "rule": "synonym",
+        "sec_id": "curl.1#ALL OPTIONS"
+      },
+      {
+        "alias": "--location-trusted",
+        "line": "--location-trusted",
+        "rule": "alternative",
+        "sec_id": "curl.1#ALL OPTIONS",
+        "via_base": "a30"
+      }
+    ]
+  },
+  "a30.z": {
+    "--location": [
+      {
+        "alias": "-L",
+        "line": "-L, --location",
+        "rule": "synonym",
+        "sec_id": "curl.1#ALL OPTIONS"
+      },
+      {
+        "alias": "--location-trusted",
+        "line": "--location-trusted",
+        "rule": "alternative",
+        "sec_id": "curl.1#ALL OPTIONS",
+        "via_base": "a30"
+      }
+    ]
+  },
+  "a31": {
+    "--remote-name": [
+      {
+        "alias": "-O",
+        "line": "-O, --remote-name",
+        "rule": "synonym",
+        "sec_id": "curl.1#ALL OPTIONS"
+      },
+      {
+        "alias": "--remote-name-all",
+        "line": "--remote-name-all",
+        "rule": "alternative",
+        "sec_id": "curl.1#ALL OPTIONS"
+      }
+    ]
+  },
+  "a32": {
+    "--continue": [
+      {
+        "alias": "-c",
+        "line": "            wget -c ftp://sunsite.doc.ic.ac.uk/ls-lR.Z",
+        "rule": "alternative",
+        "sec_id": "wget.1#OPTIONS/Download Options"
+      }
+    ]
+  },
+  "a33": {
+    "status=LEVEL": [
+      {
+        "alias": "USR1",
+        "line": "Sending a USR1 signal to a running 'dd' process makes it print I/O statistics to standard",
+        "rule": "alternative",
+        "sec_id": "dd.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a34": {
+    "--null": [
+      {
+        "alias": "-0",
+        "line": "-0, --null",
+        "rule": "synonym",
+        "sec_id": "xargs.1#OPTIONS"
+      },
+      {
+        "alias": "--delimiter",
+        "line": "--delimiter=delim, -d delim",
+        "rule": "alternative",
+        "sec_id": "xargs.1#OPTIONS"
+      },
+      {
+        "alias": "-d",
+        "line": "--delimiter=delim, -d delim",
+        "rule": "alternative",
+        "sec_id": "xargs.1#OPTIONS"
+      },
+      {
+        "alias": "-I",
+        "line": "-I replace-str",
+        "rule": "alternative",
+        "sec_id": "xargs.1#OPTIONS"
+      }
+    ]
+  },
+  "a35": {
+    "enable UNIT": [
+      {
+        "alias": "reenable",
+        "line": "reenable UNIT...",
+        "rule": "alternative",
+        "sec_id": "systemctl.1#COMMANDS/Unit File Commands"
+      }
+    ]
+  },
+  "a36": {
+    "--boot": [
+      {
+        "alias": "-b",
+        "line": "-b [[ID][\u00b1offset]|all], --boot[=[ID][\u00b1offset]|all]",
+        "rule": "alternative",
+        "sec_id": "journalctl.1#FILTERING OPTIONS"
+      }
+    ]
+  },
+  "a37": {
+    "--read-only": [
+      {
+        "alias": "-r",
+        "line": "-r, --read-only",
+        "rule": "synonym",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+      },
+      {
+        "alias": "ro",
+        "line": "    Mount the filesystem read-only. A synonym is -o ro.",
+        "rule": "alternative",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+      }
+    ]
+  },
+  "a37.n": {
+    "--read-only": [
+      {
+        "alias": "-r",
+        "line": "-r, --read-only",
+        "rule": "synonym",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+      },
+      {
+        "alias": "ro",
+        "line": "    Mount the filesystem read-only. A synonym is -o ro.",
+        "rule": "alternative",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS",
+        "via_base": "a37"
+      }
+    ]
+  },
+  "a37.t": {
+    "--read-only": [
+      {
+        "alias": "-r",
+        "line": "-r, --read-only",
+        "rule": "synonym",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+      },
+      {
+        "alias": "ro",
+        "line": "    Mount the filesystem read-only. A synonym is -o ro.",
+        "rule": "alternative",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS",
+        "via_base": "a37"
+      }
+    ]
+  },
+  "a37.z": {
+    "--read-only": [
+      {
+        "alias": "-r",
+        "line": "-r, --read-only",
+        "rule": "synonym",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS"
+      },
+      {
+        "alias": "ro",
+        "line": "    Mount the filesystem read-only. A synonym is -o ro.",
+        "rule": "alternative",
+        "sec_id": "mount.8#COMMAND-LINE OPTIONS",
+        "via_base": "a37"
+      }
+    ]
+  },
+  "a38": {
+    "new-volume-label": [
+      {
+        "alias": "-L",
+        "line": "-L new-volume-label",
+        "rule": "argument",
+        "sec_id": "mke2fs.8#OPTIONS"
+      },
+      {
+        "alias": "-L",
+        "line": "-L new-volume-label",
+        "rule": "description",
+        "sec_id": "mke2fs.8#OPTIONS"
+      }
+    ]
+  },
+  "a39": {
+    "--create-home": [
+      {
+        "alias": "-m",
+        "line": "-m, --create-home",
+        "rule": "synonym",
+        "sec_id": "useradd.8#OPTIONS"
+      }
+    ]
+  },
+  "a40": {
+    "--listening": [
+      {
+        "alias": "-l",
+        "line": "-l, --listening",
+        "rule": "synonym",
+        "sec_id": "ss.8#OPTIONS"
+      }
+    ]
+  },
+  "a41": {
+    "--symbolic": [
+      {
+        "alias": "-s",
+        "line": "-s, --symbolic",
+        "rule": "synonym",
+        "sec_id": "ln.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a42": {
+    "--format": [
+      {
+        "alias": "-c",
+        "line": "-c  --format=FORMAT",
+        "rule": "alternative",
+        "sec_id": "stat.1#DESCRIPTION"
+      },
+      {
+        "alias": "--printf",
+        "line": "--printf=FORMAT",
+        "rule": "alternative",
+        "sec_id": "stat.1#DESCRIPTION"
+      }
+    ]
+  },
+  "a43": {
+    "%F": [
+      {
+        "alias": "--iso-8601",
+        "line": "-I[FMT], --iso-8601[=FMT]",
+        "rule": "alternative",
+        "sec_id": "date.1#DESCRIPTION"
+      },
+      {
+        "alias": "-I",
+        "line": "-I[FMT], --iso-8601[=FMT]",
+        "rule": "alternative",
+        "sec_id": "date.1#DESCRIPTION"
+      }
+    ]
+  },
+  "b05": {
+    "PermitRootLogin": [
+      {
+        "alias": "DenyUsers",
+        "line": "DenyUsers",
+        "rule": "alternative",
+        "sec_id": "sshd_config.5#DESCRIPTION"
+      }
+    ]
+  },
+  "b06": {
+    "Port": [
+      {
+        "alias": "ListenAddress",
+        "line": "              ListenAddress hostname:port [rdomain domain]",
+        "rule": "alternative",
+        "sec_id": "sshd_config.5#DESCRIPTION"
+      }
+    ]
+  },
+  "b07": {
+    "ServerAliveInterval": [
+      {
+        "alias": "ProtocolKeepAlives",
+        "line": "        ProtocolKeepAlives is a Debian-specific compatibility alias for this option.",
+        "rule": "alternative",
+        "sec_id": "ssh_config.5#DESCRIPTION"
+      }
+    ]
+  },
+  "c02": {
+    "cannot be caught": [
+      {
+        "alias": "SIGKILL",
+        "line": "The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.",
+        "rule": "alternative",
+        "sec_id": "signal.7#DESCRIPTION/Standard signals"
+      },
+      {
+        "alias": "SIGSTOP",
+        "line": "The signals SIGKILL and SIGSTOP cannot be caught, blocked, or ignored.",
+        "rule": "alternative",
+        "sec_id": "signal.7#DESCRIPTION/Standard signals"
+      }
+    ]
+  },
+  "e01": {
+    "find-file-read-only": [
+      {
+        "alias": "C-x C-r",
+        "line": "\u2018C-x C-r\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#visiting"
+      }
+    ]
+  },
+  "e02": {
+    "kill-buffer": [
+      {
+        "alias": "C-x k",
+        "line": "\u2018C-x k BUFFER <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#kill-buffer"
+      }
+    ]
+  },
+  "e02.t": {
+    "kill-buffer": [
+      {
+        "alias": "C-x k",
+        "line": "\u2018C-x k BUFFER <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#kill-buffer"
+      }
+    ]
+  },
+  "e03": {
+    "delete-other-windows": [
+      {
+        "alias": "C-x 1",
+        "line": "\u2018C-x 1\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#change-window"
+      }
+    ]
+  },
+  "e04": {
+    "split-window-right": [
+      {
+        "alias": "C-x 3",
+        "line": "\u2018C-x 3\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#split-window"
+      }
+    ]
+  },
+  "e04.z": {
+    "split-window-right": [
+      {
+        "alias": "C-x 3",
+        "line": "\u2018C-x 3\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#split-window"
+      }
+    ]
+  },
+  "e05": {},
+  "e06": {
+    "query-replace": [
+      {
+        "alias": "M-%",
+        "line": "\u2018M-%\u2019 (\u2018query-replace\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#replace"
+      }
+    ]
+  },
+  "e07": {
+    "kill-ring-save": [
+      {
+        "alias": "M-w",
+        "line": "\u2018M-w\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#other-kill-commands"
+      }
+    ]
+  },
+  "e07.t": {
+    "kill-ring-save": [
+      {
+        "alias": "M-w",
+        "line": "\u2018M-w\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#other-kill-commands"
+      }
+    ]
+  },
+  "e08": {
+    "append-next-kill": [
+      {
+        "alias": "C-M-w",
+        "line": "\u2018C-M-w\u2019 (\u2018append-next-kill\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#appending-kills"
+      }
+    ]
+  },
+  "e09": {},
+  "e09.z": {},
+  "e10": {
+    "revert-buffer": [
+      {
+        "alias": "revert-buffer-quick",
+        "line": "   The \u2018C-x x g\u2019 keystroke is bound to the \u2018revert-buffer-quick\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#reverting"
+      },
+      {
+        "alias": "revert-buffer-with-fine-grain",
+        "line": "\u2018revert-buffer-with-fine-grain\u2019.  This command acts like",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#reverting"
+      }
+    ]
+  },
+  "e11": {
+    "kmacro-name-last-macro": [
+      {
+        "alias": "C-x C-k n",
+        "line": "\u2018C-x C-k n\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#save-keyboard-macro"
+      }
+    ]
+  },
+  "e12": {
+    "C-x (": [
+      {
+        "alias": "kmacro-start-macro",
+        "line": "Start defining a keyboard macro (old style) (\u2018kmacro-start-macro\u2019);",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#basic-keyboard-macro"
+      }
+    ]
+  },
+  "e13": {
+    "copy-to-register": [
+      {
+        "alias": "C-x r s",
+        "line": "\u2018C-x r s R\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#text-registers"
+      }
+    ]
+  },
+  "e13.t": {
+    "copy-to-register": [
+      {
+        "alias": "C-x r s",
+        "line": "\u2018C-x r s R\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#text-registers"
+      }
+    ]
+  },
+  "e14": {
+    "bookmark-jump": [
+      {
+        "alias": "C-x r b",
+        "line": "\u2018C-x r b BOOKMARK <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#bookmarks"
+      }
+    ]
+  },
+  "e15": {
+    "dired-mark-files-regexp": [
+      {
+        "alias": "% m",
+        "line": "\u2018% m REGEXP <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#marks-vs-flags"
+      },
+      {
+        "alias": "* %",
+        "line": "\u2018* % REGEXP <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#marks-vs-flags"
+      }
+    ]
+  },
+  "e15.z": {
+    "dired-mark-files-regexp": [
+      {
+        "alias": "% m",
+        "line": "\u2018% m REGEXP <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#marks-vs-flags"
+      },
+      {
+        "alias": "* %",
+        "line": "\u2018* % REGEXP <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#marks-vs-flags"
+      }
+    ]
+  },
+  "e16": {},
+  "e17": {},
+  "e18": {},
+  "e19": {
+    "describe-mode": [
+      {
+        "alias": "C-h m",
+        "line": "\u2018C-h m\u2019 (\u2018describe-mode\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-help"
+      }
+    ]
+  },
+  "e19.t": {
+    "describe-mode": [
+      {
+        "alias": "C-h m",
+        "line": "\u2018C-h m\u2019 (\u2018describe-mode\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-help"
+      }
+    ]
+  },
+  "e20": {},
+  "e21": {
+    "describe-key": [
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k\u2019\n(\u2018describe-key\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#basic-help"
+      },
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k KEY\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k\u2019 (\u2018describe-key\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#key-help"
+      }
+    ]
+  },
+  "e21.z": {
+    "describe-key": [
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k\u2019\n(\u2018describe-key\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#basic-help"
+      },
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k KEY\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h k",
+        "line": "\u2018C-h k\u2019 (\u2018describe-key\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#key-help"
+      }
+    ]
+  },
+  "e22": {
+    "help-with-tutorial": [
+      {
+        "alias": "C-h t",
+        "line": "\u2018C-h t\u2019\n(\u2018help-with-tutorial\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#entering-emacs"
+      },
+      {
+        "alias": "C-h t",
+        "line": "\u2018C-h t\u2019\n(\u2018help-with-tutorial\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#basic"
+      },
+      {
+        "alias": "C-h t",
+        "line": "\u2018C-h t\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      }
+    ]
+  },
+  "e23": {
+    "vc-annotate": [
+      {
+        "alias": "C-x v g",
+        "line": "\u2018C-x v g\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#old-revisions"
+      }
+    ]
+  },
+  "e24": {
+    "vc-print-log": [
+      {
+        "alias": "C-x v l",
+        "line": "\u2018C-x v l\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#vc-change-log"
+      }
+    ]
+  },
+  "e25": {},
+  "e26": {
+    "org-export-dispatch": [
+      {
+        "alias": "C-c C-e",
+        "line": "\u2018C-c C-e\u2019 (\u2018org-export-dispatch\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#the-export-dispatcher"
+      }
+    ]
+  },
+  "e27": {},
+  "e27.t": {},
+  "e28": {},
+  "e29": {},
+  "e30": {},
+  "e31": {},
+  "e32": {},
+  "e33": {},
+  "e33.z": {},
+  "e34": {},
+  "e35": {},
+  "e36": {},
+  "e37": {},
+  "e38": {},
+  "e39": {},
+  "e40": {},
+  "e41": {
+    "dired-omit-mode": [
+      {
+        "alias": "C-x M-o",
+        "line": "\u2018C-x M-o\u2019",
+        "rule": "keybinding",
+        "sec_id": "dired-x.emacs#omitting-files-in-dired"
+      }
+    ]
+  },
+  "e42": {},
+  "e43": {},
+  "e44": {},
+  "ep01": {
+    "find-file-read-only": [
+      {
+        "alias": "C-x C-r",
+        "line": "\u2018C-x C-r\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#visiting"
+      }
+    ]
+  },
+  "ep02": {},
+  "ep03": {
+    "kmacro-name-last-macro": [
+      {
+        "alias": "C-x C-k n",
+        "line": "\u2018C-x C-k n\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#save-keyboard-macro"
+      }
+    ]
+  },
+  "ep04": {},
+  "ep05": {},
+  "ep06": {},
+  "er01": {},
+  "er02": {
+    "winner-undo": [
+      {
+        "alias": "C-c left",
+        "line": "\u2018C-c left\u2019 (\u2018winner-undo\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#window-convenience"
+      }
+    ]
+  },
+  "er03": {
+    "transpose-words": [
+      {
+        "alias": "M-t",
+        "line": "\u2018M-t\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#transpose"
+      },
+      {
+        "alias": "M-t",
+        "line": "\u2018M-t\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#words"
+      }
+    ]
+  },
+  "er04": {
+    "upcase-word": [
+      {
+        "alias": "M-u",
+        "line": "\u2018M-u\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#case"
+      }
+    ]
+  },
+  "er05": {},
+  "er06": {},
+  "er07": {
+    "string-rectangle": [
+      {
+        "alias": "C-x r t",
+        "line": "\u2018C-x r t STRING <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "string-insert-rectangle",
+        "line": "\u2018M-x string-insert-rectangle <RET> STRING <RET>\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#rectangles"
+      }
+    ]
+  },
+  "er08": {
+    "count-words": [
+      {
+        "alias": "count-words-region",
+        "line": "\u2018M-=\u2019 (\u2018count-words-region\u2019) displays a message reporting the number",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#position-info"
+      },
+      {
+        "alias": "M-=",
+        "line": "\u2018M-=\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#position-info",
+        "via": "count-words-region"
+      }
+    ]
+  },
+  "er09": {
+    "narrow-to-region": [
+      {
+        "alias": "C-x n n",
+        "line": "\u2018C-x n n\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#narrowing"
+      }
+    ]
+  },
+  "er10": {},
+  "er11": {
+    "global-auto-revert-mode": [
+      {
+        "alias": "auto-revert-mode",
+        "line": "enable Auto Revert mode by typing \u2018M-x auto-revert-mode\u2019.  This",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#auto-revert"
+      }
+    ]
+  },
+  "er12": {},
+  "er13": {},
+  "er14": {
+    "view-lossage": [
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019 (\u2018view-lossage\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-help"
+      },
+      {
+        "alias": "C-h l",
+        "line": "\u2018C-h l\u2019\n(\u2018view-lossage\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#text-garbled"
+      }
+    ]
+  },
+  "er15": {
+    "where-is": [
+      {
+        "alias": "C-h w",
+        "line": "\u2018C-h w COMMAND <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      }
+    ]
+  },
+  "er16": {
+    "shell-command-on-region": [
+      {
+        "alias": "M-|",
+        "line": "\u2018M-| CMD <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#shell"
+      },
+      {
+        "alias": "M-|",
+        "line": "\u2018M-|\u2019 (\u2018shell-command-on-region\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#single-shell"
+      }
+    ]
+  },
+  "er17": {
+    "text-scale-adjust": [
+      {
+        "alias": "text-scale-increase",
+        "line": "The commands \u2018text-scale-increase\u2019 and \u2018text-scale-decrease\u2019 increase",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      },
+      {
+        "alias": "C-x C-+",
+        "line": "type \u2018C-x C-+\u2019 or \u2018C-x C-=\u2019.  To decrease it, type \u2018C-x C--\u2019.  To",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      },
+      {
+        "alias": "C-x C-=",
+        "line": "type \u2018C-x C-+\u2019 or \u2018C-x C-=\u2019.  To decrease it, type \u2018C-x C--\u2019.  To",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#text-scale"
+      }
+    ]
+  },
+  "er18": {},
+  "er19": {},
+  "er20": {},
+  "er21": {
+    "org-deadline": [
+      {
+        "alias": "C-c C-d",
+        "line": "\u2018C-c C-d\u2019 (\u2018org-deadline\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#inserting-deadline-schedule"
+      }
+    ]
+  },
+  "er22": {
+    "quick-calc": [
+      {
+        "alias": "C-x * q",
+        "line": "make one or two quick calculations.  Type \u2018C-x * q\u2019 (or \u2018M-x",
+        "rule": "alternative",
+        "sec_id": "calc.emacs#quick-calculator"
+      }
+    ]
+  },
+  "er23": {
+    "org-table-create-or-convert-from-region": [
+      {
+        "alias": "C-c |",
+        "line": "\u2018C-c |\u2019 (\u2018org-table-create-or-convert-from-region\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#built-in-table-editor"
+      }
+    ]
+  },
+  "er24": {
+    "fill-paragraph": [
+      {
+        "alias": "M-q",
+        "line": "\u2018M-q\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#fill-commands"
+      }
+    ]
+  },
+  "er25": {},
+  "er26": {
+    "read-only-mode": [
+      {
+        "alias": "C-x C-q",
+        "line": "\u2018C-x C-q\u2019\n(\u2018read-only-mode\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#visiting"
+      },
+      {
+        "alias": "C-x C-q",
+        "line": "\u2018C-x C-q\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#misc-buffer"
+      },
+      {
+        "alias": "find-file-read-only",
+        "line": "(\u2018find-file-read-only\u2019) instead of \u2018C-x C-f\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#visiting"
+      },
+      {
+        "alias": "C-x C-r",
+        "line": "\u2018C-x C-r\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#visiting",
+        "via": "find-file-read-only"
+      }
+    ]
+  },
+  "er27": {},
+  "er28": {
+    "rename-buffer": [
+      {
+        "alias": "C-x x r",
+        "line": "\u2018C-x x r\u2019 (\u2018rename-buffer\u2019 changes the name of the current buffer.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#misc-buffer"
+      }
+    ]
+  },
+  "er29": {
+    "rgrep": [
+      {
+        "alias": "grep-find",
+        "line": "\u2018M-x grep-find\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#grep-searching"
+      }
+    ]
+  },
+  "er30": {
+    "flush-lines": [
+      {
+        "alias": "kill-matching-lines",
+        "line": "\u2018M-x kill-matching-lines\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#other-repeating-search"
+      }
+    ]
+  },
+  "er31": {},
+  "er32": {},
+  "er33": {},
+  "er34": {
+    "goto-line": [
+      {
+        "alias": "M-g M-g",
+        "line": "\u2018M-g M-g\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#moving-point"
+      },
+      {
+        "alias": "M-g g",
+        "line": "\u2018M-g g\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#moving-point"
+      }
+    ]
+  },
+  "er35": {
+    "show-paren-mode": [
+      {
+        "alias": "show-paren-local-mode",
+        "line": "current buffer, type \u2018M-x show-paren-local-mode\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#matching"
+      }
+    ]
+  },
+  "er36": {},
+  "er37": {},
+  "er38": {},
+  "er39": {
+    "vc-diff": [
+      {
+        "alias": "C-x v =",
+        "line": "\u2018C-x v =\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#old-revisions"
+      },
+      {
+        "alias": "vc-ediff",
+        "line": "\u2018M-x vc-ediff\u2019 works like \u2018C-x v =\u2019, except that it uses an Ediff",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#old-revisions"
+      }
+    ]
+  },
+  "er40": {
+    "vc-revert": [
+      {
+        "alias": "C-x v u",
+        "line": "\u2018C-x v u\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#vc-undo"
+      }
+    ]
+  },
+  "er41": {
+    "org-refile": [
+      {
+        "alias": "C-c C-w",
+        "line": "\u2018C-c C-w\u2019 (\u2018org-refile\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#refile-and-copy"
+      }
+    ]
+  },
+  "er42": {},
+  "er43": {},
+  "er44": {
+    "eglot-format": [
+      {
+        "alias": "eglot-format-buffer",
+        "line": "\u2018M-x eglot-format-buffer\u2019",
+        "rule": "alternative",
+        "sec_id": "eglot.emacs#eglot-commands"
+      }
+    ]
+  },
+  "er45": {},
+  "er46": {
+    "balance-windows": [
+      {
+        "alias": "C-x +",
+        "line": "\u2018C-x +\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#change-window"
+      }
+    ]
+  },
+  "er47": {},
+  "er48": {},
+  "er49": {
+    "toggle-input-method": [
+      {
+        "alias": "C-\\",
+        "line": "\u2018C-\\\u2019 (\u2018toggle-input-method\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#input-methods"
+      },
+      {
+        "alias": "C-\\",
+        "line": "\u2018C-\\\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#select-input-method"
+      }
+    ]
+  },
+  "er50": {
+    "insert-char": [
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8 <RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#inserting-text"
+      },
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8\n<RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#international-chars"
+      },
+      {
+        "alias": "C-x 8",
+        "line": "\u2018C-x 8 <RET>\u2019 (\u2018insert-char\u2019)",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#input-methods"
+      }
+    ]
+  },
+  "er51": {
+    "zap-to-char": [
+      {
+        "alias": "M-z",
+        "line": "\u2018M-z CHAR\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#other-kill-commands"
+      },
+      {
+        "alias": "zap-up-to-char",
+        "line": "\u2018M-x zap-up-to-char CHAR\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#other-kill-commands"
+      }
+    ]
+  },
+  "er52": {
+    "delete-indentation": [
+      {
+        "alias": "M-^",
+        "line": "\u2018M-^\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#deletion"
+      },
+      {
+        "alias": "M-^",
+        "line": "\u2018M-^\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#indentation-commands"
+      }
+    ]
+  },
+  "er53": {
+    "just-one-space": [
+      {
+        "alias": "cycle-spacing",
+        "line": "The command \u2018cycle-spacing\u2019 (\u2018M-<SPC>\u2019) acts like a more flexible",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#deletion"
+      },
+      {
+        "alias": "M-<SPC>",
+        "line": "\u2018M-<SPC>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#deletion",
+        "via": "cycle-spacing"
+      }
+    ]
+  },
+  "er54": {
+    "vc-create-tag": [
+      {
+        "alias": "C-x v s",
+        "line": "\u2018C-x v s NAME <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#revision-tags"
+      }
+    ]
+  },
+  "er55": {},
+  "er56": {
+    "org-toggle-checkbox": [
+      {
+        "alias": "C-c C-c",
+        "line": "\u2018C-c C-c\u2019 (\u2018org-toggle-checkbox\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#checkboxes"
+      },
+      {
+        "alias": "C-c C-x C-b",
+        "line": "\u2018C-c C-x C-b\u2019 (\u2018org-toggle-checkbox\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#checkboxes"
+      }
+    ]
+  },
+  "er57": {
+    "org-archive-subtree": [
+      {
+        "alias": "C-c $",
+        "line": "\u2018C-c $\u2019 (\u2018org-archive-subtree\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#moving-subtrees"
+      },
+      {
+        "alias": "C-c C-x C-s",
+        "line": "\u2018C-c C-x C-s\u2019 or short \u2018C-c $\u2019 (\u2018org-archive-subtree\u2019)",
+        "rule": "alternative",
+        "sec_id": "org.emacs#moving-subtrees"
+      }
+    ]
+  },
+  "er58": {},
+  "er59": {
+    "list-holidays": [
+      {
+        "alias": "holiday-list",
+        "line": "The command \u2018M-x holiday-list\u2019 displays the list of holidays for a",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#holidays"
+      }
+    ]
+  },
+  "er60": {},
+  "er61": {
+    "highlight-regexp": [
+      {
+        "alias": "M-s h r",
+        "line": "\u2018M-s h r REGEXP <RET> FACE <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "C-x w h",
+        "line": "\u2018C-x w h REGEXP <RET> FACE <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "highlight-phrase",
+        "line": "Highlight matches of PHRASE, using face FACE (\u2018highlight-phrase\u2019).",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#highlight-interactively"
+      },
+      {
+        "alias": "M-s h p",
+        "line": "\u2018M-s h p PHRASE <RET> FACE <RET>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#highlight-interactively",
+        "via": "highlight-phrase"
+      },
+      {
+        "alias": "C-x w p",
+        "line": "\u2018C-x w p PHRASE <RET> FACE <RET>\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#highlight-interactively",
+        "via": "highlight-phrase"
+      }
+    ]
+  },
+  "er62": {
+    "indent-rigidly": [
+      {
+        "alias": "C-x <TAB>",
+        "line": "\u2018C-x <TAB>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#indentation-commands"
+      },
+      {
+        "alias": "indent-code-rigidly",
+        "line": "\u2018M-x indent-code-rigidly\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#multi-line-indent"
+      }
+    ]
+  },
+  "er63": {
+    "kill-rectangle": [
+      {
+        "alias": "C-x r k",
+        "line": "\u2018C-x r k\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "delete-rectangle",
+        "line": "(\u2018delete-rectangle\u2019) to delete the text outright, or \u2018C-x r k\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#rectangles"
+      },
+      {
+        "alias": "C-x r d",
+        "line": "\u2018C-x r d\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#rectangles",
+        "via": "delete-rectangle"
+      }
+    ]
+  },
+  "er64": {
+    "comment-dwim": [
+      {
+        "alias": "M-;",
+        "line": "\u2018M-;\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "M-;",
+        "line": "\u2018M-;\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#fortran-comments"
+      },
+      {
+        "alias": "comment-region",
+        "line": "\u2018M-x comment-region\u2019",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "comment-line",
+        "line": "Comment or uncomment the current line (\u2018comment-line\u2019).  If the",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#comment-commands"
+      },
+      {
+        "alias": "C-x C-;",
+        "line": "\u2018C-x C-;\u2019",
+        "rule": "alternative-key",
+        "sec_id": "emacs.emacs#comment-commands",
+        "via": "comment-line"
+      }
+    ]
+  },
+  "er65": {},
+  "er66": {
+    "org-clock-in": [
+      {
+        "alias": "C-c C-x C-i",
+        "line": "\u2018C-c C-x C-i\u2019 (\u2018org-clock-in\u2019)",
+        "rule": "keybinding",
+        "sec_id": "org.emacs#clocking-commands"
+      }
+    ]
+  },
+  "er67": {},
+  "er68": {},
+  "er69": {},
+  "er70": {},
+  "er71": {
+    "c-set-style": [
+      {
+        "alias": "C-c .",
+        "line": "To set a buffer's style interactively, use the command \u2018C-c .\u2019 (*note",
+        "rule": "alternative",
+        "sec_id": "ccmode.emacs#choosing-a-style"
+      }
+    ]
+  },
+  "er72": {
+    "electric-pair-mode": [
+      {
+        "alias": "electric-pair-local-mode",
+        "line": "toggle the mode in a single buffer, use \u2018M-x electric-pair-local-mode\u2019.",
+        "rule": "alternative",
+        "sec_id": "emacs.emacs#matching"
+      }
+    ]
+  },
+  "er73": {},
+  "er74": {
+    "vc-region-history": [
+      {
+        "alias": "C-x v h",
+        "line": "\u2018C-x v h\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#vc-change-log"
+      }
+    ]
+  },
+  "er75": {
+    "apropos-command": [
+      {
+        "alias": "C-h a",
+        "line": "\u2018C-h a TOPICS <RET>\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#help-summary"
+      },
+      {
+        "alias": "C-h a",
+        "line": "\u2018C-h a\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#apropos"
+      }
+    ]
+  },
+  "er76": {},
+  "er77": {
+    "eval-last-sexp": [
+      {
+        "alias": "C-x C-e",
+        "line": "\u2018C-x C-e\u2019",
+        "rule": "keybinding",
+        "sec_id": "emacs.emacs#lisp-eval"
+      }
+    ]
+  },
+  "er78": {
+    "reftex-toc": [
+      {
+        "alias": "C-c =",
+        "line": "\u2018C-c =\u2019 (\u2018reftex-toc\u2019)",
+        "rule": "keybinding",
+        "sec_id": "reftex.emacs#reftex-in-a-nutshell"
+      }
+    ]
+  },
+  "er79": {},
+  "er80": {},
+  "p01": {
+    "--exclude-from": [
+      {
+        "alias": "-X",
+        "line": "-X, --exclude-from=FILE",
+        "rule": "synonym",
+        "sec_id": "tar.1#OPTIONS/Local file selection"
+      }
+    ]
+  },
+  "p02": {
+    "--recursive": [
+      {
+        "alias": "-r",
+        "line": "-r, --recursive",
+        "rule": "synonym",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection"
+      },
+      {
+        "alias": "-R",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      },
+      {
+        "alias": "--dereference-recursive",
+        "line": "-R, --dereference-recursive",
+        "rule": "alternative",
+        "sec_id": "grep.1#OPTIONS/File and Directory Selection",
+        "via_base": "a04"
+      }
+    ]
+  },
+  "p03": {
+    "null character": [
+      {
+        "alias": "-print0",
+        "line": "-print0",
+        "rule": "description",
+        "sec_id": "find.1#EXPRESSION/ACTIONS"
+      }
+    ]
+  }
+}
