@@ -131,10 +131,10 @@ def main() -> int:
                          "question vectors to the candidate pool (needs an index built "
                          "by scripts/build_qvec.py). 0 (default) reproduces today's "
                          "behaviour exactly.")
-    ap.add_argument("--route", choices=("dense-vote",), default=None,
+    ap.add_argument("--route", choices=("dense-vote", "quota"), default=None,
                     help="phase 13 R9: infer the domain from the question (majority "
                          "domain of the open search's top 5 chunks) and retrieve within "
-                         "it; exclusive with --domain. Default off reproduces today's "
+                         "it; 'quota' (R10) instead takes an equal share of candidates from every domain; exclusive with --domain. Default off reproduces today's "
                          "behaviour exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
