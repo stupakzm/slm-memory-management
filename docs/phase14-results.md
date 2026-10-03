@@ -181,3 +181,38 @@ reranker `--parallel 1`), paired against `p13-ctl` on v1 labels. Rules: answerab
 abstention net ≥ −1, retrieval s/q ≤ 4.25.
 
 Frozen per-question outputs: `data/eval/results/p14-rcheck-{A,B,C,D}.json`.
+
+## Reranker adoption run: result (2026-10-03). Not adopted
+
+Full pool, arm D's settings (client batch 1, reranker `--parallel 1`), generation under setting C,
+paired against `p13-ctl` on v1 labels (`p14-rb1`):
+
+| | net | rule |
+|---|---|---|
+| answerable | **−10** (9 gained / 19 lost), p 0.087 | ≥ −3: **fail** |
+| Emacs | **−9** (0 gained / 9 lost), p 0.004 | |
+| man | −1 (9 / 10) | |
+| abstention | +1 | ≥ −1: pass |
+| retrieval s/q | 3.18 (control 3.25) | ≤ 4.25: pass |
+
+**Not adopted.** The defaults stay at client batch 16 and server parallel 4 (eval), and `asq` is
+unchanged.
+
+**What it shows.** One pair per request removes the drift, but it does not just steady the old scores:
+it changes them. 576 of 1,160 rows get a different ordered top 5. The change is one-sided on Emacs (9
+lost, none gained, p 0.004). On v2 labels the total is −9 (informational).
+
+So batched scoring is not "true scores plus noise". The two settings rank differently, and batched
+happens to suit this pool's Emacs rows better. Why is not established. Untested candidates:
+- per-slot context differs between the server settings (8192 at `--parallel 1` against 2048 at
+  `--parallel 4`)
+- arm B (batch 1, `--parallel 4`) was not run on the full pool
+
+**Consequences:**
+- **A rerank-score cache that matches the live system is not available** without changing live quality.
+  Phase 14's floor sweep stays void. A floor quota can still be tested, but only live, one full arm per
+  F, at full cost.
+- **The batch-composition noise (p90 0.019) remains in every paired comparison.** Phases 11–13's
+  verdicts stand. Margins of a few rows remain inside it.
+
+Frozen: `p14-rb1-answers.json` (sha256 5958ef65…).
