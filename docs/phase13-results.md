@@ -160,3 +160,46 @@ never merged unattended.
   name Emacs.
 - Unanswerable rows: the reranker now sees 25 candidates from a domain the question may have nothing to
   do with. If abstention falls, this is where it shows.
+
+## R10 results (run 2026-10-03, overnight, unattended)
+
+Code: `orch/tsk_20261003_quota` (c4dd9fd). The run used that branch, which is not yet merged. Same pool,
+same control `p13-ctl`, same scorer, generation under setting C on :8090.
+
+| | Emacs answerable (324) | man answerable (559) | abstention (277) | evidence | retrieval s/q |
+|---|---|---|---|---|---|
+| control `p13-ctl` | 202 | 338 | 254 | 711 | 3.25 |
+| **R10 quota** `p13-quota` | 219: **+17** (26/9), p 0.006 | 335: **−3** (28/31), p 0.80 | 251: **−3** | 727 | 3.56 |
+| oracle (for reference) | 233: +31 | 347: +9 | 256: +2 | 754 | 3.58 |
+
+**Against the rule:**
+1. Emacs: pass (+17, p 0.006).
+2. Man ≥ −2: **fail** (−3).
+3. Abstention ≥ −1: **fail** (−3).
+4. ≤ 4.08 s/q: pass (3.56).
+
+**R10 does not ship.** The flag stays opt-in (`--route quota`), and `asq`'s default is unchanged.
+
+**What it shows:**
+- **A quota recovers about half of the oracle's Emacs gain (+17 of +31) without a routing decision, and
+  without R9's collapse.** It confirms the crowding hypothesis in part: Emacs passages do gain from a
+  guaranteed share of the rerank slots.
+- **The man pages pay a little for it.** They drop from most of 50 candidates to 25. The −3 is 31 lost
+  against 28 gained (p 0.8), so it is churn rather than a clear harm, but it misses a margin set in
+  advance, and the rule stands.
+- **The abstention changes are mostly that same churn, not invasion.** Of the 9 unanswerable rows whose
+  abstention changed (6 newly answered, 3 newly abstained), 8 had a man-page-only top 5. One, `u07.k`
+  ("gdb set breakpoint"), got an all-Emacs top 5: the Emacs manual's own GDB interface. That one is the
+  pre-registered risk, and on this pool it happened once.
+- **Realistic set (reported only):** `p13-quota-real` scores 30/80 against open `p12-ctl` at 28, a net of
+  +2 (4/2), evidence 52 against 49. Domain-known `p12b-ctl` scores 35 (+7). Where askers do not name
+  Emacs, the quota recovers little. So the pool's +17 leans on Emacs rows whose wording already helps.
+
+**Where this leaves domain routing.** Domain knowledge is worth +40 on the pool. A hard router loses it
+(R9: −31), and an equal quota recovers half on Emacs at a small man-page cost (R10). An unequal quota
+(e.g. a floor for the smaller domain) adds a tuning knob, and tuning it on this pool would overfit. If
+tried, it needs a fresh pre-registration and ideally a held-out set. Explicit `--domain` remains the
+only way to the full gain today.
+
+Frozen outputs (committed): `p13-quota-answers.json` (sha256 `610f18cb…`) and `p13-quota-real-answers.json`
+(`ae66438e…`).
