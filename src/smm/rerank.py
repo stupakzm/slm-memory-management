@@ -32,9 +32,10 @@ _TOO_LARGE_RE = re.compile(
 
 
 class Reranker:
-    def __init__(self, url: str = DEFAULT_URL, timeout: int = 300):
+    def __init__(self, url: str = DEFAULT_URL, timeout: int = 300, batch: int = 16):
         self.url = url.rstrip("/")
         self.timeout = timeout
+        self.batch = batch
 
     def _post(self, path: str, payload: dict) -> dict:
         req = urllib.request.Request(
@@ -136,14 +137,16 @@ class Reranker:
             return self._scores_with_fallback(query, documents, limit)
 
     def rerank(self, query: str, chunks: list[dict], top_k: int | None = None,
-               batch: int = 16) -> list[dict]:
+               batch: int | None = None) -> list[dict]:
         """Rescore chunks and return them best-first, each carrying `rerank_score`.
 
         Batched because the reranker context is 4096 tokens and a 50-candidate
-        request would otherwise be one very large prompt.
+        request would otherwise be one very large prompt. `batch` defaults to the
+        instance's (16); batch 1 sends each document in its own request.
         """
         if not chunks:
             return []
+        batch = batch if batch is not None else self.batch
         docs = [f"{c.get('prefix','')}{c['text']}" for c in chunks]
         scored = []
         for i in range(0, len(docs), batch):

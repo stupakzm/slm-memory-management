@@ -217,14 +217,26 @@ def main() -> int:
                          "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
                          "cascade_rewrites ([] at tier 0). Default off reproduces "
                          "every existing run byte-for-byte.")
-    ap.add_argument("--route", choices=("dense-vote", "oracle", "quota"), default=None,
+    ap.add_argument("--route", choices=("dense-vote", "oracle", "quota", "floor"), default=None,
                     help="phase 13 R9: choose each question's domain. 'dense-vote' is the "
                          "retriever's own router (majority domain of the open search's top "
                          "5 chunks); 'oracle' retrieves within the row's true domain (a "
                          "ceiling, not a router); 'quota' (R10) takes an equal share of the candidates from every domain, no routing decision. Writes NAME-routes.json at the retrieve "
                          "stage. Default off reproduces every existing run byte-for-byte.")
+    ap.add_argument("--floor", type=int, default=None,
+                    help="phase 14 R11: with --route floor, each domain is guaranteed its "
+                         "own top FLOOR chunks and the rest of the candidates go to the "
+                         "best by dense distance (0 = the open search). Required by, and "
+                         "only valid with, --route floor.")
+    ap.add_argument("--rerank-batch", type=int, default=None,
+                    help="documents per reranker request (default unset = 16). Set 1 to "
+                         "score every document alone.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if (args.route == "floor") != (args.floor is not None):
+        print("--route floor and --floor go together", file=sys.stderr)
+        return 2
 
     if args.route:
         clash = [flag for flag, on in (
@@ -242,8 +254,10 @@ def main() -> int:
 
     # Only passed when set, so a default run constructs Retriever exactly as before.
     qv_kw = {"question_vectors": args.question_vectors} if args.question_vectors else {}
-    if args.route in ("dense-vote", "quota"):
+    if args.route in ("dense-vote", "quota", "floor"):
         qv_kw["route"] = args.route
+    if args.floor is not None:
+        qv_kw["floor"] = args.floor
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -284,7 +298,7 @@ def main() -> int:
                 return 2
         rr = None
         if args.rerank:
-            rr = Reranker()
+            rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
             if not rr.health():
                 print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
                 return 2
@@ -506,6 +520,8 @@ def write_report(args, results: list, t0: float) -> int:
               "cap_per_doc": args.cap_per_doc, "answer_mode": args.answer_mode,
               "qids": args.qids, "abstain_rule": "all-sentences",
               "evidence_rule": "aliased"}
+    if args.rerank_batch:
+        config["rerank_batch"] = args.rerank_batch
     # Only added under --normalize spell, so --normalize off's output stays
     # byte-identical to every run made before this flag existed.
     if args.normalize == "spell":
@@ -522,6 +538,8 @@ def write_report(args, results: list, t0: float) -> int:
         config["question_vectors"] = args.question_vectors
     if args.route:
         config["route"] = args.route
+    if args.floor is not None:
+        config["floor"] = args.floor
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
@@ -558,7 +576,7 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
     if not emb.health():
         print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
         return 2
-    rr = Reranker()
+    rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
     if not rr.health():
         print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
         return 2

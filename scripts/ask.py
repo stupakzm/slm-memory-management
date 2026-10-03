@@ -131,13 +131,24 @@ def main() -> int:
                          "question vectors to the candidate pool (needs an index built "
                          "by scripts/build_qvec.py). 0 (default) reproduces today's "
                          "behaviour exactly.")
-    ap.add_argument("--route", choices=("dense-vote", "quota"), default=None,
+    ap.add_argument("--route", choices=("dense-vote", "quota", "floor"), default=None,
                     help="phase 13 R9: infer the domain from the question (majority "
                          "domain of the open search's top 5 chunks) and retrieve within "
                          "it; 'quota' (R10) instead takes an equal share of candidates from every domain; exclusive with --domain. Default off reproduces today's "
                          "behaviour exactly.")
+    ap.add_argument("--floor", type=int, default=None,
+                    help="phase 14 R11: with --route floor, each domain is guaranteed its "
+                         "own top FLOOR candidates and the rest go to the best by dense "
+                         "distance (0 = the open search). Required by, and only valid "
+                         "with, --route floor.")
+    ap.add_argument("--rerank-batch", type=int, default=None,
+                    help="documents per reranker request (default unset = 16). Set 1 to "
+                         "score every document alone.")
     args = ap.parse_args()
     question = " ".join(args.question)
+    if (args.route == "floor") != (args.floor is not None):
+        print("--route floor and --floor go together", file=sys.stderr)
+        return 2
     if args.route and args.domain:
         print("--route and --domain are exclusive: a route chooses the domain",
               file=sys.stderr)
@@ -185,7 +196,7 @@ def main() -> int:
         return 2
     rr = None
     if not args.no_rerank:
-        rr = Reranker()
+        rr = Reranker(**({"batch": args.rerank_batch} if args.rerank_batch else {}))
         if not rr.health():
             print("reranker not running: ./scripts/servers.sh start reranker", file=sys.stderr)
             return 2
@@ -197,6 +208,8 @@ def main() -> int:
         return 2
     # Only passed when set, so a default ask constructs Retriever exactly as before.
     route_kw = {"route": args.route} if args.route else {}
+    if args.floor is not None:
+        route_kw["floor"] = args.floor
     r = Retriever(db, embedder=emb, reranker=rr, mode="dense",
                   candidates=args.candidates, domain=args.domain,
                   question_vectors=args.question_vectors, **route_kw)
