@@ -36,3 +36,31 @@ reader, this audit measures how much of the 195 is label noise and how much is r
   passages, escalation to the 30B on hard cases).
 
 Labels are not changed by this audit. It measures; any relabelling is a separate, blind task.
+
+## Audit 1 is VOID: the sample came from the wrong population (found 2026-10-03, before any conclusion)
+
+The sampling code scored rows with `gold.aliases_for(aliases, qid, None)`, without the variant→base
+fallback the real scorer (`screen_report.score_run`) uses. Typo and paraphrase variants therefore lost
+their aliases, and 95 rows the real scorer credits were counted as "wrong". The true counts for
+`p13-ctl`'s 883 answerable rows:
+- 537 correct with evidence
+- **101** wrong with evidence (not 195)
+- 73 abstained with evidence
+- 169 with no evidence (86 wrong, 83 abstained)
+
+33 of audit 1's 60 "wrong" items were in fact credited, so its 37/60 CORRECT measures nothing about the
+real wrong set. Audit 1's files are kept as a record (`…-audit-{view,key,judgments}.jsonl`), and its
+result is not used. One finding from it stands on its own: 2 of its 20 controls (credited by the
+scorer) were judged WRONG on reading. The scorer also over-credits sometimes: the token is present,
+but the answer is wrong.
+
+**The premise was also wrong.** Reading failures (101 wrong + 73 abstained = 174) and retrieval misses
+(169) are about even. The reader is *not* the dominant bottleneck.
+
+## Audit 2 (same criteria, judge instructions and decision rule as above, corrected population)
+
+The sample is 60 of the true 101 wrong-with-evidence rows and 20 of the 537 correct-with-evidence
+controls, drawn with `random.Random(17)` from the real scorer's output, shuffled and renamed
+`B01`–`B80`. Gold text is now cut at 12,000 characters (audit 1's 6,000 hid the decisive entry in 3
+items). The rule is unchanged: controls ≥ 17/20, then u ≥ 20 % means relabel first. With 60 of 101
+sampled, u scales to the 101.

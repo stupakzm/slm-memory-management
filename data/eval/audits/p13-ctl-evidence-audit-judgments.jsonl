@@ -1,0 +1,80 @@
+{"aid": "A01", "verdict": "CORRECT", "reason": "Gold says 'For brevity the rest of the Emacs documentation generally uses just ... ~/.emacs.d/init.el', which is the answer."}
+{"aid": "A02", "verdict": "CORRECT", "reason": "-C NUM prints NUM lines of output context around matches per grep's Context Line Control."}
+{"aid": "A03", "verdict": "CORRECT", "reason": "C-x C-k n gives a command name to the most recently defined keyboard macro (kmacro-name-last-macro)."}
+{"aid": "A04", "verdict": "WRONG", "reason": "Its lead option --preserve=timestamps,permissions uses 'permissions', which is not an ATTR_LIST value ('mode' is for permissions), and it misstates -p, which the text defines as --preserve=mode,ownership,timestamps."}
+{"aid": "A05", "verdict": "CORRECT", "reason": "Matches 'IP_address canonical_hostname [aliases...]' with blank/tab-separated fields and # comments."}
+{"aid": "A06", "verdict": "CORRECT", "reason": "useradd -m, --create-home creates the user's home directory."}
+{"aid": "A07", "verdict": "CORRECT", "reason": "'% m REGEXP <RET>' marks all files whose names match REGEXP (dired-mark-files-regexp)."}
+{"aid": "A08", "verdict": "WRONG", "reason": "Gives sed's s///g instead of the Emacs command M-x replace-string, which replaces every occurrence after point without prompting."}
+{"aid": "A09", "verdict": "CORRECT", "reason": "find's -delete action deletes files or directories without another command."}
+{"aid": "A10", "verdict": "CORRECT", "reason": "The crontab text says one of eight special strings may replace the five time fields; @reboot runs once at startup (table itself is cut off in the provided text)."}
+{"aid": "A11", "verdict": "CORRECT", "reason": "uniq -c, --count prefixes lines by the number of occurrences."}
+{"aid": "A12", "verdict": "UNCLEAR", "reason": "Gold names M-w (kill-ring-save) for copying without removal; copy-region-as-kill is not mentioned in the provided text, though it is a real Emacs command that does this."}
+{"aid": "A13", "verdict": "WRONG", "reason": "Names /etc/shadow but never lists or explains the aging fields the question asks for; the field list is empty."}
+{"aid": "A14", "verdict": "CORRECT", "reason": "Gold: 'In Info mode, M-n runs the Emacs command clone-buffer'."}
+{"aid": "A15", "verdict": "WRONG", "reason": "Opens by claiming find does not delete matched files directly, which the text contradicts (-delete deletes files); it never gives a clear how-to."}
+{"aid": "A16", "verdict": "CORRECT", "reason": "Matches the usage line 'python -m pip install [options] <requirement specifier>'."}
+{"aid": "A17", "verdict": "CORRECT", "reason": "useradd -m, --create-home creates the user's home directory."}
+{"aid": "A18", "verdict": "CORRECT", "reason": "PermitRootLogin is the sshd_config keyword controlling root login, and 'no' forbids it (the keyword entry lies past the provided excerpt)."}
+{"aid": "A19", "verdict": "CORRECT", "reason": "Says a named class stands for all characters in that class, matching glob(7)'s named character classes defined by the locale, though it says 'collating sequence' where the text says LC_CTYPE."}
+{"aid": "A20", "verdict": "CORRECT", "reason": "The text lists UMASK as a /etc/login.defs parameter used by useradd and newusers, so the answer names the right file."}
+{"aid": "A21", "verdict": "CORRECT", "reason": "curl -L, --location follows redirects."}
+{"aid": "A22", "verdict": "WRONG", "reason": "Answers 'I don't know' instead of giving the difference; the text states SIGKILL (9) cannot be caught, blocked, or ignored, unlike the default SIGTERM."}
+{"aid": "A23", "verdict": "CORRECT", "reason": "tar -z, --gzip filters the archive through gzip(1)."}
+{"aid": "A24", "verdict": "WRONG", "reason": "Never gives ls -h (--human-readable, 'print sizes like 1K 234M 2G') and claims find has -k/-M/-G flags for showing sizes, which is false."}
+{"aid": "A25", "verdict": "UNCLEAR", "reason": "The terse question could ask for the export menu itself (C-c C-e, org-export-dispatch) or for its formats; the answer lists formats, which the provided dispatcher text neither lists nor contradicts."}
+{"aid": "A26", "verdict": "UNCLEAR", "reason": "Gold gives ls -h/--human-readable ('print sizes like 1K 234M 2G'); the answer gives du -h, which is not in the provided text and reports disk usage rather than listing sizes."}
+{"aid": "A27", "verdict": "UNCLEAR", "reason": "Gold names M-w (kill-ring-save); copy-region-as-kill is not in the provided text, though it is a real Emacs command that copies without deleting."}
+{"aid": "A28", "verdict": "CORRECT", "reason": "ls -t sorts by time, newest first."}
+{"aid": "A29", "verdict": "CORRECT", "reason": "M-x replace-string replaces every occurrence after point, unconditionally."}
+{"aid": "A30", "verdict": "CORRECT", "reason": "@reboot is one of the crontab special strings that replace the time fields and runs once at startup (the table itself is cut off in the provided text)."}
+{"aid": "A31", "verdict": "CORRECT", "reason": "DenyUsers blocks login for the named users; the text confirms the allow/deny users directives ('processed in the following order: DenyUsers, AllowUsers'). PermitRootLogin would only cover root."}
+{"aid": "A32", "verdict": "CORRECT", "reason": "chown -R, --recursive operates on files and directories recursively."}
+{"aid": "A33", "verdict": "CORRECT", "reason": "sed -i[SUFFIX], --in-place edits files in place and makes a backup if SUFFIX is supplied."}
+{"aid": "A34", "verdict": "UNCLEAR", "reason": "Gold names M-w (kill-ring-save); the answer quotes a mouse-3/mouse-1 passage that is not in the provided text and does not plainly act on an existing region."}
+{"aid": "A35", "verdict": "CORRECT", "reason": "C-x M-o (dired-omit-mode) toggles between displaying and omitting 'uninteresting' files."}
+{"aid": "A36", "verdict": "CORRECT", "reason": "The find -print0 | xargs -0 example is the null-delimited handoff; '-0 option with find' is a small slip, but the example is right."}
+{"aid": "A37", "verdict": "CORRECT", "reason": "find -print0 piped to xargs -0 hands off null-terminated names safely; the text mentions -print0 (via -fprint0)."}
+{"aid": "A38", "verdict": "WRONG", "reason": "Gives install --preserve-timestamps and cpio --preserve-modification-time, which only keep timestamps, not permissions; the text's way is cp -p or --preserve=mode,timestamps."}
+{"aid": "A39", "verdict": "CORRECT", "reason": "C-x 1 deletes all windows in the selected frame except the selected window (delete-other-windows)."}
+{"aid": "A40", "verdict": "CORRECT", "reason": "C-h k (describe-key) displays a help buffer with the command's documentation string for the next key."}
+{"aid": "A41", "verdict": "UNCLEAR", "reason": "Gold gives C-x v g (vc-annotate) in Emacs VC; git-blame does annotate lines for Git files, but it is not in the provided text and the question is in the Emacs-manual context."}
+{"aid": "A42", "verdict": "CORRECT", "reason": "Matches pipe(7): since Linux 2.6.11 capacity is 16 pages (65,536 bytes with 4096-byte pages), adjustable via fcntl F_SETPIPE_SZ."}
+{"aid": "A43", "verdict": "CORRECT", "reason": "ss -l, --listening displays only listening sockets."}
+{"aid": "A44", "verdict": "CORRECT", "reason": "uniq -c, --count prefixes lines by the number of occurrences."}
+{"aid": "A45", "verdict": "CORRECT", "reason": "ps -e selects all processes, and 'a' with 'x' lists all processes."}
+{"aid": "A46", "verdict": "CORRECT", "reason": "xargs -0, --null terminates items with a null character, used with GNU find -print0, per the text."}
+{"aid": "A47", "verdict": "CORRECT", "reason": "xargs -0 with find -print0 matches the text ('The GNU find -print0 option produces input suitable for this mode')."}
+{"aid": "A48", "verdict": "WRONG", "reason": "The text names -O, --remote-name for saving to a local file; the answer gives only -J (--remote-header-name), which is not in the provided text and in curl only modifies -O, so on its own it does not save a file."}
+{"aid": "A49", "verdict": "WRONG", "reason": "du -c, --total adds a grand total but still prints a line per subdirectory; the text's way is -s, --summarize ('display only a total for each argument')."}
+{"aid": "A50", "verdict": "CORRECT", "reason": "sed -i, --in-place edits files in place."}
+{"aid": "A51", "verdict": "CORRECT", "reason": "tar -X, --exclude-from=FILE excludes files matching patterns listed in FILE."}
+{"aid": "A52", "verdict": "WRONG", "reason": "Names gh-codespace-cp -r, which only copies to GitHub codespaces and is not a general remote-machine copy; the text's tool is scp (-r recursive)."}
+{"aid": "A53", "verdict": "CORRECT", "reason": "Gold: typing C-M-w (append-next-kill) right beforehand forces the next kill to combine with the last killed text."}
+{"aid": "A54", "verdict": "CORRECT", "reason": "revert-buffer (C-x x g) reverts the buffer to the saved version of the file."}
+{"aid": "A55", "verdict": "WRONG", "reason": "The answer is cut off after minute, hour and day of month and never gives month and day of week, which the text lists ('month (1 - 12)', 'day of week (0 - 6)')."}
+{"aid": "A56", "verdict": "UNCLEAR", "reason": "Gold gives C-x v g (vc-annotate) in Emacs VC; git-blame does annotate lines for Git files, but it is not in the provided text and the question is in the Emacs-manual context."}
+{"aid": "A57", "verdict": "UNCLEAR", "reason": "The text names curl -O, --remote-name; the answer gives curl -J (which in curl only modifies -O) or wget --content-disposition, and neither is in the provided text, though the wget option works by itself in practice."}
+{"aid": "A58", "verdict": "CORRECT", "reason": "wc -l, --lines prints the newline counts."}
+{"aid": "A59", "verdict": "CORRECT", "reason": "C-h k (describe-key) followed by the key displays a help buffer with the command's documentation string."}
+{"aid": "A60", "verdict": "CORRECT", "reason": "C-x r b BOOKMARK <RET> jumps to the named bookmark (bookmark-jump)."}
+{"aid": "A61", "verdict": "CORRECT", "reason": "dd status=LEVEL with 'progress' shows periodic transfer statistics."}
+{"aid": "A62", "verdict": "CORRECT", "reason": "xargs -0, --null with find -print0 handles whitespace in names, per the text."}
+{"aid": "A63", "verdict": "WRONG", "reason": "Gives chacl -r, an ACL tool not in the text, instead of chmod -R, --recursive ('change files and directories recursively')."}
+{"aid": "A64", "verdict": "CORRECT", "reason": "wc -l, --lines prints the newline counts."}
+{"aid": "A65", "verdict": "CORRECT", "reason": "C-x r b BOOKMARK <RET> jumps to the named bookmark (bookmark-jump)."}
+{"aid": "A66", "verdict": "CORRECT", "reason": "C-x k (kill-buffer) kills the buffer, which the text says releases its memory ('Some other editors call this operation close')."}
+{"aid": "A67", "verdict": "WRONG", "reason": "The text names -O, --remote-name for saving to a local file; the answer gives only -J (--remote-header-name), which is not in the provided text and in curl only modifies -O, so on its own it does not save a file."}
+{"aid": "A68", "verdict": "WRONG", "reason": "Names gh-codespace-cp --recursive, which only copies to GitHub codespaces; the text's general tool is scp with recursive copy."}
+{"aid": "A69", "verdict": "CORRECT", "reason": "ediff-backup: 'Compare a file with its backup' in Ediff's side-by-side windows."}
+{"aid": "A70", "verdict": "CORRECT", "reason": "Gold: 'move the cursor onto this new formula and press C-x * e' to enter Embedded mode."}
+{"aid": "A71", "verdict": "CORRECT", "reason": "sort -g, --general-numeric-sort compares by general numerical value, so 9 sorts before 10; -n is the reference, but -g also works."}
+{"aid": "A72", "verdict": "CORRECT", "reason": "C-h k (describe-key) displays a help buffer containing the documentation string for the key."}
+{"aid": "A73", "verdict": "CORRECT", "reason": "C-x k (kill-buffer) defaults to killing the current buffer, which releases its memory."}
+{"aid": "A74", "verdict": "CORRECT", "reason": "scp's -r copies directories recursively; scp has no long option, so '--recursive' is a small slip, and the recursive copy matches the reference."}
+{"aid": "A75", "verdict": "CORRECT", "reason": "Gold: to revert the changes and go back to the saved version of the file, type C-x x g."}
+{"aid": "A76", "verdict": "WRONG", "reason": "The example ps -a selects only processes with a terminal, excluding session leaders, and BSD 'a' alone also lists only tty processes; listing every process needs -e/-A or 'ax'."}
+{"aid": "A77", "verdict": "WRONG", "reason": "du -c, --total adds a grand total but still lists each subdirectory; the 'folder only' total is -s, --summarize ('display only a total for each argument')."}
+{"aid": "A78", "verdict": "CORRECT", "reason": "PermitRootLogin no in sshd_config stops root login; the trailing checkmark self-commentary is noise but contradicts nothing."}
+{"aid": "A79", "verdict": "WRONG", "reason": "Muddles shell read -r/-d and says the manual has no direct solution, never giving the text's xargs -0/--null (or xargs -d) for items containing whitespace."}
+{"aid": "A80", "verdict": "CORRECT", "reason": "ss -l, --listening displays only listening sockets."}
