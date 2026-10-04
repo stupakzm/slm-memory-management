@@ -136,6 +136,19 @@ Renaming needs no code edit: `asq install --name X --prefix DIR` points a new
 symlink at `bin/smm`, which takes its usage text from whatever name it is
 invoked as. Unrecognised flags pass straight through to `ask.py` / `ingest.py`.
 
+### From Emacs
+
+`emacs/asq.el` adds `M-x asq`, which runs `asq` and streams the answer into an
+`*asq*` buffer. It searches the Emacs manuals (`--db data/index/phase11.db
+--domain emacs`); with a prefix argument it drops `--domain` and searches
+everything. `asq-program`, `asq-db` and `asq-domain` are customisable.
+
+```elisp
+(load-file "/path/to/slm-memory-management/emacs/asq.el")
+;; M-x asq        ask about Emacs
+;; C-u M-x asq    search everything
+```
+
 ### Reproducing the numbers
 
 Evaluation runs in two stages with one set of models resident at a time, because the
