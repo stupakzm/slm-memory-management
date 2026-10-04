@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import random
 import sqlite3
 import sys
 import time
@@ -41,13 +42,24 @@ PROMPT_TEMPLATE = (
     "variable or key name from the passage. One question per line, no numbering, "
     "nothing else."
 )
+# R13: the same idea for the Linux man-page domain. Selected with --prompt linux.
+LINUX_PROMPT_TEMPLATE = (
+    "You help people find things in Linux manual pages. Given one passage from a "
+    "manual page, write {n} short questions a user might ask when they want what this "
+    "passage describes, but do not know its terms. Use everyday words, the way a "
+    "person would describe the task or the problem. You may name the program, but do "
+    "not use any option, flag, variable or file name from the passage. One question "
+    "per line, no numbering, nothing else."
+)
+PROMPTS = {"emacs": PROMPT_TEMPLATE, "linux": LINUX_PROMPT_TEMPLATE}
+DEFAULT_SEED = 20261004
 NUMBER_WORDS = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}
 SAVE_EVERY = 250
 EMBED_BATCH = 64
 
 
-def system_prompt(per_chunk: int) -> str:
-    return PROMPT_TEMPLATE.format(n=NUMBER_WORDS.get(per_chunk, str(per_chunk)))
+def system_prompt(per_chunk: int, prompt: str = "emacs") -> str:
+    return PROMPTS[prompt].format(n=NUMBER_WORDS.get(per_chunk, str(per_chunk)))
 
 
 def parse_questions(text: str, n: int) -> list[str]:
@@ -60,13 +72,18 @@ def todo_chunks(chunks: list[tuple[str, str]], cache: dict) -> list[tuple[str, s
     return [c for c in chunks if c[0] not in cache]
 
 
-def load_chunks(src: Path, domain: str, limit: int | None = None) -> list[tuple[str, str]]:
+def load_chunks(src: Path, domain: str, limit: int | None = None,
+                sample: int | None = None, seed: int = DEFAULT_SEED) -> list[tuple[str, str]]:
     db = sqlite3.connect(f"file:{src}?mode=ro", uri=True)
     try:
         rows = db.execute("SELECT chunk_id, text FROM chunks WHERE domain=? ORDER BY rowid",
                           (domain,)).fetchall()
     finally:
         db.close()
+    if sample:
+        # a seeded random subset, kept in rowid order (rows is already in rowid order)
+        keep = set(random.Random(seed).sample(range(len(rows)), min(sample, len(rows))))
+        return [r for i, r in enumerate(rows) if i in keep]
     return rows[:limit] if limit else rows
 
 
@@ -77,10 +94,10 @@ def save_cache(path: Path, cache: dict) -> None:
 
 
 def generate(chunks, cache: dict, cache_path: Path, gen, per_chunk: int,
-             parallel: int = 4) -> int:
+             parallel: int = 4, prompt: str = "emacs") -> int:
     """Ask `gen` for questions for every chunk not yet cached; returns how many."""
     todo = todo_chunks(chunks, cache)
-    system = system_prompt(per_chunk)
+    system = system_prompt(per_chunk, prompt)
 
     def one(chunk):
         msgs = [{"role": "system", "content": system}, {"role": "user", "content": chunk[1]}]
@@ -117,7 +134,8 @@ def prepare_out(src: Path, out: Path) -> None:
         s.close()
 
 
-def embed(out: Path, cache: dict, emb, domain: str, per_chunk: int) -> int:
+def embed(out: Path, cache: dict, emb, domain: str, per_chunk: int,
+          prompt: str = "emacs") -> int:
     """Embed cached questions not yet in `out`'s chunk_questions; returns how many."""
     db = store.connect(out)
     try:
@@ -132,8 +150,9 @@ def embed(out: Path, cache: dict, emb, domain: str, per_chunk: int) -> int:
             store.add_questions(db, [(c, q, v) for (c, q), v in zip(batch, vecs)])
             print(f"  embedded {min(i + EMBED_BATCH, len(todo))}/{len(todo)}", flush=True)
         store.set_meta(db, qvec_domain=domain, qvec_per_chunk=per_chunk,
+                       qvec_prompt=prompt,
                        qvec_prompt_sha256=hashlib.sha256(
-                           system_prompt(per_chunk).encode()).hexdigest())
+                           system_prompt(per_chunk, prompt).encode()).hexdigest())
     finally:
         db.close()
     return len(todo)
@@ -144,7 +163,8 @@ def fold_text(prefix: str, text: str, questions: list[str]) -> str:
     return f"{prefix}{text}\n\nQuestions this passage answers:\n" + "\n".join(questions)
 
 
-def fold(out: Path, cache: dict, emb, domain: str, per_chunk: int = 3) -> int:
+def fold(out: Path, cache: dict, emb, domain: str, per_chunk: int = 3,
+         prompt: str = "emacs") -> int:
     """Replace, in `out`, the vector of every `domain` chunk that has cached questions
     with the embedding of fold_text(...); same rowid, chunks table untouched."""
     db = store.connect(out)
@@ -163,8 +183,9 @@ def fold(out: Path, cache: dict, emb, domain: str, per_chunk: int = 3) -> int:
             db.commit()
             print(f"  folded {min(i + EMBED_BATCH, len(todo))}/{len(todo)}", flush=True)
         store.set_meta(db, qvec_fold=1, qvec_domain=domain, qvec_per_chunk=per_chunk,
+                       qvec_prompt=prompt,
                        qvec_prompt_sha256=hashlib.sha256(
-                           system_prompt(per_chunk).encode()).hexdigest())
+                           system_prompt(per_chunk, prompt).encode()).hexdigest())
     finally:
         db.close()
     return len(todo)
@@ -172,15 +193,17 @@ def fold(out: Path, cache: dict, emb, domain: str, per_chunk: int = 3) -> int:
 
 def build(src: Path, out: Path, domain: str, per_chunk: int, cache_path: Path,
           gen=None, emb=None, stage: str = "both", parallel: int = 4,
-          limit: int | None = None) -> None:
+          limit: int | None = None, prompt: str = "emacs",
+          sample: int | None = None, seed: int = DEFAULT_SEED) -> None:
     if src.resolve() == out.resolve():
         raise SystemExit("--out must not be --src: the source index is never written")
     cache = json.loads(cache_path.read_text()) if cache_path.exists() else {}
     if stage in ("generate", "both"):
-        generate(load_chunks(src, domain, limit), cache, cache_path, gen, per_chunk, parallel)
+        generate(load_chunks(src, domain, limit, sample, seed), cache, cache_path, gen,
+                 per_chunk, parallel, prompt)
     if stage in ("embed", "both"):
         prepare_out(src, out)
-        embed(out, cache, emb, domain, per_chunk)
+        embed(out, cache, emb, domain, per_chunk, prompt)
 
 
 def main() -> int:
@@ -196,10 +219,18 @@ def main() -> int:
     ap.add_argument("--parallel", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0,
                     help="only the first N chunks of the domain (smoke runs)")
+    ap.add_argument("--prompt", choices=sorted(PROMPTS), default="emacs",
+                    help="question-writing prompt: emacs (default) or linux (man pages)")
+    ap.add_argument("--sample", type=int, default=0,
+                    help="only a random N chunks of the domain (kept in rowid order)")
+    ap.add_argument("--seed", type=int, default=DEFAULT_SEED, help="seed for --sample")
     ap.add_argument("--stage", choices=("generate", "embed", "both"), default="both")
     ap.add_argument("--fold", action="store_true",
                     help="R8c: re-embed each chunk with its cached questions (no generation)")
     args = ap.parse_args()
+    if args.sample and args.limit:
+        print("--sample and --limit are exclusive", file=sys.stderr)
+        return 2
     cache = ROOT / (args.cache or f"data/index/qvec-{args.domain}.json")
     out = ROOT / (args.out or ("data/index/phase11-qc.db" if args.fold
                                else "data/index/phase11-qx.db"))
@@ -214,7 +245,8 @@ def main() -> int:
             print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
             return 2
         prepare_out(ROOT / args.src, out)
-        fold(out, json.loads(cache.read_text()), emb, args.domain, args.per_chunk)
+        fold(out, json.loads(cache.read_text()), emb, args.domain, args.per_chunk,
+             args.prompt)
         return 0
 
     gen = emb = None
@@ -232,7 +264,8 @@ def main() -> int:
             return 2
     build(ROOT / args.src, out, args.domain, args.per_chunk, cache,
           gen=gen, emb=emb, stage=args.stage, parallel=args.parallel,
-          limit=args.limit or None)
+          limit=args.limit or None, prompt=args.prompt,
+          sample=args.sample or None, seed=args.seed)
     return 0
 
 

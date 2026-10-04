@@ -1,0 +1,17 @@
+# Training-only environment for scripts/train_embedder.py (Phase 15 R13).
+# Nothing under src/smm imports these; the retrieval environment (requirements.txt) is unchanged.
+# torch is the CUDA 12.4 wheel (torch 2.6.0+cu124): install it from the PyTorch index, e.g.
+#   --index-url https://download.pytorch.org/whl/cu124
+# and everything else from PyPI:
+#   python3 -m venv .venv-train
+#   .venv-train/bin/pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+#   .venv-train/bin/pip install -r requirements-train.txt
+torch==2.6.0
+transformers==4.57.6
+tokenizers==0.22.2
+safetensors==0.8.0
+sentencepiece==0.2.2
+protobuf==4.25.9
+numpy==2.5.3
+# gguf is not pinned here: it comes from ~/opt/llama.cpp/gguf-py (the llama.cpp checkout
+# that runs convert_hf_to_gguf.py), installed into this venv with `pip install -e`.
