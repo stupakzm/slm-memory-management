@@ -1,5 +1,6 @@
 # virtualenv and bytecode
 .venv/
+.venv-train/
 __pycache__/
 *.pyc
 
