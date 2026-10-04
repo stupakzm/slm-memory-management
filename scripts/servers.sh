@@ -28,6 +28,9 @@ MODELS="${SMM_MODELS:-$ROOT/models}"
 # The full reranker profile's --parallel slot count is env-tunable (default 4), e.g. 1 for batch-independence checks.
 # SMM_GEN_MODEL picks which generator weight `start_generator` loads, e.g.
 # SMM_GEN_MODEL=Qwen3-30B-A3B-Instruct-2507-Q4_K_M.gguf for the 30B reader.
+# SMM_EMBED_MODEL picks which embedder weight both embedder profiles load, e.g.
+# SMM_EMBED_MODEL=qwen3-embed-ft-q8_0.gguf for a fine-tuned conversion. Unset,
+# behaviour is exactly what it always was.
 # SMM_GEN_ARGS adds extra llama-server args (word-split, appended), e.g.
 # SMM_GEN_ARGS="--cpu-moe -t 12" for that same 30B run. Both unset, behaviour
 # is exactly what it always was.
@@ -35,6 +38,7 @@ RUN="${SMM_RUN:-$ROOT/.run}"
 EMBED_PORT="${SMM_EMBED_PORT:-8081}"
 RERANK_PORT="${SMM_RERANK_PORT:-8082}"
 GEN_PORT="${SMM_GEN_PORT:-8080}"
+EMBED_MODEL="${SMM_EMBED_MODEL:-Qwen3-Embedding-0.6B-Q8_0.gguf}"
 RERANK_MODEL="${SMM_RERANK_MODEL:-qwen3-reranker-0.6b-q8_0.gguf}"
 GEN_MODEL="${SMM_GEN_MODEL:-Qwen3-4B-Instruct-2507-Q4_K_M.gguf}"
 GEN_ARGS="${SMM_GEN_ARGS:-}"
@@ -42,7 +46,7 @@ mkdir -p "$RUN"
 
 start_embedder() {
   "$LLAMA/llama-server" \
-    -m "$MODELS/Qwen3-Embedding-0.6B-Q8_0.gguf" \
+    -m "$MODELS/$EMBED_MODEL" \
     --embedding --pooling last -c 8192 -ngl 99 \
     -b 4096 -ub 1024 --parallel 4 \
     --host 127.0.0.1 --port "$EMBED_PORT" \
@@ -98,7 +102,7 @@ start_reranker() {
 # already generous and the compute buffer shrinks with it.
 start_embedder_lean() {
   "$LLAMA/llama-server" \
-    -m "$MODELS/Qwen3-Embedding-0.6B-Q8_0.gguf" \
+    -m "$MODELS/$EMBED_MODEL" \
     --embedding --pooling last -c 512 -ngl 99 \
     -b 512 -ub 512 --parallel 1 \
     --host 127.0.0.1 --port "$EMBED_PORT" \
