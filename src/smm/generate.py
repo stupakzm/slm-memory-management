@@ -22,6 +22,22 @@ extracts provided. Follow these rules exactly:
 - Cite the extract number you used, like [2].
 - Be brief. No preamble."""
 
+# Phase 15 R14: the reader's system prompt is one of the three instructions the
+# system gives its models. SYSTEM stays today's text; SYSTEM_V2 widens it to both
+# corpora and tells the reader the question may be misspelt or in everyday words.
+# Selected by --reader-prompt v2 (cite mode only; quote mode stays on SYSTEM).
+SYSTEM_V2 = """You answer questions about the software on this computer (Linux commands and \
+configuration, and the GNU Emacs editor) using only the documentation extracts provided. \
+The question may be misspelt, terse, or use everyday words instead of the documentation's \
+own terms: answer what the user most plausibly means, if the extracts say it. Follow these \
+rules exactly:
+
+- Use only the extracts. Never use knowledge from outside them.
+- If the extracts do not contain the answer, reply exactly: I don't know.
+- Prefer naming the exact command, flag, option or setting, spelled as the documentation spells it.
+- Cite the extract number you used, like [2].
+- Be brief. No preamble."""
+
 # Phase 10: the 30B reader gains correctness by answering from parametric
 # knowledge, not by reading (blk_phase9_parametric_knowledge_failure) - the
 # reranker gate cannot catch this, because a parametric answer still scores
@@ -112,14 +128,15 @@ def build_correct_prompt(question: str) -> list[dict]:
     ]
 
 
-def build_prompt(question: str, chunks: list[dict], system: str = SYSTEM) -> list[dict]:
+def build_prompt(question: str, chunks: list[dict], system: str = SYSTEM,
+                 header: str = "Manual page extracts") -> list[dict]:
     parts = []
     for i, c in enumerate(chunks, 1):
         parts.append(f"[{i}] {c['doc_id']}\n{c['prefix']}{c['text']}")
     context = "\n\n".join(parts) if parts else "(no extracts found)"
     return [
         {"role": "system", "content": system},
-        {"role": "user", "content": f"Manual page extracts:\n\n{context}\n\nQuestion: {question}"},
+        {"role": "user", "content": f"{header}:\n\n{context}\n\nQuestion: {question}"},
     ]
 
 
@@ -146,7 +163,7 @@ class Generator:
         return out["choices"][0]["message"]["content"].strip()
 
     def answer(self, question: str, chunks: list[dict], cite_grammar: bool = False,
-               mode: str = "cite", **kw) -> str:
+               mode: str = "cite", reader_prompt: str = "v1", **kw) -> str:
         """`cite_grammar` constrains decoding so every claim carries an in-range
         citation - see smm.grammar for what that does and does not guarantee.
 
@@ -154,12 +171,24 @@ class Generator:
         grammar.quoted_answer, so every claim must also open with an exact
         quotation from the extract it cites. Grammar is always on in quote
         mode, independent of `cite_grammar`. `mode="cite"` (the default) is
-        exactly the pre-existing behaviour - same messages, same grammar."""
+        exactly the pre-existing behaviour - same messages, same grammar.
+
+        `reader_prompt="v2"` (phase 15 R14) swaps SYSTEM for SYSTEM_V2 and the
+        extracts header for "Documentation extracts"; "v1" (default) is
+        byte-identical to before. Cite mode only: quote mode is v1 only."""
+        if reader_prompt not in ("v1", "v2"):
+            raise ValueError(f"unknown reader_prompt {reader_prompt!r}")
+        if reader_prompt == "v2" and mode == "quote":
+            raise ValueError("reader_prompt v2 does not apply to quote mode")
         if mode == "quote":
             g = grammar.quoted_answer(len(chunks))
             return self.chat(build_prompt(question, chunks, system=QUOTE_SYSTEM), grammar=g, **kw)
         g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
-        return self.chat(build_prompt(question, chunks), grammar=g, **kw)
+        if reader_prompt == "v2":
+            msgs = build_prompt(question, chunks, system=SYSTEM_V2, header="Documentation extracts")
+        else:
+            msgs = build_prompt(question, chunks)
+        return self.chat(msgs, grammar=g, **kw)
 
     def rewrites(self, question: str, n: int = 1, max_tokens: int = 120,
                  style: str = "man") -> list[str]:
