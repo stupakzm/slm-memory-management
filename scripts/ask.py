@@ -53,7 +53,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from smm import cascade, grammar, store, tools  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
-from smm.embed import Embedder  # noqa: E402
+from smm.embed import TASKS, Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
 from smm.retrieve import Retriever, expand, gate_score  # noqa: E402
@@ -147,8 +147,19 @@ def main() -> int:
     ap.add_argument("--rerank-batch", type=int, default=None,
                     help="documents per reranker request (default unset = 16). Set 1 to "
                          "score every document alone.")
+    ap.add_argument("--embed-task", choices=tuple(TASKS), default="linux",
+                    help="phase 15 R14: the embedder's query instruction "
+                         "(smm.embed.TASKS). 'linux' (default) is today's instruction "
+                         "and reproduces today's behaviour exactly.")
+    ap.add_argument("--reader-prompt", choices=("v1", "v2"), default="v1",
+                    help="phase 15 R14: the reader's system prompt (smm.generate.SYSTEM / "
+                         "SYSTEM_V2). 'v1' (default) reproduces today's behaviour exactly.")
     args = ap.parse_args()
     question = " ".join(args.question)
+    # Passed only when non-default, so stub Embedders/Generators that do not
+    # know the kwarg keep working.
+    emb_kw = {"task": TASKS[args.embed_task]} if args.embed_task != "linux" else {}
+    rp_kw = {"reader_prompt": args.reader_prompt} if args.reader_prompt != "v1" else {}
     if (args.route == "floor") != (args.floor is not None):
         print("--route floor and --floor go together", file=sys.stderr)
         return 2
@@ -202,7 +213,7 @@ def main() -> int:
     if args.rewrites > 0 and not args.cascade:
         rewrite_texts = gen.rewrites(question, n=args.rewrites, style=args.rewrite_style)
 
-    emb = Embedder()
+    emb = Embedder(**emb_kw)
     if not emb.health():
         print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
         return 2
@@ -239,7 +250,7 @@ def main() -> int:
                 return 2
 
         def answer_fn(q: str, hits: list) -> str:
-            return gen.answer(q, hits, cite_grammar=not args.no_grammar)
+            return gen.answer(q, hits, cite_grammar=not args.no_grammar, **rp_kw)
 
         cres = cascade.run_cascade(r, gen, question, answer_fn,
                                    0.0 if args.no_gate else args.gate, k=args.k)
@@ -318,7 +329,7 @@ def main() -> int:
     if args.act:
         return act(gen, db, question, hits, args)
 
-    print(gen.answer(question, hits, cite_grammar=not args.no_grammar))
+    print(gen.answer(question, hits, cite_grammar=not args.no_grammar, **rp_kw))
     print("\nsources: " + ", ".join(f"[{i}] {h['doc_id']}" for i, h in enumerate(hits, 1)))
     return 0
 

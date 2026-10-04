@@ -39,7 +39,7 @@ ORACLE_NULL_DOMAIN = "linux"
 from smm import gold, grammar, lexical, store  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
 from smm.cascade import ABSTAIN_RE, abstained, run_cascade  # noqa: E402
-from smm.embed import Embedder  # noqa: E402
+from smm.embed import TASKS, Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
 from smm.rerank import Reranker  # noqa: E402
 from smm.retrieve import Retriever, cap_per_doc, expand, gate_score  # noqa: E402
@@ -235,8 +235,22 @@ def main() -> int:
     ap.add_argument("--rerank-batch", type=int, default=None,
                     help="documents per reranker request (default unset = 16). Set 1 to "
                          "score every document alone.")
+    ap.add_argument("--embed-task", choices=tuple(TASKS), default="linux",
+                    help="phase 15 R14: the embedder's query instruction (smm.embed.TASKS). "
+                         "Acts at the retrieve stage; pass it to the generate stage too so "
+                         "the answers file's config records it. 'linux' (default) is "
+                         "today's instruction and reproduces every existing run exactly.")
+    ap.add_argument("--reader-prompt", choices=("v1", "v2"), default="v1",
+                    help="phase 15 R14: the reader's system prompt (smm.generate.SYSTEM / "
+                         "SYSTEM_V2). Acts at the generate stage; cite mode only. 'v1' "
+                         "(default) reproduces every existing run exactly.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if args.reader_prompt == "v2" and args.answer_mode == "quote":
+        print("--reader-prompt v2 does not compose with --answer-mode quote "
+              "(quote mode is v1 only)", file=sys.stderr)
+        return 2
 
     if (args.route == "floor") != (args.floor is not None):
         print("--route floor and --floor go together", file=sys.stderr)
@@ -270,6 +284,10 @@ def main() -> int:
         qv_kw["route"] = args.route
     if args.floor is not None:
         qv_kw["floor"] = args.floor
+    # Same convention for the R14 switches: passed only when non-default, so
+    # stub Embedders/Generators that do not know the kwarg keep working.
+    emb_kw = {"task": TASKS[args.embed_task]} if args.embed_task != "linux" else {}
+    rp_kw = {"reader_prompt": args.reader_prompt} if args.reader_prompt != "v1" else {}
 
     qid_aliases = {} if args.no_aliases else gold.load_aliases(
         ROOT / "data" / "eval" / "gold_aliases.json")
@@ -311,7 +329,7 @@ def main() -> int:
     if args.stage in ("retrieve", "both"):
         emb = None
         if args.mode in ("dense", "hybrid"):
-            emb = Embedder()
+            emb = Embedder(**emb_kw)
             if not emb.health():
                 print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
                 return 2
@@ -420,7 +438,7 @@ def main() -> int:
         elif args.answer_mode == "quote":
             text = gen.answer(qtext, hits, mode="quote")
         else:
-            text = gen.answer(qtext, hits, cite_grammar=args.grammar)
+            text = gen.answer(qtext, hits, cite_grammar=args.grammar, **rp_kw)
 
         # Quote mode's verification has to run BEFORE correct/evidence scoring:
         # a claim whose opening quote isn't actually in the extract it cites is
@@ -572,6 +590,10 @@ def write_report(args, results: list, t0: float) -> int:
         config["route"] = args.route
     if args.floor is not None:
         config["floor"] = args.floor
+    if args.embed_task != "linux":
+        config["embed_task"] = args.embed_task
+    if args.reader_prompt != "v1":
+        config["reader_prompt"] = args.reader_prompt
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
@@ -604,7 +626,7 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
     gated - and every tier's gate/widening depends on a real reranker score
     (docs/phase11-results.md, "R4d pre-registration").
     """
-    emb = Embedder()
+    emb = Embedder(**({"task": TASKS[args.embed_task]} if args.embed_task != "linux" else {}))
     if not emb.health():
         print("embedder not running: ./scripts/servers.sh start embedder", file=sys.stderr)
         return 2
@@ -644,7 +666,9 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
             ph = read_view(raw_hits)
             if args.answer_mode == "quote":
                 return gen.answer(q, ph, mode="quote")
-            return gen.answer(q, ph, cite_grammar=args.grammar)
+            return gen.answer(q, ph, cite_grammar=args.grammar,
+                              **({"reader_prompt": args.reader_prompt}
+                                 if args.reader_prompt != "v1" else {}))
 
         cres = run_cascade(r, gen, qtext, answer_fn, args.gate, k=args.k)
         hits = read_view(cres["hits"])

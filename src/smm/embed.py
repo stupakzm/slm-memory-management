@@ -15,6 +15,16 @@ import urllib.request
 DEFAULT_URL = "http://127.0.0.1:8081"
 TASK = "Given a question about using a Linux system, retrieve the manual page passage that answers it"
 
+# Phase 15 R14: the query instruction is one of the three the system gives its
+# models. "linux" is today's TASK (the default, unchanged); "neutral" drops the
+# man-page framing and names both corpora. Selected by --embed-task.
+TASKS = {
+    "linux": TASK,
+    "neutral": "Given a question about using the software on this computer, Linux commands and "
+               "configuration or the GNU Emacs editor, retrieve the documentation passage that "
+               "answers it",
+}
+
 
 def query_text(q: str, task: str = TASK) -> str:
     return f"Instruct: {task}\nQuery: {q}"
@@ -26,9 +36,10 @@ def _normalize(v: list[float]) -> list[float]:
 
 
 class Embedder:
-    def __init__(self, url: str = DEFAULT_URL, timeout: int = 600):
+    def __init__(self, url: str = DEFAULT_URL, timeout: int = 600, task: str = TASK):
         self.url = url.rstrip("/")
         self.timeout = timeout
+        self.task = task
         self._dim: int | None = None
 
     def _post(self, path: str, payload: dict) -> dict:
@@ -50,8 +61,8 @@ class Embedder:
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         return self.embed(texts)
 
-    def embed_query(self, q: str, task: str = TASK) -> list[float]:
-        return self.embed([query_text(q, task)])[0]
+    def embed_query(self, q: str, task: str | None = None) -> list[float]:
+        return self.embed([query_text(q, self.task if task is None else task)])[0]
 
     @property
     def dim(self) -> int:
