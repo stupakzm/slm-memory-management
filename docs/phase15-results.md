@@ -209,3 +209,52 @@ So typo repair belongs before retrieval. The rename problem has to be solved the
 signal can be moved there, unrun and not pre-registered: retrieve with the raw question, repair from
 its extracts, and retrieve again only when something was repaired. That costs one extra retrieval on
 about a sixth of the pool's rows.
+
+## R14 pre-registration: say what the corpus is (written 2026-10-04, before the build and any run)
+
+**Why.** Three models are told what they are doing, and all three are told something narrower or
+vaguer than the truth. None of these instructions was ever measured:
+- the embedder's query instruction says "a question about using a Linux system … the manual page
+  passage" (`src/smm/embed.py`), even for Emacs questions;
+- the reranker runs the instruction built into its GGUF, "Given a web search query, retrieve relevant
+  passages that answer the query";
+- the reader's system prompt says "a Linux system … manual page extracts", and nothing warns it that a
+  question may be misspelt, terse or in everyday words.
+
+Phase 13 found that knowing the domain is worth +40 answers. Part of that may be instruction mismatch.
+
+**Arms**, one mechanism each, never combined in this pre-registration:
+- **R14a, embedder:** `--embed-task neutral`: "Given a question about using the software on this
+  computer, Linux commands and configuration or the GNU Emacs editor, retrieve the documentation
+  passage that answers it". Query side only, so the index is unchanged. Retrieval and generation over
+  all 1,160 pool rows.
+- **R14b, reranker:** a derived reranker GGUF (`scripts/rerank_instruct.py`) whose rerank template
+  says "Given a question from a user of Linux command-line tools or the GNU Emacs editor, possibly
+  misspelt or in everyday words, judge whether the documentation passage answers it". Only that
+  metadata string differs, which a key dump shows before the run. Served with `SMM_RERANK_MODEL`.
+  Retrieval and generation, all rows. The gate stays 0.65, so a shift in score scale shows up in
+  rule 3 and in the gate-fire rate.
+- **R14c, reader:** `--reader-prompt v2` (text in `src/smm/generate.py` `SYSTEM_V2`, sha256 recorded
+  at run time). Generation only, on the control's retrieval.
+
+**Control.** The system's default configuration on the day of the run, generated under setting C.
+If R13 has shipped by then, that means the R13 embedder and index. If a retrieval control from today
+exists, it is reused. Otherwise phase 13's drift check (50 rows, seed 13, more than 2 differing means
+full regeneration) decides.
+
+**Scoring.** `scripts/screen_report.py --group variant_kind` (default group "clean", as under R12)
+and `--group domain --group-default linux`, `--aliases data/eval/gold_aliases_v2.json`.
+
+**Decision rule, per arm.** It becomes the default only if all four hold:
+1. **Answers rise:** all 883 answerable rows net ≥ +8, sign test p < 0.05.
+2. **Clean unharmed:** clean group net ≥ −2.
+3. **No new invention:** abstention net over 277 unanswerable rows ≥ −1.
+4. **Same speed** (R14a, R14b): mean retrieval seconds per question ≤ control + 0.3 s.
+
+Failing 2 or 3 means no ship. Passing 1 with p ≥ 0.05 is "direction only". If two or more arms pass,
+their combination gets its own pre-registration. It is not assumed to add up.
+
+**Known limits, stated now.** R12 showed the 4B's answers flip in both directions when only the
+question's wording changes. A new reader prompt will churn answers the same way, so rule 1 needs a
+net gain, not churn. The reranker arm changes the score the gate reads. A fail on rule 3 there may
+be calibration rather than invention, and that is reported as such, without re-tuning the gate here.
