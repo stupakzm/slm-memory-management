@@ -153,3 +153,59 @@ only".
   transfer.
 - Re-embedding changes every vector, so any retrieval-noise effect (batch composition, phase 14)
   lands in this comparison too. The drift check bounds it for the control, not for the arm.
+
+## R12 results (run 2026-10-04)
+
+**Pre-pass** (`data/eval/results/p15-r12-prepass.json`, over `p13-ctl-retrieved.json`).
+- The reader's question changes on 210 rows: typo1 74, typo3 116, typo (old) 19, and 1 clean row
+  [chk_013]. 206 rows are gated as before.
+- The only clean change is `eu01`: "using projectile" → "using projection", an unanswerable row about
+  a tool the corpus lacks.
+- On the typo rows the repair reverts the generator's own recorded edits (typo1 69, typo3 214) with
+  **0 new wrong edits**.
+- p95 is 3.45 ms per question.
+
+**Control.** The pre-registered noise check compares the unchanged rows' answer text with `p13-ctl`.
+No tracked tool does that comparison, and an inline script may not decide which control is used.
+So the pre-registered fallback was taken instead: the control was regenerated today under setting C
+with `--normalize off` (`p15-ctl`). It matches `p13-ctl` exactly, 0 lost and 0 gained over 883
+answerable rows and the same abstentions [chk_011]. With no noise, the two paths give the same
+answer. Setting C held across two days.
+
+**Arm** `p15-r12` against `p15-ctl` [chk_012]:
+
+| group | answerable | lost | gained | net |
+|---|---|---|---|---|
+| typo1 | 116 | 0 | 2 | +2 |
+| typo3 | 116 | 5 | 0 | −5 |
+| clean (with older paraphrases) | 132 | 0 | 0 | 0 |
+| every other kind | 519 | 0 | 0 | 0 |
+| all | 883 | 5 | 2 | −3 |
+
+Abstention net is +1. Lost: a06.y3, a10.y3, a37.y3, b02.y3, e16.y3. Gained: a29.y1, b02.y1.
+
+**Against the rule:**
+1. Typos recover (pooled net ≥ +10, p < 0.05): **fail.** Pooled typo1 + typo3 is −3 (2 gained, 5 lost).
+2. Clean left alone: pass. (a) 1 of 160 changed (≤ 3). (b) Clean net 0.
+3. No new invention: pass (+1; `eu01` still abstains).
+4. Cheap: pass (p95 3.45 ms).
+5. Nothing else pays: pass (0).
+
+**Verdict: does not ship.** `--normalize local` stays default-off.
+
+**What it establishes.** With the five extracts held fixed, correcting the question's spelling does
+not help the 4B reader. The repairs are right: "lsit a directoryy … fiirst" becomes "list a directory …
+first", "wihtout havign" becomes "without having". But the answers flip in both directions on the same
+evidence. `a06.y3` was answered correctly while misspelt and became "I don't know" once spelled
+correctly. `b02.y1` and `b02.y3` moved in opposite directions on one base question.
+
+Phase 11's reading of R3 was "typos break the reader: the page arrives and the 4B misreads the
+question". It needs restating. When the page was in hand, what differed between a typo variant and its
+clean base was the **context**: the other extracts and their order. It was not the misspelt word. R4a
+gained +27 because it repaired the question **before retrieval**, so the reader got the clean base's
+context.
+
+So typo repair belongs before retrieval. The rename problem has to be solved there. The evidence-local
+signal can be moved there, unrun and not pre-registered: retrieve with the raw question, repair from
+its extracts, and retrieve again only when something was repaired. That costs one extra retrieval on
+about a sixth of the pool's rows.
