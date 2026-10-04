@@ -97,14 +97,17 @@ def main() -> int:
                          "retrieved and reranked separately (default 0: no "
                          "rewrites, generator not started for them). --rewrites 0 "
                          "is the single-query path.")
-    ap.add_argument("--normalize", choices=("off", "spell"), default="off",
+    ap.add_argument("--normalize", choices=("off", "spell", "local"), default="off",
                     help="phase 11 R4a: 'spell' corrects the question against the "
                          "index's own vocabulary (smm.normalize) before retrieval AND "
-                         "generation; 'off' (default) reproduces today's behaviour "
-                         "exactly")
+                         "generation; phase 15 R12: 'local' retrieves and gates on the "
+                         "question as typed and gives only the reader a question "
+                         "repaired toward words in the extracts it reads (not with "
+                         "--cascade, --llm-correct or --act); 'off' (default) "
+                         "reproduces today's behaviour exactly")
     ap.add_argument("--vocab-cache", default=None,
-                    help="override path for --normalize spell's vocab cache (default: "
-                         "<db>.vocab.json next to --db)")
+                    help="override path for --normalize spell/local's vocab cache "
+                         "(default: <db>.vocab.json next to --db)")
     ap.add_argument("--rewrite-style", choices=("man", "docs"), default="man",
                     help="phase 11 R4b: 'docs' asks the rewriter for documentation's "
                          "own terminology (manual pages and the GNU Emacs manuals) "
@@ -153,6 +156,15 @@ def main() -> int:
         print("--route and --domain are exclusive: a route chooses the domain",
               file=sys.stderr)
         return 2
+
+    if args.normalize == "local":
+        clash = [flag for flag, on in (
+            ("--cascade", args.cascade), ("--llm-correct", args.llm_correct),
+            ("--act", args.act)) if on]
+        if clash:
+            print(f"--normalize local does not compose with {', '.join(clash)}",
+                  file=sys.stderr)
+            return 2
 
     if args.normalize == "spell":
         vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
@@ -286,6 +298,16 @@ def main() -> int:
         print(f"{grammar.REFUSAL}\n\n(gate: best evidence scored {score:.3f}, "
               f"below {args.gate:.3f} - the model was not asked)")
         return 0
+
+    if args.normalize == "local":
+        # Retrieval and the gate used the question as typed; only the reader
+        # gets it repaired toward the extracts it is about to read.
+        vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
+        read_question, _edits = qnorm.normalize_query(
+            question, "local", vocab, [qnorm.hit_extract(h) for h in hits])
+        if read_question != question:
+            print(f'(read as: "{read_question}")')
+        question = read_question
 
     if gen is None:
         gen = Generator()

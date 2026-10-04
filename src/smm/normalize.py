@@ -28,6 +28,12 @@ Mechanism, exactly as pre-registered:
   - case pattern (all-lower / Capitalised / ALL-CAPS) and the token's
     original surrounding punctuation are preserved; anything else is left
     exactly as it was written.
+
+Phase 15 R12 (`normalize_local`, CLI `--mode local`; docs/phase15-results.md
+"R12 pre-registration"): the same eligibility, distances, tie-break and case
+rules, but a word is corrected only toward words found in the extracts the
+reader is about to read (`hit_extract`: doc id, prefix and text of each hit),
+and the repaired question is for the reader only.
 """
 
 from __future__ import annotations
@@ -206,21 +212,24 @@ def _deletions_upto(word: str, max_n: int) -> set:
     return out
 
 
-def _delete_index(vocab: dict) -> dict:
+def _delete_index(vocab: dict, depth: int = _DELETE_MAX) -> dict:
     """deletion-string -> set of vocab words that produce it, deleting up
-    to `_DELETE_MAX` characters. Cached by `id(vocab)` (re-validated
+    to `depth` (default `_DELETE_MAX`) characters; a lookup that allows
+    `d` edits needs `depth >= d`. Cached by `id(vocab)` (re-validated
     against `len(vocab)`), so this is built once per vocab dict and reused
     across every `normalize()` call in the process - the normal CLI and
-    eval_answers.py/ask.py usage."""
-    key = id(vocab)
+    eval_answers.py/ask.py usage. The entry keeps a reference to `vocab`
+    itself, so its id cannot be recycled by a different dict of the same
+    length while the entry exists (checked with `is`)."""
+    key = (id(vocab), depth)
     cached = _INDEX_CACHE.get(key)
-    if cached is not None and cached[0] == len(vocab):
+    if cached is not None and cached[0] == len(vocab) and cached[2] is vocab:
         return cached[1]
     idx: dict = {}
     for w in vocab:
-        for deleted in _deletions_upto(w, _DELETE_MAX):
+        for deleted in _deletions_upto(w, depth):
             idx.setdefault(deleted, set()).add(w)
-    _INDEX_CACHE[key] = (len(vocab), idx)
+    _INDEX_CACHE[key] = (len(vocab), idx, vocab)
     return idx
 
 
@@ -266,31 +275,46 @@ def _match_case(word: str, original_core: str) -> str:
     return word
 
 
-def normalize(question: str, vocab: dict) -> tuple:
-    """(new_question, edits). Tokenises on the space character (keeping
-    punctuation attached and whitespace itself byte-exact via split(" ")/
-    " ".join round-tripping), corrects each eligible token's core in place,
-    and leaves everything else untouched. `edits` is
-    [{"from": core, "to": corrected_core, "distance": d}, ...], in question
-    order. The first letter is NOT protected (see module docstring)."""
+def _eligible(token: str, known: dict, targets: dict):
+    """(prefix, core, suffix) if `token` may be corrected, else None: its core
+    is purely alphabetic, 4+ letters, and its lower-cased form is in neither
+    `known` (the corpus vocabulary) nor `targets` (a word that is already a
+    correction target is not a typo)."""
+    prefix, core, suffix = _split_token(token)
+    if not core or not core.isalpha() or len(core) < 4:
+        return None
+    core_lower = core.lower()
+    if core_lower in known or core_lower in targets:
+        return None
+    return prefix, core, suffix
+
+
+def _repair(question: str, known: dict, targets: dict, get_idx) -> tuple:
+    """The shared token loop behind `normalize` and `normalize_local`.
+    A token is eligible iff its core is purely alphabetic, 4+ letters, and
+    its lower-cased core is not in `known` (the corpus vocabulary); it is
+    then snapped to the best word in `targets` (a word already in `targets`
+    is left alone). `get_idx()` returns `_delete_index(targets)` and is only
+    called once a token actually needs a candidate search. For `normalize`,
+    `known is targets`, so this is exactly the original loop."""
     if not question:
         return question, []
-    idx = _delete_index(vocab)
+    idx = None
     out_tokens = []
     edits = []
     for token in question.split(" "):
         if not token:
             out_tokens.append(token)
             continue
-        prefix, core, suffix = _split_token(token)
-        if not core or not core.isalpha() or len(core) < 4:
+        parts = _eligible(token, known, targets)
+        if parts is None:
             out_tokens.append(token)
             continue
+        prefix, core, suffix = parts
         core_lower = core.lower()
-        if core_lower in vocab:
-            out_tokens.append(token)
-            continue
-        found = _best_candidate(core_lower, vocab, idx)
+        if idx is None:
+            idx = get_idx()
+        found = _best_candidate(core_lower, targets, idx)
         if found is None:
             out_tokens.append(token)
             continue
@@ -301,17 +325,85 @@ def normalize(question: str, vocab: dict) -> tuple:
     return " ".join(out_tokens), edits
 
 
-def normalize_query(question: str, mode: str, vocab: dict | None = None) -> tuple:
+def normalize(question: str, vocab: dict) -> tuple:
+    """(new_question, edits). Tokenises on the space character (keeping
+    punctuation attached and whitespace itself byte-exact via split(" ")/
+    " ".join round-tripping), corrects each eligible token's core in place,
+    and leaves everything else untouched. `edits` is
+    [{"from": core, "to": corrected_core, "distance": d}, ...], in question
+    order. The first letter is NOT protected (see module docstring)."""
+    return _repair(question, vocab, vocab, lambda: _delete_index(vocab))
+
+
+def hit_extract(hit: dict) -> str:
+    """What the reader is shown for one hit, minus its "[i] " label -
+    `smm.generate.build_prompt`'s f"{doc_id}\n{prefix}{text}"."""
+    return f"{hit['doc_id']}\n{hit['prefix']}{hit['text']}"
+
+
+def local_targets(extracts) -> dict:
+    """Counter-style dict: lower-cased [a-z]+ words of length >= 3 counted
+    over the extract strings (phase 15 R12)."""
+    counts: dict = {}
+    for ex in extracts:
+        for w in _VOCAB_WORD_RE.findall(ex.lower()):
+            if len(w) >= 3:
+                counts[w] = counts.get(w, 0) + 1
+    return counts
+
+
+def normalize_local(question: str, extracts, vocab: dict) -> tuple:
+    """(new_question, edits) - phase 15 R12. Eligibility is `normalize()`'s
+    (alphabetic core, 4+ letters, not in the corpus `vocab`), but the words
+    a token may be corrected TO are only those found in `extracts` (the
+    strings the reader is about to read, see `hit_extract`), counted as in
+    `local_targets`. Distance bands, tie-break order, case and punctuation
+    handling, and the edits shape are `normalize()`'s own. A token that is
+    itself a word of the extracts is evidence, not a typo, and is left
+    alone."""
+    targets = local_targets(extracts)
+    # Only extract words within reach (by length) of an eligible token can be
+    # a correction, so index just those: same candidates, a much smaller
+    # deletion index, which is what keeps this per-question call cheap.
+    lengths = set()
+    depth = 0
+    for token in question.split(" "):
+        parts = _eligible(token, vocab, targets) if token else None
+        if parts is not None:
+            n = len(parts[1])
+            lengths.update(range(n - _max_dist_for(n), n + _max_dist_for(n) + 1))
+            depth = max(depth, _max_dist_for(n))
+    targets = {w: c for w, c in targets.items() if len(w) in lengths}
+
+    def get_idx():
+        # `_delete_index` memoises by id(vocab); `targets` is a throwaway
+        # per-call dict, so evict its entry rather than keep it alive. Only as
+        # deep as the longest eligible token needs (1 edit -> 1 deletion).
+        try:
+            return _delete_index(targets, depth)
+        finally:
+            _INDEX_CACHE.pop((id(targets), depth), None)
+
+    return _repair(question, vocab, targets, get_idx)
+
+
+def normalize_query(question: str, mode: str, vocab: dict | None = None,
+                    extracts=None) -> tuple:
     """The single call site scripts/eval_answers.py and scripts/ask.py use.
     `mode="off"` returns `(question, [])` unchanged - byte-identical to
     before this feature existed. `mode="spell"` requires `vocab` and
-    delegates to `normalize()`."""
+    delegates to `normalize()`. `mode="local"` (phase 15 R12) requires
+    `vocab` and `extracts` and delegates to `normalize_local()`."""
     if mode == "off":
         return question, []
-    if mode != "spell":
+    if mode not in ("spell", "local"):
         raise ValueError(f"unknown normalize mode {mode!r}")
     if vocab is None:
-        raise ValueError("normalize_query(mode='spell') requires vocab")
+        raise ValueError(f"normalize_query(mode={mode!r}) requires vocab")
+    if mode == "local":
+        if extracts is None:
+            raise ValueError("normalize_query(mode='local') requires extracts")
+        return normalize_local(question, extracts, vocab)
     return normalize(question, vocab)
 
 
@@ -394,6 +486,24 @@ def _score_typo_row(row: dict, normalized_question: str) -> tuple:
     return reverted, partial, new_wrong
 
 
+def _unpack_entry(entry):
+    """(hits, gate_hits) of one eval_answers retrieval-cache entry, either
+    shape: a plain list is both, a dict carries both. A local copy of
+    scripts/eval_answers.py's `unpack_entry` (this package imports nothing
+    from scripts/)."""
+    if isinstance(entry, dict):
+        return entry["hits"], entry["gate_hits"]
+    return entry, entry
+
+
+def _gate_score(hits: list) -> float:
+    """Local copy of smm.retrieve.gate_score (that module needs sqlite_vec):
+    the top hit's rerank_score, else its score; -inf for no hits."""
+    if not hits:
+        return float("-inf")
+    return hits[0].get("rerank_score", hits[0].get("score", 0.0))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--db", required=True)
@@ -402,10 +512,33 @@ def main() -> int:
     ap.add_argument("--vocab-cache", default=None,
                      help="override the vocab cache path (default: "
                           "<db>.vocab.json next to --db)")
+    ap.add_argument("--mode", choices=("spell", "local"), default="spell",
+                     help="'spell' (default) is the phase 11 corpus-vocabulary "
+                          "corrector; 'local' (phase 15 R12) repairs only toward words "
+                          "in the extracts the reader would read, from --retrieved")
+    ap.add_argument("--retrieved", default=None,
+                     help="--mode local: an eval_answers NAME-retrieved.json cache")
+    ap.add_argument("--gate", type=float, default=0.65,
+                     help="--mode local: a row whose gate_hits top score is below "
+                          "this is reported unchanged and counted as gated")
+    ap.add_argument("--qids-out", default=None,
+                     help="write the JSON list of changed qids, in pool order "
+                          "(the format eval_answers.py --qids reads)")
     args = ap.parse_args()
+    local = args.mode == "local"
+    if local and not args.retrieved:
+        ap.error("--mode local requires --retrieved")
+    if args.retrieved and not local:
+        ap.error("--retrieved is only valid with --mode local")
 
     vocab = build_vocab(args.db, cache_path=args.vocab_cache)
     rows = _load_pool_rows(args.pool)
+    retrieved = json.loads(Path(args.retrieved).read_text(encoding="utf-8")) if local else None
+    if local:
+        missing = [r["qid"] for r in rows if r["qid"] not in retrieved]
+        if missing:
+            raise SystemExit(f"{len(missing)} pool qids not in {args.retrieved}: "
+                             f"{missing[:5]}")
 
     kind_totals: dict = {}
     typo_stats = {"typo1": [0, 0, 0, 0], "typo3": [0, 0, 0, 0]}  # reverted, partial, new_wrong, n_rows
@@ -413,9 +546,21 @@ def main() -> int:
     times_ms = []
     results = []
 
+    changed_qids = []
+
     for row in rows:
+        gated = False
         t0 = time.perf_counter()
-        new_q, edits = normalize(row["question"], vocab)
+        if local:
+            hits, gate_hits = _unpack_entry(retrieved[row["qid"]])
+            gated = _gate_score(gate_hits) < args.gate
+            if gated:
+                new_q, edits = row["question"], []
+            else:
+                new_q, edits = normalize_local(
+                    row["question"], [hit_extract(h) for h in hits], vocab)
+        else:
+            new_q, edits = normalize(row["question"], vocab)
         times_ms.append((time.perf_counter() - t0) * 1000.0)
 
         kind = _classify_kind(row)
@@ -423,6 +568,10 @@ def main() -> int:
         bucket = kind_totals.setdefault(kind, {"n": 0, "changed": 0})
         bucket["n"] += 1
         bucket["changed"] += int(changed)
+        if local:
+            bucket["gated"] = bucket.get("gated", 0) + int(gated)
+        if changed:
+            changed_qids.append(row["qid"])
 
         if kind in typo_stats and row.get("edits"):
             reverted, partial, new_wrong = _score_typo_row(row, new_q)
@@ -435,11 +584,14 @@ def main() -> int:
         if kind == "clean" and changed:
             clean_changed.append({"qid": row["qid"], "from": row["question"], "to": new_q})
 
-        results.append({
+        rec = {
             "qid": row["qid"], "kind": kind, "changed": changed,
             "question": row["question"], "question_normalized": new_q,
             "edits": edits,
-        })
+        }
+        if local:
+            rec["gated"] = gated
+        results.append(rec)
 
     clean_changed.sort(key=lambda r: r["qid"])
     results.sort(key=lambda r: r["qid"])
@@ -460,16 +612,19 @@ def main() -> int:
         "clean_changed": clean_changed,
         "results": results,
     }
+    if local:
+        report.update({"mode": "local", "retrieved": args.retrieved, "gate": args.gate})
 
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     print(f"normalised {len(rows)} pool questions from {len(args.pool)} file(s)\n")
-    print(f"{'kind':12} {'n':>5} {'changed':>8}")
+    print(f"{'kind':12} {'n':>5} {'changed':>8}" + (f" {'gated':>6}" if local else ""))
     for kind in sorted(kind_totals):
         b = kind_totals[kind]
-        print(f"{kind:12} {b['n']:5d} {b['changed']:8d}")
+        print(f"{kind:12} {b['n']:5d} {b['changed']:8d}"
+              + (f" {b['gated']:6d}" if local else ""))
     print()
     for k in ("typo1", "typo3"):
         s = typo_stats[k]
@@ -480,6 +635,11 @@ def main() -> int:
     print(f"\nclean questions changed: {len(clean_changed)}")
     for c in clean_changed:
         print(f"  {c['qid']}: {c['from']!r} -> {c['to']!r}")
+    if args.qids_out:
+        qo = Path(args.qids_out)
+        qo.parent.mkdir(parents=True, exist_ok=True)
+        qo.write_text(json.dumps(changed_qids), encoding="utf-8")
+        print(f"wrote {qo} ({len(changed_qids)} changed qids)")
     print(f"\nwrote {out_path}")
     return 0
 

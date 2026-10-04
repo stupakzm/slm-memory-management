@@ -185,13 +185,17 @@ def main() -> int:
     ap.add_argument("--qids", default=None,
                     help="path to a JSON list of qids; restricts rows to those qids, kept "
                          "in the eval set's own order, applied after --limit")
-    ap.add_argument("--normalize", choices=("off", "spell"), default="off",
+    ap.add_argument("--normalize", choices=("off", "spell", "local"), default="off",
                     help="phase 11 R4a: 'spell' corrects the question against the index's "
                          "own vocabulary (smm.normalize) before retrieval AND generation; "
-                         "'off' (default) reproduces every existing run byte-for-byte")
+                         "phase 15 R12: 'local' leaves retrieval and the gate on the raw "
+                         "question and gives the READER a question repaired only toward "
+                         "words in the extracts it reads (not with --cascade or "
+                         "--llm-correct); 'off' (default) reproduces every existing run "
+                         "byte-for-byte")
     ap.add_argument("--vocab-cache", default=None,
-                    help="override path for --normalize spell's vocab cache (default: "
-                         "<db>.vocab.json next to --db)")
+                    help="override path for --normalize spell/local's vocab cache "
+                         "(default: <db>.vocab.json next to --db)")
     ap.add_argument("--question-vectors", type=int, default=0,
                     help="phase 11 R8: add the chunks of the M nearest generated-question "
                          "vectors (scripts/build_qvec.py) to the candidate pool; 0 "
@@ -247,6 +251,14 @@ def main() -> int:
             print(f"--route does not compose with {', '.join(clash)}", file=sys.stderr)
             return 2
 
+    if args.normalize == "local":
+        clash = [flag for flag, on in (
+            ("--cascade", args.cascade), ("--llm-correct", args.llm_correct)) if on]
+        if clash:
+            print(f"--normalize local does not compose with {', '.join(clash)}",
+                  file=sys.stderr)
+            return 2
+
     if args.cascade and args.stage != "both":
         print("--cascade requires --stage both (the tier depends on the reader's "
               "own answer)", file=sys.stderr)
@@ -281,6 +293,13 @@ def main() -> int:
         vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
         for row in rows:
             normalized[row["qid"]] = qnorm.normalize_query(row["question"], "spell", vocab)
+
+    # --normalize local: nothing before the reader changes (query_text stays the
+    # raw question, the retrieve stage caches exactly what --normalize off does);
+    # the vocabulary is only needed where the reader's question is built.
+    local_vocab = None
+    if args.normalize == "local" and args.stage != "retrieve":
+        local_vocab = qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
 
     def query_text(row: dict) -> str:
         return normalized[row["qid"]][0] if args.normalize == "spell" else row["question"]
@@ -386,6 +405,16 @@ def main() -> int:
         # question) when --llm-correct is off, or for a legacy cache.
         question_corrected = correct_text(entry)
         qtext = question_corrected if question_corrected is not None else query_text(row)
+        if args.normalize == "local":
+            # The reader (only) gets the question repaired toward the extracts it
+            # reads - `hits` here is already select_hits' output. A gated row never
+            # reaches the reader, so it keeps the raw question and no edits.
+            if gated:
+                qtext, local_edits = row["question"], []
+            else:
+                qtext, local_edits = qnorm.normalize_query(
+                    row["question"], "local", local_vocab,
+                    [qnorm.hit_extract(h) for h in hits])
         if gated:
             text = grammar.REFUSAL
         elif args.answer_mode == "quote":
@@ -422,6 +451,9 @@ def main() -> int:
             norm_text, norm_edits = normalized[row["qid"]]
             rec["question_normalized"] = norm_text
             rec["normalize_edits"] = norm_edits
+        if args.normalize == "local":
+            rec["question_normalized"] = qtext
+            rec["normalize_edits"] = local_edits
         if args.llm_correct:
             rec["question_corrected"] = qtext
         if row["kind"] == "answerable":
@@ -524,7 +556,7 @@ def write_report(args, results: list, t0: float) -> int:
         config["rerank_batch"] = args.rerank_batch
     # Only added under --normalize spell, so --normalize off's output stays
     # byte-identical to every run made before this flag existed.
-    if args.normalize == "spell":
+    if args.normalize in ("spell", "local"):
         config["normalize"] = args.normalize
     # Same convention for R4b/R4a': only added when non-default, so every
     # existing run's config (and defaults off) stays byte-for-byte unchanged.
