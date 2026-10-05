@@ -338,3 +338,99 @@ Abstention is 20/20 in both arms.
     That needs a pre-registered check on Emacs rows under `--domain emacs`.
   - Re-sweep the gate for the fine-tuned embedder on man pages (phase 8's gate re-sweep procedure).
     It runs first, before any adoption that touches man pages.
+
+## R14 results (run 2026-10-05)
+
+All three arms against `p15-ctl`, generated under setting C. R14c's prompt sha256 is `a778ffa4…`.
+R14b's derived reranker differs from the original in 1 of 40 metadata keys
+(`tokenizer.chat_template.rerank`), and all 311 tensors are identical.
+
+| arm | all answerable | clean | abstention net | Emacs | man pages | retrieval s/q | gate fired |
+|---|---|---|---|---|---|---|---|
+| R14a, embedder instruction [chk_032, chk_033] | 53 gained, 32 lost, +21 (p 0.030) | −3 | −5 | **+26 (p 0.00002)** | −5 | 3.27 | 196 |
+| R14b, reranker instruction [chk_034, chk_035] | 73 gained, 48 lost, +25 (p 0.029) | −4 | −6 | +2 | **+23 (p 0.015)** | 3.46 | 181 |
+| R14c, reader prompt [chk_030, chk_031] | 38 gained, 18 lost, +20 (p 0.011) | +2 | −2 | +11 (p 0.007) | +9 | (control's) | 206 |
+
+The control's gate fired on 206 rows, at 3.24 s per question.
+
+**Against the rule:**
+- **R14a:** rule 1 passes; rule 2 **fails** (−3); rule 3 **fails** (−5); rule 4 passes.
+- **R14b:** rule 1 passes; rule 2 **fails** (−4); rule 3 **fails** (−6); rule 4 passes (+0.22 s).
+- **R14c:** rule 1 passes; rule 2 passes; rule 3 **fails by one row** (−2).
+
+**Verdict: no arm ships.** No combination is pre-registered, because none passed.
+
+**What R14 establishes.**
+- **The three instructions matter, and each helps a different place.**
+  - The embedder instruction is worth +26 on Emacs. The old "Linux system … manual page"
+    instruction was costing the Emacs questions. A one-line change beats R13's 5-hour fine-tune
+    (+21) there.
+  - The reranker instruction is worth +23 on man pages.
+  - The reader prompt is worth +10 on terse questions (p 0.006) and +11 on Emacs.
+- **Every arm pays in abstention.**
+  - R14a and R14b change retrieval, and the gate fires less: 196 and 181 rows against 206. The 0.65
+    threshold was set for the old score distribution.
+  - R14c changes no retrieval. Its 3 newly answered unanswerable rows come from the prompt itself.
+    "Answer what the user most plausibly means" draws the 4B into answering from its own knowledge:
+    `strace`, and `tcpdump -i <interface> -w <filename>` alongside an admission that the extracts
+    do not say it. The third, `u07.k` "gdb set breakpoint", is answered from Emacs's own GUD manual
+    (`C-x C-a C-b`, `gud-break`). That answer is documented, so the row's tool-not-installed label is
+    arguable. It is left as labelled.
+
+## Diagnostic, not pre-registered: every arm at the control's abstention (2026-10-05)
+
+Every arm that changed retrieval lowered the number of rows the 0.65 gate refuses: R13 192, R14a 196,
+R14b 181, against the control's 206. So part of each gain may be the gate letting more questions
+through, answerable and unanswerable alike.
+`scripts/screen_report.py --match-abstention` (tsk_20261005_matchabst) re-scores each arm at the
+lowest gate where its abstention equals the control's (254/277). It replays the recorded top scores,
+so no GPU run is needed. **This decides nothing.** It was not pre-registered, and it shows where the
+next phase should look [chk_038].
+
+| arm | matched gate | all answerable | Emacs | man pages |
+|---|---|---|---|---|
+| R13, fine-tuned embedder | 0.834 | +1 | **+19 (p 0.007)** | −18 (p 0.06) |
+| R14a, embedder instruction | 0.765 | +9 (p 0.41) | **+25 (p 0.00004)** | −16 (p 0.044) |
+| R14b, reranker instruction | 0.866 | +12 (p 0.33) | +1 | +11 (p 0.29) |
+| R14c, reader prompt | 0.685 | **+16 (p 0.048)** | +11 (p 0.007) | +5 |
+
+At equal safety, the Emacs gains from R13 and R14a hold, and both cost man pages about as much again.
+The reader prompt keeps most of its gain with a slightly stricter gate.
+
+## Phase 15 closing (2026-10-05)
+
+| part | mechanism | verdict | the number that decided it |
+|---|---|---|---|
+| R12 | typo repair for the reader, from the extracts | no ship | typos pooled −3 [chk_012] |
+| R13 | 0.6B embedder fine-tuned on 102k 4B-written questions | no ship (rules 1 and 4) | vocabulary +9; abstention −6 [chk_026, chk_028] |
+| asq.el | `M-x asq`, Emacs manuals with `--domain emacs` | shipped (code) | — |
+| R14a | neutral embedder instruction | no ship (rules 2 and 3) | clean −3; abstention −5 [chk_032] |
+| R14b | reranker instruction in the GGUF | no ship (rules 2 and 3) | clean −4; abstention −6 [chk_034] |
+| R14c | reader prompt for misspelt, terse and everyday questions | no ship (rule 3) | abstention −2 [chk_030] |
+
+**What phase 15 established:**
+- **Typo damage is context, not words.** Repairing the reader's question on fixed evidence does
+  nothing (R12). The gain R4a saw came from changing what retrieval returns.
+- **The Emacs vocabulary gap can be closed.**
+  - A one-line embedder instruction gives +26 on Emacs [chk_033], and still +25 at the control's
+    abstention [chk_038].
+  - The fine-tuned embedder gives +21 [chk_027], at no extra cost per question.
+  - Both cost man pages, so a single global setting cannot carry them.
+- **Each model wanted a different fix.** The embedder instruction helped Emacs, the reranker
+  instruction helped man pages, and the reader prompt helped terse questions.
+- **The gate is calibrated to one pipeline.** Every retrieval change shifted it. A new configuration
+  has to be judged at matched abstention, or with a re-swept gate, not at 0.65 by default.
+- **Measurement.**
+  - Full-pool retrieval reproduces exactly across days [chk_025], and so does generation under
+    setting C [chk_011].
+  - Subset retrieval runs drift on 3 of 50 rows because of the order requests reach the server
+    [chk_023, chk_024]. A drift check has to compare runs of the same shape.
+
+**Next, for pre-registration** (none run):
+1. **Domain-aware configuration.** With `--domain emacs` (the `asq.el` path), use the neutral or an
+   Emacs-specific embedder instruction, and measure on Emacs rows under `--domain emacs`. The man-page
+   path is untouched, so it cannot cost man pages.
+2. **A gate re-sweep per configuration**, chosen on a dev split and judged once on held-out rows,
+   before adopting R14b or R14c globally.
+3. **R14c at a pre-registered stricter gate.** The diagnostic suggests about +16 at matched
+   abstention; that has to be confirmed on rows it was not chosen on.
