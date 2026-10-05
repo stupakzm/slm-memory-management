@@ -258,3 +258,83 @@ their combination gets its own pre-registration. It is not assumed to add up.
 question's wording changes. A new reader prompt will churn answers the same way, so rule 1 needs a
 net gain, not churn. The reranker arm changes the score the gate reads. A fail on rule 3 there may
 be calibration rather than invention, and that is reported as such, without re-tuning the gate here.
+
+## R13 results (run 2026-10-04 to 2026-10-05)
+
+**Data.** 102,138 question–passage pairs: Emacs 19,046 × 3 (R8's cache) and man pages 15,000 × 3,
+newly written (prompt sha256 `127b2e51…`). The hash split holds out 332 chunks (996 questions) as
+dev, and trains on 101,142 pairs. **Leakage:** the closest any of the 1,160 pool questions comes to
+any training question is token Jaccard 0.778, below the 0.8 flag [chk_020]. No gained row is flagged.
+
+**Training.** 3,161 steps over four resumable stages, 5.5–5.9 s per step on the RTX 3060 Laptop
+(about 5 h). Loss fell from 0.37 to about 0.04. The log is frozen as
+`data/eval/results/p15-r13-train_log.json`.
+
+**G1, dev: pass.** recall@10 rose from 0.746 to 0.961 against a bar of +0.05 [chk_020]. recall@1 rose
+from 0.388 to 0.650. These are 4B-written questions about held-out chunks, so they are the most
+favourable test.
+
+**G2, parity: pass.** The fine-tuned GGUF served by llama-server matches the HF model at min cosine
+0.9988 for questions and 0.9988 for chunks (200 each, threshold 0.99). The base model's own
+conversion scores 0.9989 / 0.9991, as calibration. Run with `scripts/embed_parity.py`. These need a
+live server, so they are not registered. Converting the base HF model with the same command
+reproduces the official GGUF's 310 tensors byte for byte (only `general.name` differs), so the
+conversion step is exact.
+
+**Re-index.** `data/index/phase15-ft.db`: all 75,613 vectors re-embedded at 21.7 chunks/s (58 min).
+The chunks table is identical to `phase11.db`.
+
+**Control drift check.**
+- The 50-row sample (seed 13) differs from `p13-ctl` on 3 rows (a29.y3, a30, eu05.y3), all in
+  top-5 order, none in the gate [chk_023]. That exceeds 2, so the control retrieval was regenerated
+  in full today, as pre-registered.
+- The full run reproduces `p13-ctl` on **all 1,160 rows** [chk_025]. So `p15-ctl`, which was
+  generated on that retrieval, is the control.
+- The 3 rows are phase 13's same 3, and today's 50-row run matches phase 13's 50-row run exactly
+  [chk_024]. So a row's retrieval depends on which rows ran before it in the same server session.
+  A subset run and a full run disagree. Runs of the same shape agree across days. This is a
+  property of the drift check's design, not of the code. The cause is untested; the reranker
+  server's prompt cache is the obvious suspect.
+
+**Arm** `p15-r13` against `p15-ctl` [chk_026, chk_027, chk_028]:
+
+| group | lost | gained | net |
+|---|---|---|---|
+| synonym + no-name + terse + casual (484) | 27 | 36 | +9 (p 0.31) |
+| clean (132) | 4 | 8 | +4 |
+| typo1 + typo3 + typo (252) | 14 | 21 | +7 |
+| **all answerable (883)** | 46 | 65 | **+19** (p 0.087) |
+| **Emacs (324)** | 11 | 32 | **+21 (p 0.002)** |
+| man pages (559) | 35 | 33 | −2 |
+
+Evidence rises from 711 to 726. Abstention falls by **6** overall: 12 unanswerable rows newly
+answered and 6 newly abstained. Emacs abstention is +1; man pages are −7.
+
+**Against the rule:**
+1. Vocabulary recovers (≥ +10, p < 0.05): **fail** (+9, p 0.31).
+2. Clean unharmed (≥ −2): pass (+4).
+3. Typos unharmed (≥ −3): pass (+7).
+4. No new invention (≥ −1): **fail** (−6).
+5. Same speed (≤ +0.3 s): pass (3.27 against 3.24 s per question).
+
+**Verdict: does not ship as the default embedder.** It fails rules 1 and 4.
+
+**Realistic Emacs set** (reported) [chk_029]. 34/80 against 28/80, +6 (10 gained, 4 lost, p 0.18).
+Abstention is 20/20 in both arms.
+
+**What it establishes.**
+- **On the Emacs manuals the fine-tune works.** It gives +21 answers at p 0.002 with no loss in
+  abstention, and +6 on the human-phrased realistic set. This is the first mechanism in phases 11–15
+  with a significant gain on the domain where vocabulary breaks retrieval. It costs nothing at
+  question time: the same model size, one vector per chunk, and +0.03 s per question.
+- **On man pages it buys nothing and costs safety.** The newly answered unanswerable rows are all
+  man-page tools the corpus lacks. `strace` now retrieves `vdso.7` and `proc_pid_syscall.5`;
+  `tcpdump` retrieves `tc.8` and `ss.8`. The reranker scores these above the 0.65 gate, and the
+  reader answers, sometimes from its own knowledge (`tcpdump -i <interface> -w <filename>`). The
+  embedder got better at what a question means. The gate was tuned for the old embedder's weaker
+  near-misses.
+- **Two follow-ups,** not run and not pre-registered:
+  - Adopt the fine-tuned embedder for the Emacs domain only (`asq.el` always passes `--domain emacs`).
+    That needs a pre-registered check on Emacs rows under `--domain emacs`.
+  - Re-sweep the gate for the fine-tuned embedder on man pages (phase 8's gate re-sweep procedure).
+    It runs first, before any adoption that touches man pages.
