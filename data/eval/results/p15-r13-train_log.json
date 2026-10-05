@@ -1,0 +1,177 @@
+{
+ "hyperparameters": {
+  "db": "data/index/phase11.db",
+  "questions": [
+   "data/index/qvec-emacs.json",
+   "data/index/qvec-linux.json"
+  ],
+  "base_model": "models/hf/Qwen3-Embedding-0.6B",
+  "out": "models/r13/ft",
+  "device": "cuda",
+  "rank": 16,
+  "alpha": 32,
+  "dropout": 0.05,
+  "temperature": 0.05,
+  "lr": 0.0001,
+  "warmup": 100,
+  "batch": 32,
+  "epochs": 1,
+  "max_query_tokens": 64,
+  "max_doc_tokens": 512,
+  "seed": 20261004,
+  "dev_frac": 0.01,
+  "dev_extra": 5000,
+  "leakage_against": "data/index/phase11-scratch/pool.jsonl",
+  "leakage_max_eval": 1160,
+  "checkpoint_every": 500,
+  "resume": true,
+  "stop_after_s": 5700.0,
+  "eval_only": false
+ },
+ "counts": {
+  "pairs": 102138,
+  "cache_chunks_not_in_db": 0,
+  "train_pairs": 101142,
+  "dev_pairs": 996,
+  "train_chunks": 33714,
+  "dev_chunks": 332,
+  "dev_pool_extra": 5000,
+  "lora_modules": 196,
+  "steps": 3161,
+  "dropped_singleton_pairs": 0
+ },
+ "input_sha256": {
+  "db": "88d6d3b282dafe41d4fff7a74546646500809ae8aea3af924b95b69ea10aaa47",
+  "qvec-emacs.json": "34bd6dacb3d8c18d82baeb11499312bd33ce4f23e7310df14f0b5958104ecaef",
+  "qvec-linux.json": "bdbadcdd4304c8ee12a887bf6586349e5a275381fe8219e9154c9f0e0b09c53e"
+ },
+ "leakage": {
+  "file": "data/index/phase11-scratch/pool.jsonl",
+  "n_eval": 1160,
+  "max_token_jaccard": 0.7777777777777778
+ },
+ "dev_before": {
+  "recall@1": 0.38755020080321284,
+  "recall@10": 0.7459839357429718,
+  "n_queries": 996,
+  "n_dev_chunks": 332,
+  "n_docs": 5332
+ },
+ "dev_after": {
+  "recall@1": 0.6495983935742972,
+  "recall@10": 0.9608433734939759,
+  "n_queries": 996,
+  "n_dev_chunks": 332,
+  "n_docs": 5332
+ },
+ "status": "complete",
+ "step": 3161,
+ "merged_modules": 196,
+ "loss_curve": [
+  [
+   2920,
+   0.04620970664545894
+  ],
+  [
+   2930,
+   0.03174367779865861
+  ],
+  [
+   2940,
+   0.03469721125438809
+  ],
+  [
+   2950,
+   0.023676058556884528
+  ],
+  [
+   2960,
+   0.048834235221147534
+  ],
+  [
+   2970,
+   0.03182385014370084
+  ],
+  [
+   2980,
+   0.039334205258637664
+  ],
+  [
+   2990,
+   0.04584428602829575
+  ],
+  [
+   3000,
+   0.052245131134986876
+  ],
+  [
+   3010,
+   0.060155567992478606
+  ],
+  [
+   3020,
+   0.04350741039961577
+  ],
+  [
+   3030,
+   0.02895946488715708
+  ],
+  [
+   3040,
+   0.0243135841563344
+  ],
+  [
+   3050,
+   0.056635973323136565
+  ],
+  [
+   3060,
+   0.03093476640060544
+  ],
+  [
+   3070,
+   0.02889239639043808
+  ],
+  [
+   3080,
+   0.0502238648943603
+  ],
+  [
+   3090,
+   0.04486142627429217
+  ],
+  [
+   3100,
+   0.04636638085357845
+  ],
+  [
+   3110,
+   0.02949472740292549
+  ],
+  [
+   3120,
+   0.05209835362620652
+  ],
+  [
+   3130,
+   0.044513817643746734
+  ],
+  [
+   3140,
+   0.06629922632128
+  ],
+  [
+   3150,
+   0.04231964247301221
+  ],
+  [
+   3160,
+   0.039968574536032975
+  ],
+  [
+   3161,
+   0.016398975625634193
+  ]
+ ],
+ "seconds_this_run": 1675.3237545490265
+}
