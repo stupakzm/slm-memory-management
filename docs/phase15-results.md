@@ -270,7 +270,7 @@ any training question is token Jaccard 0.778, below the 0.8 flag [chk_020]. No g
 (about 5 h). Loss fell from 0.37 to about 0.04. The log is frozen as
 `data/eval/results/p15-r13-train_log.json`.
 
-**G1, dev: pass.** recall@10 rose from 0.746 to 0.961 against a bar of +0.05 [chk_020]. recall@1 rose
+**G1, dev: pass.** recall@10 rose from 0.746 to 0.961 [chk_020], against a bar of five points. recall@1 rose
 from 0.388 to 0.650. These are 4B-written questions about held-out chunks, so they are the most
 favourable test.
 
