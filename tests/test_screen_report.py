@@ -250,6 +250,99 @@ def test_no_group_output_unchanged():
         check("groups" not in json.loads(out_json.read_text())["arms"]["a"], "no groups")
 
 
+def _ma_fixture(t, arm_gate=None):
+    ev_rows = [erow("q1"), erow("q2"),
+               erow("u1", kind="unanswerable"), erow("u2", kind="unanswerable"),
+               erow("u3", kind="unanswerable")]
+    ctl = [row("q1", "alpha", evidence=True), row("q2", "alpha"),
+           row("u1", abstained=True), row("u2", abstained=True), row("u3")]
+    arm = [dict(row("q1", "alpha"), top_score=0.9), dict(row("q2", "alpha"), top_score=0.5),
+           dict(row("u1"), top_score=0.7), dict(row("u2"), top_score=0.6),
+           dict(row("u3"), top_score=0.95)]
+    ev, al = setup(t, ev_rows, {"c": ctl, "a": arm})
+    if arm_gate is not None:
+        (Path(t) / "a-answers.json").write_text(
+            json.dumps({"config": {"gate": arm_gate}, "results": arm}))
+    return ev, al
+
+
+def test_match_abstention_picks_lowest_reaching_gate():
+    with tempfile.TemporaryDirectory() as t:
+        ev, al = _ma_fixture(t)
+        # control abstains on 2 unanswerable; arm needs top_score < t for u2 and u1
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--match-abstention"])
+        check(code == 0, err)
+        check("  matched-abstention gate 0.7000:" in out, f"\n{out}")
+        out_json = Path(t) / "o.json"
+        run_main(t, ev, al, "c", ["a"], ["--match-abstention", "--json", str(out_json)])
+        m = json.loads(out_json.read_text())["arms"]["a"]["matched"]
+        check(abs(m["threshold"] - 0.7) < 1e-6 and m["abstained"] == 2, m)
+        # the arm's own gate floors the candidates
+        ev, al = _ma_fixture(t, arm_gate=0.8)
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--match-abstention"])
+        check("  matched-abstention gate 0.8000:" in out, f"\n{out}")
+
+
+def test_match_abstention_replays_refusals():
+    with tempfile.TemporaryDirectory() as t:
+        ev, al = _ma_fixture(t)
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--match-abstention"])
+        # q2 (0.5 < 0.7) becomes a refusal and loses; q1 (0.9) stays correct
+        want = ("  matched-abstention gate 0.7000: correct 1/2 lost 1 gained 0 "
+                "net -1 p 1 evidence 2/2 abstained 2/3 abstention_net +0 "
+                "verdict FAIL\n")
+        check(want in out, f"\n{out}")
+        run = sr.score_run(Path(t) / "a-answers.json", sr.load_eval(ev),
+                           sr.gold.load_aliases(al))
+        rp = sr.replay_gate(run, 0.7)
+        check(rp["q2"]["abstained"] and not rp["q2"]["correct"] and rp["q2"]["evidence"],
+              rp["q2"])
+        check(not rp["q1"]["abstained"] and rp["q1"]["correct"], rp["q1"])
+        run["q1"]["top_score"] = float("-inf")
+        check(not sr.replay_gate(run, 5.0)["q1"]["abstained"], "no score, never gated")
+
+
+def test_match_abstention_unreachable():
+    with tempfile.TemporaryDirectory() as t:
+        ev_rows = [erow("u1", kind="unanswerable"), erow("u2", kind="unanswerable")]
+        ev, al = setup(t, ev_rows, {
+            "c": [row("u1", abstained=True), row("u2", abstained=True)],
+            "a": [row("u1"), row("u2")]})  # no top_score at all
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--match-abstention"])
+        check(code == 0 and out.endswith(
+            "  matched-abstention: unreachable (max abstained 0/2)\n"), f"\n{out}")
+
+
+def test_match_abstention_line_format():
+    with tempfile.TemporaryDirectory() as t:
+        ev, al = _ma_fixture(t)
+        out_json = Path(t) / "o.json"
+        code, out, err = run_main(t, ev, al, "c", ["a"],
+                                  ["--match-abstention", "--group", "domain",
+                                   "--json", str(out_json)])
+        lines = out.splitlines()
+        i = next(k for k, l in enumerate(lines) if l.startswith("  matched-abstention"))
+        check(lines[i].startswith("  matched-abstention gate 0.7000: correct 1/2 "), lines[i])
+        check(lines[i].endswith("verdict FAIL"), lines[i])
+        check(lines[i + 1].startswith("    [-] correct "), lines[i + 1:])
+        check(lines[i - 1].startswith("  [-] "), lines[i - 1])
+        r = json.loads(out_json.read_text())["arms"]["a"]
+        check("threshold" in r["matched"] and "groups" in r["matched"], r["matched"])
+
+
+def test_no_flag_output_unchanged_with_top_score():
+    with tempfile.TemporaryDirectory() as t:
+        ev, al = _ma_fixture(t)
+        out_json = Path(t) / "o.json"
+        code, out, err = run_main(t, ev, al, "c", ["a"], ["--json", str(out_json)])
+        check(code == 0 and "matched" not in out, f"\n{out}")
+        check("matched" not in json.loads(out_json.read_text())["arms"]["a"], "json")
+        want = ("control c: correct 2/2 evidence 2/2 abstained 2/3\n"
+                "a vs c: correct 2/2 lost 0 gained 0 net +0 p 1 evidence 2/2 "
+                "abstained 0/3 abstention_net -2 verdict FAIL\n")
+        check(out == want, f"\n{out}")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0

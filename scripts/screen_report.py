@@ -81,8 +81,36 @@ def score_run(answers_path, eval_rows: dict, aliases: dict) -> dict:
         out[qid] = {"correct": bool(correct),
                     "evidence": bool(row.get("evidence_retrieved")),
                     "abstained": bool(row["abstained"]),
-                    "answerable": er["kind"] == "answerable"}
+                    "answerable": er["kind"] == "answerable",
+                    "top_score": float(row.get("top_score", float("-inf")))}
     return out
+
+
+def arm_gate(answers_path) -> float:
+    """The gate the answers file ran with (0 if its config has none)."""
+    return float((json.loads(Path(answers_path).read_text()).get("config") or {})
+                 .get("gate") or 0)
+
+
+def replay_gate(run: dict, t: float) -> dict:
+    """Rows whose top_score is below t become refusals (rows without one never do); evidence is unchanged."""
+    return {q: ({**r, "abstained": True, "correct": False}
+                if r["top_score"] != float("-inf") and r["top_score"] < t else r)
+            for q, r in run.items()}
+
+
+def match_abstention(ctl: dict, arm: dict, gate: float):
+    """(threshold, replayed arm) at the lowest gate >= `gate` whose abstentions on
+    unanswerable rows reach the control's; (None, max abstained) if none does."""
+    target = summarize(ctl)["abstained"]
+    scores = sorted({r["top_score"] + 1e-9 for r in arm.values()
+                     if r["top_score"] != float("-inf")})
+    cands = [gate] + [t for t in scores if t >= gate]
+    for t in cands:
+        replayed = replay_gate(arm, t)
+        if summarize(replayed)["abstained"] >= target:
+            return t, replayed
+    return None, summarize(replay_gate(arm, cands[-1]))["abstained"]
 
 
 def summarize(run: dict) -> dict:
@@ -127,28 +155,43 @@ def group_compare(ctl: dict, arm: dict, eval_rows: dict, field: str, default: st
     return out
 
 
+def _fields(r: dict) -> str:
+    return (f"correct {r['correct']}/{r['answerable']} "
+            f"lost {r['lost']} gained {r['gained']} net {signed(r['net'])} "
+            f"p {r['p']:.3g} evidence {r['evidence']}/{r['answerable']} "
+            f"abstained {r['abstained']}/{r['unanswerable']} "
+            f"abstention_net {signed(r['abstention_net'])} verdict {r['verdict']}")
+
+
+def _group_lines(r: dict, indent: str = "  ") -> list:
+    return [indent + f"[{g}] correct {gr['correct']}/{gr['answerable']} "
+            f"lost {gr['lost']} gained {gr['gained']} net {signed(gr['net'])} "
+            f"p {gr['p']:.3g} evidence {gr['evidence']}/{gr['answerable']} "
+            f"abstained {gr['abstained']}/{gr['unanswerable']} "
+            f"abstention_net {signed(gr['abstention_net'])}"
+            for g, gr in r.get("groups", {}).items()]
+
+
 def format_report(control: str, cs: dict, arms: list) -> str:
     A, U = cs["answerable"], cs["unanswerable"]
     lines = [f"control {control}: correct {cs['correct']}/{A} "
              f"evidence {cs['evidence']}/{A} abstained {cs['abstained']}/{U}"]
     for name, r in arms:
-        lines.append(
-            f"{name} vs {control}: correct {r['correct']}/{r['answerable']} "
-            f"lost {r['lost']} gained {r['gained']} net {signed(r['net'])} "
-            f"p {r['p']:.3g} evidence {r['evidence']}/{r['answerable']} "
-            f"abstained {r['abstained']}/{r['unanswerable']} "
-            f"abstention_net {signed(r['abstention_net'])} verdict {r['verdict']}")
+        lines.append(f"{name} vs {control}: {_fields(r)}")
         if r["lost"]:
             lines.append("  lost: " + " ".join(r["lost_qids"]))
         if r["gained"]:
             lines.append("  gained: " + " ".join(r["gained_qids"]))
-        for g, gr in r.get("groups", {}).items():
-            lines.append(
-                f"  [{g}] correct {gr['correct']}/{gr['answerable']} "
-                f"lost {gr['lost']} gained {gr['gained']} net {signed(gr['net'])} "
-                f"p {gr['p']:.3g} evidence {gr['evidence']}/{gr['answerable']} "
-                f"abstained {gr['abstained']}/{gr['unanswerable']} "
-                f"abstention_net {signed(gr['abstention_net'])}")
+        lines.extend(_group_lines(r))
+        m = r.get("matched")
+        if m is not None:
+            if m["threshold"] is None:
+                lines.append(f"  matched-abstention: unreachable (max abstained "
+                             f"{m['max_abstained']}/{r['unanswerable']})")
+            else:
+                lines.append(f"  matched-abstention gate {m['threshold']:.4f}: "
+                             f"{_fields(m)}")
+                lines.extend(_group_lines(m, "    "))
     return "\n".join(lines) + "\n"
 
 
@@ -161,6 +204,7 @@ def main(argv=None, results_dir=None) -> int:
     ap.add_argument("--group", default=None)
     ap.add_argument("--group-default", default="-")
     ap.add_argument("--json", default=None)
+    ap.add_argument("--match-abstention", action="store_true")
     ap.add_argument("--min-net", type=int, default=4)
     ap.add_argument("--max-lost", type=int, default=1)
     ap.add_argument("--min-abstention-net", type=int, default=0)
@@ -182,6 +226,18 @@ def main(argv=None, results_dir=None) -> int:
         if a.group:
             for (n, run), (_, r) in zip(arms, results):
                 r["groups"] = group_compare(ctl, run, eval_rows, a.group, a.group_default)
+        if a.match_abstention:
+            for (n, run), (_, r) in zip(arms, results):
+                t, got = match_abstention(ctl, run, arm_gate(path_of(n)))
+                if t is None:
+                    r["matched"] = {"threshold": None, "max_abstained": got}
+                    continue
+                m = {"threshold": t, **compare(ctl, got, a.min_net, a.max_lost,
+                                               a.min_abstention_net)}
+                if a.group:
+                    m["groups"] = group_compare(ctl, got, eval_rows, a.group,
+                                                a.group_default)
+                r["matched"] = m
     except ValueError as e:
         print(str(e), file=sys.stderr)
         return 2
