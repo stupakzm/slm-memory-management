@@ -28,6 +28,10 @@ MODELS = {
     "embedder": ("Qwen/Qwen3-Embedding-0.6B-GGUF", "Qwen3-Embedding-0.6B-Q8_0.gguf", None),
     "generator": ("unsloth/Qwen3-4B-Instruct-2507-GGUF", "Qwen3-4B-Instruct-2507-Q4_K_M.gguf", None),
     "reranker": ("ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF", "qwen3-reranker-0.6b-q8_0.gguf", None),
+    # Phase 16 idea 8: the same reader at less compression. Opt-in, like reranker-4b.
+    "generator-q5": ("unsloth/Qwen3-4B-Instruct-2507-GGUF", "Qwen3-4B-Instruct-2507-Q5_K_M.gguf", None),
+    "generator-q6": ("unsloth/Qwen3-4B-Instruct-2507-GGUF", "Qwen3-4B-Instruct-2507-Q6_K.gguf", None),
+    "generator-q8": ("unsloth/Qwen3-4B-Instruct-2507-GGUF", "Qwen3-4B-Instruct-2507-Q8_0.gguf", None),
     "reranker-4b": (
         "pyarn/Qwen3-Reranker-4B-Q4_K_M-GGUF",
         "qwen3-reranker-4b-q4_k_m.gguf",
