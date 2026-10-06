@@ -51,7 +51,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from smm import cascade, grammar, store, tools  # noqa: E402
+from smm import cascade, evidence, grammar, store, tools  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
 from smm.embed import TASKS, Embedder  # noqa: E402
 from smm.generate import Generator  # noqa: E402
@@ -68,6 +68,14 @@ GATE = 0.65
 # not document retrieves near zero. The populations separate an order of magnitude
 # further down. Inheriting 0.65 here refused a quarter of the answerable requests.
 GATE_ACT = 0.30
+
+
+def print_evidence(args, answer: str, hits: list) -> None:
+    if args.no_evidence:
+        return
+    for ev in evidence.evidence_lines(answer, hits):
+        print(f"evidence [{ev['n']}]: {ev['line']}")
+        print(f"read more: {ev['pointer']}")
 
 
 def main() -> int:
@@ -154,6 +162,9 @@ def main() -> int:
     ap.add_argument("--reader-prompt", choices=("v1", "v2"), default="v1",
                     help="phase 15 R14: the reader's system prompt (smm.generate.SYSTEM / "
                          "SYSTEM_V2). 'v1' (default) reproduces today's behaviour exactly.")
+    ap.add_argument("--no-evidence", action="store_true",
+                    help="do not print, under the sources line, the line of each cited "
+                         "extract that contains an identifier the answer names")
     args = ap.parse_args()
     question = " ".join(args.question)
     # Passed only when non-default, so stub Embedders/Generators that do not
@@ -276,6 +287,7 @@ def main() -> int:
         # mode, whatever --act says.
         print(cres["answer"])
         print("\nsources: " + ", ".join(f"[{i}] {h['doc_id']}" for i, h in enumerate(hits, 1)))
+        print_evidence(args, cres["answer"], hits)
         return 0
 
     if args.rewrites > 0:
@@ -329,8 +341,10 @@ def main() -> int:
     if args.act:
         return act(gen, db, question, hits, args)
 
-    print(gen.answer(question, hits, cite_grammar=not args.no_grammar, **rp_kw))
+    answer = gen.answer(question, hits, cite_grammar=not args.no_grammar, **rp_kw)
+    print(answer)
     print("\nsources: " + ", ".join(f"[{i}] {h['doc_id']}" for i, h in enumerate(hits, 1)))
+    print_evidence(args, answer, hits)
     return 0
 
 
