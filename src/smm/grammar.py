@@ -30,13 +30,19 @@ REFUSAL = "I don't know."
 # Each claim carries its own citation, so a two-part answer cannot cite once and
 # smuggle the rest in uncited. Capped at four claims: these are man-page lookups,
 # and a longer answer at 4B is padding, not detail.
+#
+# Claim text may contain "[" and "]" (a gold answer like [:alpha:] must be
+# producible), but "[" may never be followed by a digit 1-9, so a citation stays
+# the only place a bracketed digit can occur. GBNF has no lookahead, so the
+# unit rule consumes "[" runs together with the one char after them.
 TEMPLATE = r'''
 root    ::= refusal | claims
 refusal ::= "I don't know."
 claims  ::= claim (" " claim){0,3}
 claim   ::= text " [" ref "]"
 ref     ::= REFS
-text    ::= [^\[\]\n]+
+text    ::= unit+
+unit    ::= [^\[\]\n] | "["+ [^1-9\[\n] | "]"
 '''
 
 
