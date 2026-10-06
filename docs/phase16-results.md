@@ -314,7 +314,7 @@ itself.
 Both clear the size of rule 1 (net >= +8) and fail its significance (p < 0.05). Both leave abstention
 and the clean group untouched, which is what the phase 15 arms could not do under the open-domain
 pool: knowing the domain removes the abstention cost. Matched-abstention replays equal the plain
-numbers, since abstention did not move. About a third of each arm's gains come from question families
+numbers, since abstention did not move. Between a third and a half of each arm's gains come from question families
 with five or six variants (`e25`, `e07`, `e43`), so the rows are not independent and the sign test is
 generous, not harsh. Neither arm becomes the `asq.el` setting on this evidence; both are candidates
 for a larger Emacs set, which does not exist yet (the realistic Emacs screen has 80 rows).
