@@ -80,6 +80,63 @@ def quoted_answer(n_extracts: int) -> str:
     return QUOTE_TEMPLATE.replace("REFS", refs).strip() + "\n"
 
 
+# Line mode (tsk_20261006_linemode). Quote mode lost correct answers because the
+# 4B mis-copied its own quotes and every miscopy became a refusal. Here the
+# grammar lists each extract's actual lines as literal alternatives, so a
+# miscopy is impossible and the model only has to choose a line. A real line can
+# still be the wrong line: this fixes the copying, not the choosing. One claim
+# per answer, and one rule pair per extract, so the quoted line and the closing
+# citation number cannot disagree.
+LINE_TEMPLATE = r'''
+root    ::= refusal | claim
+refusal ::= "I don't know."
+claim   ::= CLAIMS
+text    ::= [^\[\]\n]+
+'''
+
+
+def extract_lines(chunk: dict, max_lines: int = 40, max_len: int = 160) -> list[str]:
+    """The usable lines of chunk["text"] (never chunk["prefix"]): stripped,
+    at least 4 characters, cut at max_len, first occurrence only, in order."""
+    out: list[str] = []
+    for raw in chunk["text"].split("\n"):
+        line = raw.strip()
+        if len(line) < 4:
+            continue
+        line = line[:max_len]
+        if line in out:
+            continue
+        out.append(line)
+        if len(out) >= max_lines:
+            break
+    return out
+
+
+def gbnf_literal(s: str) -> str:
+    """A GBNF string literal: backslash and double quote escaped, control
+    characters replaced by a space, everything else (non-ASCII too) kept."""
+    s = "".join(" " if ord(c) < 32 else c for c in s)
+    return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def line_answer(extracts: list[dict]) -> str:
+    """Grammar admitting only the refusal, or one claim `"<line>" <text> [<n>]`
+    whose <line> is one of extract n's own lines. Extracts without a line get
+    no alternative; with none at all the grammar is the refusal alone."""
+    ids, rules = [], []
+    for n, chunk in enumerate(extracts[:9], 1):
+        lines = extract_lines(chunk)
+        if not lines:
+            continue
+        ids.append(n)
+        rules.append(f'claim{n} ::= "\\"" line{n} "\\" " text " [{n}]"')
+        rules.append(f"line{n} ::= " + " | ".join(gbnf_literal(l) for l in lines))
+    if not ids:
+        return 'root    ::= refusal\nrefusal ::= "I don\'t know."\n'
+    g = LINE_TEMPLATE.replace("CLAIMS", " | ".join(f"claim{n}" for n in ids))
+    return g.strip() + "\n" + "\n".join(rules) + "\n"
+
+
 CITE_RE = re.compile(r"\[([1-9])\]")
 
 

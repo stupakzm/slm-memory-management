@@ -191,12 +191,13 @@ def main() -> int:
                     help="cap how many of the read hits may come from one doc_id, so "
                          "other documents' evidence is not crowded out (0 = off; "
                          "tsk_20260926_0967344e)")
-    ap.add_argument("--answer-mode", choices=("cite", "quote"), default="cite",
+    ap.add_argument("--answer-mode", choices=("cite", "quote", "line"), default="cite",
                     help="phase 10: 'quote' requires each claim to open with an exact "
                          "quotation from the extract it cites, verified after generation "
                          "(grammar.verify_quotes); a failed quote converts the record to "
-                         "the refusal before scoring. 'cite' (default) reproduces existing "
-                         "runs exactly.")
+                         "the refusal before scoring. 'line' restricts the opening quotation "
+                         "to a real line of the cited extract by grammar (no verification "
+                         "needed). 'cite' (default) reproduces existing runs exactly.")
     ap.add_argument("--qids", default=None,
                     help="path to a JSON list of qids; restricts rows to those qids, kept "
                          "in the eval set's own order, applied after --limit")
@@ -271,13 +272,13 @@ def main() -> int:
         print("--read-order reverse does not compose with --cascade", file=sys.stderr)
         return 2
 
-    if args.reader_prompt == "v2" and args.answer_mode == "quote":
-        print("--reader-prompt v2 does not compose with --answer-mode quote "
-              "(quote mode is v1 only)", file=sys.stderr)
+    if args.reader_prompt == "v2" and args.answer_mode in ("quote", "line"):
+        print("--reader-prompt v2 does not compose with --answer-mode quote or line "
+              "(quote and line modes are v1 only)", file=sys.stderr)
         return 2
-    if args.reader_prompt == "v3" and args.answer_mode == "quote":
-        print("--reader-prompt v3 does not compose with --answer-mode quote "
-              "(quote mode is v1 only)", file=sys.stderr)
+    if args.reader_prompt == "v3" and args.answer_mode in ("quote", "line"):
+        print("--reader-prompt v3 does not compose with --answer-mode quote or line "
+              "(quote and line modes are v1 only)", file=sys.stderr)
         return 2
 
     if (args.route == "floor") != (args.floor is not None):
@@ -466,6 +467,8 @@ def main() -> int:
             text = grammar.REFUSAL
         elif args.answer_mode == "quote":
             text = gen.answer(qtext, hits, mode="quote")
+        elif args.answer_mode == "line":
+            text = gen.answer(qtext, hits, mode="line")
         else:
             text = gen.answer(qtext, hits, cite_grammar=args.grammar, **rp_kw)
 
@@ -696,6 +699,8 @@ def run_cascade_eval(args, rows: list, qid_aliases: dict, normalized: dict,
             ph = read_view(raw_hits)
             if args.answer_mode == "quote":
                 return gen.answer(q, ph, mode="quote")
+            if args.answer_mode == "line":
+                return gen.answer(q, ph, mode="line")
             return gen.answer(q, ph, cite_grammar=args.grammar,
                               **({"reader_prompt": args.reader_prompt}
                                  if args.reader_prompt != "v1" else {}))
