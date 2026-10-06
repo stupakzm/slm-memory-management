@@ -362,3 +362,9 @@ Control `p15-ctl`, same retrieval, setting C, 883 answerable and 277 unanswerabl
   rule:** among 148 rows replaced, the 4B answers 7 unanswerable questions it had refused. The threshold
   0.9 was the only one pre-registered, so no other value is tried; a higher threshold is the obvious
   next knob and needs its own pre-registration.
+
+**G5b, line-id** (`--answer-mode line-id`): net -282, 296 lost and 14 gained, clean group net -55
+(registry entry chk_098); worse than G5. Read the answers: the grammar forces a quoted line even when no
+extract answers (`"--column" I don't know. [1]`), and the 4B still often picks a line from the
+wrong extract. A real line is no better than a copied one when the choice is the weak step. **Idea 7
+is closed; no further variation.**
