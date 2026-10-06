@@ -23,7 +23,9 @@ OPERATING POINT  the target is the number of unanswerable fit rows the
        control refuses under its own plain gate; each run's threshold t is the
        lowest candidate at which its fit-split unanswerable refusals (stored
        abstained or p < t) reach the target. A row with no hits is never
-       fitted and always refused.
+       fitted and always refused. The baseline a calibrated gate has to beat is
+       the top-1-only gate: the same threshold search over the raw top-1
+       feature instead of the model's probability, with the same target.
 
 Correctness is recomputed by screen_report.score_run (imported, never
 re-implemented). --json writes the same numbers plus the model and the
@@ -205,6 +207,14 @@ def fit_run(run: dict, feats: dict, eval_rows: dict, target: int) -> dict:
             "calibrated": replay(run, probs, t)}
 
 
+def top1_run(run: dict, feats: dict, eval_rows: dict, target: int) -> dict:
+    """The top-1-only gate: threshold the top1 feature, tuned to the same fit-row target."""
+    probs = {q: (feats[q][0] if feats[q] is not None else None) for q in run}
+    una = [q for q in run if split_of(eval_rows[q]) == "fit" and not run[q]["answerable"]]
+    t, reachable = choose_threshold([(probs[q], run[q]["abstained"]) for q in una], target)
+    return {"threshold": t, "reachable": reachable, "replayed": replay(run, probs, t)}
+
+
 # --------------------------------------------------------------------------
 # io and report
 # --------------------------------------------------------------------------
@@ -264,6 +274,12 @@ def main(argv=None, results_dir=None) -> int:
         return 2
 
     qids = sorted(ctl)
+    caches = {n: json.loads(cache_path[n].read_text()) for n in names}
+    missing = [(n, q) for n in names for q in sorted(runs[n]) if q not in caches[n]]
+    for n, q in missing:
+        print(f"{cache_path[n]}: qid {q} has no entry", file=sys.stderr)
+    if missing:
+        return 2
     fit_q = [q for q in qids if split_of(eval_rows[q]) == "fit"]
     held_q = [q for q in qids if split_of(eval_rows[q]) == "held"]
     fit_s, held_s = sr.summarize(subset(ctl, fit_q)), sr.summarize(subset(ctl, held_q))
@@ -279,7 +295,7 @@ def main(argv=None, results_dir=None) -> int:
     out = {"split_rule": SPLIT_RULE, "features": list(FEATURES), "control": ctl_name,
            "target": target, "runs": {}}
     for n, c in specs:
-        cache = json.loads(cache_path[n].read_text())
+        cache = caches[n]
         feats = {q: features(cache.get(q), eval_rows[q].get("question", ""), vocab)
                  for q in qids}
         res = fit_run(runs[n], feats, eval_rows, target)
@@ -295,16 +311,27 @@ def main(argv=None, results_dir=None) -> int:
                  "reachable": res["reachable"],
                  "fit": {"refused": fs["abstained"], "unanswerable": fs["unanswerable"],
                          "correct": fs["correct"], "answerable": fs["answerable"]}}
+        t1 = top1_run(runs[n], feats, eval_rows, target)
+        t1s = sr.summarize(subset(t1["replayed"], fit_q))
+        if not t1["reachable"]:
+            lines.append(f"{n} fit top1: target unreachable")
+        lines.append(f"{n} fit top1 threshold {t1['threshold']:.6f} refused "
+                     f"{t1s['abstained']}/{t1s['unanswerable']}")
+        t1_cmp = sr.compare(ctl_held, subset(t1["replayed"], held_q), *kw)
+        entry["top1_matched"] = {"threshold": t1["threshold"], "reachable": t1["reachable"],
+                                 "held": t1_cmp}
         cal_held = subset(cal, held_q)
         cal_cmp = sr.compare(ctl_held, cal_held, *kw)
         if n == ctl_name:
             lines.append(f"{n} held calibrated vs {ctl_name} plain: {sr._fields(cal_cmp)}")
             entry["held_calibrated"] = cal_cmp
+            lines.append(f"{n} held top1-matched vs {ctl_name} plain: {sr._fields(t1_cmp)}")
         else:
             plain_cmp = sr.compare(ctl_held, subset(runs[n], held_q), *kw)
             lines.append(f"{n} held plain vs {ctl_name}: {sr._fields(plain_cmp)}")
             lines.append(f"{n} held calibrated vs {ctl_name}: {sr._fields(cal_cmp)}")
             entry["held_plain"], entry["held_calibrated"] = plain_cmp, cal_cmp
+            lines.append(f"{n} held top1-matched vs {ctl_name}: {sr._fields(t1_cmp)}")
         out["runs"][n] = entry
     sys.stdout.write("\n".join(lines) + "\n")
 
