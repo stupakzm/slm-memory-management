@@ -334,12 +334,13 @@ def test_no_hits_row_is_always_refused():
     with tempfile.TemporaryDirectory() as tmp:
         cache = toy_cache()
         cache["t01"] = []
-        cache.pop("t02")  # a qid absent from the cache has no hits either
+        cache["t02"] = []
         ev, al, _ = write_world(tmp, caches={"ctl": cache})
         eval_rows = gf.sr.load_eval(ev)
         ctl = scored(tmp, ev, al, "ctl")
         feats = {q: gf.features(cache.get(q), "", None) for q in ctl}
         check(feats["t01"] is None and feats["t02"] is None, "no features")
+        check(gf.features(None, "", None) is None, "an entry of None has no features")
         res = gf.fit_run(ctl, feats, eval_rows, 0)
         for q in ("t01", "t02"):
             check(res["probs"][q] is None, "no probability")
@@ -434,6 +435,96 @@ def test_missing_cache_exits_2():
         check(code == 2 and "ctl-retrieved.json" in err, (code, err))
         code, out, err = run_main(tmp, ev, al, control="ghost", arms=())
         check(code == 2 and "ghost-answers.json" in err, (code, err))
+
+
+# --------------------------------------------------------------------------
+# top-1-only baseline and absent cache entries
+# --------------------------------------------------------------------------
+
+def _row(answerable, abstained, correct=False):
+    return {"correct": correct, "evidence": correct, "abstained": abstained,
+            "answerable": answerable, "top_score": 0.5}
+
+
+def test_top1_matched_uses_lowest_reaching_threshold():
+    ev_rows = {f"u{i}": {"qid": f"u{i}"} for i in range(40)}
+    fit = [q for q in ev_rows if gf.split_of(ev_rows[q]) == "fit"][:4]
+    check(len(fit) == 4, "fixture needs 4 fit rows")
+    run = {q: _row(False, False) for q in fit}
+    tops = dict(zip(fit, [0.2, 0.4, 0.6, 0.8]))
+    feats = {q: [tops[q], 0.0, 1.0, 0.0, tops[q], 0.0] for q in fit}
+    res = gf.top1_run(run, feats, ev_rows, 2)
+    check(res["reachable"] and close(res["threshold"], 0.4 + 1e-12, 1e-15), res["threshold"])
+    refused = sorted(q for q in fit if res["replayed"][q]["abstained"])
+    check(refused == sorted(q for q in fit if tops[q] < 0.4 + 1e-12) and len(refused) == 2,
+          refused)
+    res = gf.top1_run(run, feats, ev_rows, 9)
+    check(not res["reachable"] and close(res["threshold"], 0.8 + 1e-12, 1e-15), "unreachable")
+    run2 = {**run, fit[0]: _row(False, True)}  # a stored abstention counts toward the target
+    check(close(gf.top1_run(run2, feats, ev_rows, 1)["threshold"], 0.2 + 1e-12, 1e-15),
+          "stored abstentions count")
+    feats[fit[3]] = None  # a row with no hits is refused at any threshold
+    res = gf.top1_run(run, feats, ev_rows, 1)
+    check(res["replayed"][fit[3]]["abstained"], "no-hit row refused")
+
+
+def test_top1_matched_lines_format():
+    with tempfile.TemporaryDirectory() as tmp:
+        ev, al, _ = write_world(tmp)
+        js = Path(tmp) / "out.json"
+        code, out, err = run_main(tmp, ev, al, extra=["--json", str(js)])
+        check(code == 0, err)
+        lines = out.splitlines()
+        for name in ("ctl", "arm"):
+            check(any(re.fullmatch(rf"{name} fit top1 threshold \d+\.\d{{6}} refused \d+/\d+", l)
+                      for l in lines), f"{name} top1 fit line\n{out}")
+        check(any(re.fullmatch(rf"ctl held top1-matched vs ctl plain: {FIELDS}", l)
+                  for l in lines), f"control line\n{out}")
+        check(any(re.fullmatch(rf"arm held top1-matched vs ctl: {FIELDS}", l) for l in lines),
+              f"arm line\n{out}")
+        i = next(k for k, l in enumerate(lines) if l.startswith("arm held calibrated"))
+        check(lines[i + 1].startswith("arm held top1-matched"), "after the calibrated line")
+        d = json.loads(js.read_text())
+        for n in ("ctl", "arm"):
+            m = d["runs"][n]["top1_matched"]
+            check(isinstance(m["threshold"], float) and "held" in m, m)
+        # the arm's top-1 gate refuses the low-scoring unanswerable rows, as the toy requires
+        al_line = next(l for l in lines if l.startswith("arm held top1-matched"))
+        uh = int(re.search(r"held \d+ rows \(\d+ answerable, (\d+) unanswerable",
+                           lines[0]).group(1))
+        check(f"abstained {uh}/{uh}" in al_line, al_line)
+
+
+def test_top1_baseline_ignores_the_model():
+    with tempfile.TemporaryDirectory() as tmp:
+        ev, al, _ = write_world(tmp)
+        _, base, _ = run_main(tmp, ev, al)
+        real = gf.fit_logistic
+        try:
+            gf.fit_logistic = lambda Z, y: ([0.0] * 6, 0.0)
+            code, other, err = run_main(tmp, ev, al)
+        finally:
+            gf.fit_logistic = real
+        check(code == 0, err)
+        pick = [l for l in base.splitlines() if "top1" in l and "weights" not in l]
+        pick2 = [l for l in other.splitlines() if "top1" in l and "weights" not in l]
+        check(len(pick) == 4 and pick == pick2, (pick, pick2))
+        check(base != other, "the swapped model must change the calibrated output")
+
+
+def test_absent_cache_entry_exits_2():
+    with tempfile.TemporaryDirectory() as tmp:
+        cache = toy_cache()
+        cache.pop("t05")
+        ev, al, _ = write_world(tmp, caches={"ctl": cache})
+        code, out, err = run_main(tmp, ev, al)
+        check(code == 2, code)
+        check(f"{Path(tmp) / 'ctl-retrieved.json'}: qid t05 has no entry" in err, err)
+        check(out == "", "nothing printed to stdout")
+        cache["t05"] = []  # present but empty is a row with no hits, not an error
+        (Path(tmp) / "ctl-retrieved.json").write_text(json.dumps(cache))
+        code, out, err = run_main(tmp, ev, al)
+        check(code == 0, err)
 
 
 if __name__ == "__main__":
