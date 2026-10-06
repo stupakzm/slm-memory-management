@@ -335,3 +335,30 @@ out the line that holds the option (`-v, --invert-match`). **G5b**, `--answer-mo
 lines that name a flag, an Emacs key chord or an M-x command, so the chosen line carries the identifier.
 It is a variation of the same idea, tried once. Same control, rules and scoring as G5 (rules 1 to 4);
 no further variation follows whatever it shows.
+
+## Reader-side arms result (G4, G5, G6/S6; run 2026-10-06)
+
+Control `p15-ctl`, same retrieval, setting C, 883 answerable and 277 unanswerable rows.
+
+| arm | correct | lost | gained | net | p | clean net | abstention net | verdict |
+|---|---|---|---|---|---|---|---|---|
+| G3 extract repair | 558 | 32 | 26 | -6 | 0.51 | -3 | -2 | fails 1, 2, 3 [chk_088] |
+| G4 worked examples (`--reader-prompt v3`) | 588 | 29 | 53 | +24 | 0.011 | +3 | -6 | fails rule 3 [chk_091] |
+| G5 line mode | 309 | 272 | 17 | -255 | 2.6e-60 | -46 | +5 | fails rule 1 and 2 [chk_092] |
+| G6 `--read-k 2`, alone | 482 | 117 | 35 | -82 | 1.6e-11 | -20 | -4 | closed alone [chk_096] |
+| S6 second read: G6 on rows refused above 0.9 | 576 | 0 | 12 | +12 | 0.0005 | +2 | -7 | fails rule 3 [chk_097] |
+
+- **G4 is the strongest reader result of the phase and fails the same rule as the phase 15 reader
+  arm.** It gains answers broadly (terse +9, p 0.023; Emacs +14, p 0.0066) and loses abstention: six
+  more unanswerable rows are answered. At the control's abstention (gate 0.8445) its net is -5, so the
+  gain comes from letting more rows through, not from reading them better. Worked examples do
+  what the one-sentence prompt of phase 15 did, only more strongly. Under an explicit domain, where
+  the dom arms showed that abstention cost vanishes, the arm might pass; that is a separate
+  pre-registration, not a reading of this table.
+- **G5 closes line mode.** The answers show the 4B choosing a description sentence and leaving out the
+  line that holds the option (`-v, --invert-match`). It costs +0.1 s per question, so the grammar's
+  size is not the problem; the choice is. G5b below tries lines that carry an identifier, once.
+- **S6, the second read, gains 12 answers and loses none (p 0.0005), and fails only the abstention
+  rule:** among 148 rows replaced, the 4B answers 7 unanswerable questions it had refused. The threshold
+  0.9 was the only one pre-registered, so no other value is tried; a higher threshold is the obvious
+  next knob and needs its own pre-registration.
