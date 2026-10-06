@@ -131,3 +131,37 @@ the target. What the table shows:
 - The model sorts rows better than the top-1 score alone for `p15-r13` (+6 over top-1 matched,
   same abstention), and not elsewhere. One arm is a hint, not a result.
 - The replay can only add refusals. A gate looser than 0.65 needs a live run.
+
+## Generation-only arms pre-registration (written 2026-10-06, before any arm is generated)
+
+Plan ideas 4 and 5. Retrieval, embeddings, reranker scores and the gate are byte-identical across
+all arms: every arm reads the control's cached retrieval (`p13-ctl`, identical to `p15-ctlr` on all
+1160 rows) and differs only in what the reader is shown. Any abstention change can therefore come only
+from the reader.
+
+**Control.** `p15-ctl` (setting C, `SMM_GEN_ARGS="--parallel 1 --no-cache-prompt --cache-ram 0"`,
+`SMM_GEN_PORT=8090`). The control is not regenerated: phase 15 showed its generation holds across days
+[chk_025], and arms are generated on the same day under the same setting.
+
+**Arms (one mechanism each, never combined here).**
+- **G1, fewer extracts:** `--read-k 3`. The reader sees the top 3 of the cached 5.
+- **G2, reversed order:** `--read-order reverse` (task `tsk_20261006_readorder`). The reader sees all
+  5 extracts, best last, i.e. nearest the question; citation numbers map to the reversed list.
+- **G3, idea 4 (extract repair) and G4, idea 6 (worked examples in the reader prompt):** not built
+  yet. Each needs its own build and its own pre-registration section, written before its run.
+
+**Scoring.** `scripts/screen_report.py` with the five eval files, `--aliases
+data/eval/gold_aliases_v2.json`, `--group variant_kind --group-default clean` and `--group domain
+--group-default linux`.
+
+**Decision rule, per arm** (phase 15's R14 rule, kept unchanged so results compare):
+1. **Answers rise:** all 883 answerable rows net >= +8, sign test p < 0.05.
+2. **Clean unharmed:** clean group net >= -2.
+3. **No new invention:** abstention net over 277 unanswerable rows >= -1.
+
+Failing 2 or 3 means no ship. Passing 1 with p >= 0.05 is "direction only". A pass is a candidate
+default, not a ship: it still needs a confirmation arm on the realistic Emacs screen.
+
+**Known limit, stated now.** Phase 8 found about half the changed outcomes flipped only because the
+extracts' order changed, so rule 1 needs a net gain, not churn. G1 removes information (extracts 4
+and 5); if the evidence is in extract 4 or 5 the arm loses that row, and its `lost` list says so.
