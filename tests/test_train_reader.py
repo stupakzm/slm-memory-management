@@ -9,6 +9,7 @@ checkpoint save/load, generation, save_merged, and the real tokenizer's chat tem
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import importlib.util
 import json
@@ -334,6 +335,99 @@ def test_read_examples_validates():
                 check(False, f"should reject {bad}")
             except ValueError:
                 pass
+
+
+def _required():
+    return ["--data", "d.jsonl", "--out", "o"]
+
+
+def test_pick_dtype_bf16_when_supported_else_error():
+    check(tr.pick_dtype("bf16", True) == {"dtype": "bfloat16", "scaler": False}, "bf16 path")
+    try:
+        tr.pick_dtype("bf16", False)
+        check(False, "bf16 on a GPU without it must be refused")
+    except SystemExit as e:
+        check("--precision fp16" in str(e), f"the message must name the way out: {e}")
+    for bad in ("fp32", "", "bfloat16"):
+        try:
+            tr.pick_dtype(bad, True)
+            check(False, f"{bad!r} is not a precision")
+        except SystemExit:
+            pass
+
+
+def test_pick_dtype_fp16_uses_loss_scaler():
+    want = {"dtype": "float16", "scaler": True}
+    check(tr.pick_dtype("fp16", False) == want, "fp16 does not need bf16 support")
+    check(tr.pick_dtype("fp16", True) == want, "and is the same where bf16 exists")
+    check(tr.pick_dtype("bf16", True)["scaler"] is False, "bf16 has no scaler")
+
+
+def test_defaults_keep_bf16_no_4bit():
+    a = tr.parse_args(_required())
+    check(a.precision == "bf16" and a.load_in_4bit is False and a.merge_device == "same", vars(a))
+    check(tr.pick_dtype(a.precision, True) == {"dtype": "bfloat16", "scaler": False}, "bfloat16, no scaler")
+    check(tr.merge_plan(a.load_in_4bit, a.merge_device)["reload_base"] is False, "merges in place")
+    tr.validate_args(a)  # the defaults are a valid combination
+    import inspect
+    check(inspect.signature(tr.load_model).parameters["dtype_name"].default == "bfloat16"
+          and inspect.signature(tr.load_model).parameters["load_in_4bit"].default is False,
+          "load_model defaults to the old bf16, 16-bit load")
+
+
+def test_four_bit_config_arguments():
+    for name in ("float16", "bfloat16"):
+        check(tr.four_bit_config_arguments(name) == {
+            "load_in_4bit": True, "bnb_4bit_quant_type": "nf4",
+            "bnb_4bit_use_double_quant": True, "bnb_4bit_compute_dtype": name}, name)
+
+
+def test_four_bit_requires_cuda_and_rejects_bf16_unsupported_combo():
+    ok = tr.parse_args(_required() + ["--load-in-4bit"])
+    tr.validate_args(ok)  # device defaults to cuda
+    cpu = tr.parse_args(_required() + ["--load-in-4bit", "--device", "cpu"])
+    try:
+        tr.validate_args(cpu)
+        check(False, "4-bit on the CPU must be refused")
+    except SystemExit as e:
+        check("--device cuda" in str(e), str(e))
+    tr.validate_args(tr.parse_args(_required() + ["--device", "cpu"]))  # plain CPU run is not 4-bit
+    # the default --precision bf16 on a card without it is refused even with 4-bit on
+    try:
+        tr.pick_dtype(ok.precision, False)
+        check(False, "4-bit + default bf16 on a T4 must tell the user to pick fp16")
+    except SystemExit as e:
+        check("fp16" in str(e), str(e))
+    check(tr.pick_dtype("fp16", False)["dtype"] == "float16", "4-bit + fp16 on a T4 is fine")
+
+
+def test_merge_device_cpu_plan():
+    cpu = {"merge_on": "cpu", "base_dtype": "float16", "reload_base": True}
+    check(tr.merge_plan(True, "same") == cpu, "4-bit never merges into quantised weights")
+    check(tr.merge_plan(True, "cpu") == cpu, "4-bit with cpu")
+    check(tr.merge_plan(False, "cpu") == cpu, "--merge-device cpu reloads a float16 base on the CPU")
+    same = tr.merge_plan(False, "same")
+    check(same["merge_on"] == "same" and same["reload_base"] is False and same["base_dtype"] is None, same)
+    try:
+        tr.merge_plan(False, "gpu")
+        check(False, "unknown merge device")
+    except ValueError:
+        pass
+
+
+def test_parse_args_new_flags():
+    a = tr.parse_args(_required() + ["--precision", "fp16", "--load-in-4bit", "--merge-device", "cpu"])
+    check(a.precision == "fp16" and a.load_in_4bit is True and a.merge_device == "cpu", vars(a))
+    for bad in (["--precision", "fp32"], ["--merge-device", "gpu"]):
+        try:
+            with open("/dev/null", "w") as devnull, contextlib.redirect_stderr(devnull):
+                tr.parse_args(_required() + bad)
+            check(False, f"{bad} should be refused")
+        except SystemExit as e:
+            check(e.code == 2, e.code)
+    # the existing flags are untouched
+    a = tr.parse_args(_required() + ["--resume", "--stop-after-s", "10000", "--max-len", "2048"])
+    check(a.resume and a.stop_after_s == 10000 and a.max_len == 2048 and a.grad_accum == 16, vars(a))
 
 
 if __name__ == "__main__":

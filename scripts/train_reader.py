@@ -19,6 +19,9 @@ inside the functions that train, so `import train_reader` works without either.
   ... --resume --stop-after-s 6600     # under a job cap: finish the step, save, exit 0, re-run
   ... --eval-only --out /tmp/base-eval # dev loss + refusal P/R of the untouched base model
   ... --merge-only --out data/reader/r1  # re-merge adapter.pt into merged/ (no training)
+  ... --precision fp16                 # GPUs without bf16 (Colab/Kaggle T4, P100): fp16 + loss scaler
+  ... --load-in-4bit                   # QLoRA: 4-bit base, same hand-written LoRA (small GPUs)
+  ... --merge-device cpu               # merge into a float16 base on the CPU (always so under 4-bit)
   python llama.cpp/convert_hf_to_gguf.py data/reader/r1/merged --outtype q8_0
 
 One optimizer step = --grad-accum micro-batches of ONE example each (no padding); the
@@ -33,7 +36,9 @@ WHAT HAS BEEN RUN, AND WHAT HAS NOT. Written where there is no torch, no weights
 GPU. Run (tests/test_train_reader.py, stdlib only, a fake tokenizer): the pure parts -
 the dev split, the prompt/answer boundary and loss mask, the length drop, the refusal
 rule and metrics, LoRA target selection, the step plan and schedule, resume state, and
-the time-cap control flow with a fake trainer. NOT RUN, read twice but never executed: load_model,
+the time-cap control flow with a fake trainer, and the pure free-hardware helpers (pick_dtype,
+four_bit_config_arguments, merge_plan, validate_args, the new flags). NOT RUN, read twice but never
+executed: the fp16 loss-scaler step, the 4-bit load (bitsandbytes), the CPU merge, load_model,
 the LoRA wrapper and its merge, the loss on the real model, gradient checkpointing, the
 optimizer, checkpoint save/load, greedy generation, save_merged, and the real tokenizer's
 chat template (Qwen's renders an assistant turn as `<|im_start|>assistant\\n...<|im_end|>\\n`;
@@ -232,6 +237,42 @@ def load_resume_state(path, data_sha256: str, plan: dict) -> dict:
     return state
 
 
+def pick_dtype(precision: str, bf16_supported: bool) -> dict:
+    """{"dtype": torch dtype name, "scaler": use a loss scaler}. bf16 on a GPU without it is
+    refused (it would run emulated, slowly); fp16 needs the scaler to keep small gradients."""
+    if precision == "bf16":
+        if not bf16_supported:
+            raise SystemExit("this GPU has no bfloat16: re-run with --precision fp16")
+        return {"dtype": "bfloat16", "scaler": False}
+    if precision == "fp16":
+        return {"dtype": "float16", "scaler": True}
+    raise SystemExit(f"--precision must be bf16 or fp16, not {precision!r}")
+
+
+def four_bit_config_arguments(dtype_name: str) -> dict:
+    """The kwargs for transformers.BitsAndBytesConfig (QLoRA: NF4, double quantisation);
+    the compute dtype is the chosen training dtype, as its name (transformers resolves it)."""
+    return {"load_in_4bit": True, "bnb_4bit_quant_type": "nf4",
+            "bnb_4bit_use_double_quant": True, "bnb_4bit_compute_dtype": dtype_name}
+
+
+def merge_plan(load_in_4bit: bool, merge_device: str) -> dict:
+    """Where the adapter is merged. Never into 4-bit weights: under --load-in-4bit (and with
+    --merge-device cpu) the base is reloaded in float16 on the CPU. Otherwise it is merged
+    into the model already in memory, as before (base_dtype None: the dtype it was loaded in)."""
+    if merge_device not in ("same", "cpu"):
+        raise ValueError(f"merge_device must be same or cpu, not {merge_device!r}")
+    if load_in_4bit or merge_device == "cpu":
+        return {"merge_on": "cpu", "base_dtype": "float16", "reload_base": True}
+    return {"merge_on": "same", "base_dtype": None, "reload_base": False}
+
+
+def validate_args(args) -> None:
+    """Combinations that cannot work, refused before anything is loaded."""
+    if args.load_in_4bit and args.device != "cuda":
+        raise SystemExit("--load-in-4bit needs a GPU: it requires --device cuda")
+
+
 def train_loop(trainer, start: int, total: int, *, stop_after_s: float = 0,
                clock=time.monotonic, log=print) -> dict:
     """Run steps start..total-1 on `trainer` (.step(i) -> loss, .save(step), .checkpoint(step)
@@ -266,12 +307,27 @@ def load_tokenizer(model_dir: str):
     return AutoTokenizer.from_pretrained(model_dir)
 
 
-def load_model(model_dir: str, device: str):
+def load_model(model_dir: str, device: str, dtype_name: str = "bfloat16", load_in_4bit: bool = False):
     import torch
     from transformers import AutoModelForCausalLM
-    model = AutoModelForCausalLM.from_pretrained(model_dir, torch_dtype=torch.bfloat16).to(device)
+    dtype = getattr(torch, dtype_name)
+    if load_in_4bit:
+        from transformers import BitsAndBytesConfig
+        model = AutoModelForCausalLM.from_pretrained(
+            model_dir, torch_dtype=dtype, device_map={"": 0},
+            quantization_config=BitsAndBytesConfig(**four_bit_config_arguments(dtype_name)))
+        model.enable_input_require_grads()
+    else:
+        model = AutoModelForCausalLM.from_pretrained(model_dir, torch_dtype=dtype).to(device)
     model.config.use_cache = False
     return model
+
+
+def bf16_supported(device: str) -> bool:
+    """Native bf16 needs compute capability 8+ (Ampere); torch's own check also says yes for
+    emulation on a T4, which is slow. A CPU run has no such limit."""
+    import torch
+    return not device.startswith("cuda") or torch.cuda.get_device_capability(device)[0] >= 8
 
 
 def _make_lora_cls():
@@ -417,7 +473,8 @@ def evaluate(model, tok, dev, args) -> dict:
 class TorchTrainer:
     """Adapts the real model to train_loop: .step(i), .save(step), .checkpoint(step)."""
 
-    def __init__(self, model, tok, train, dev, plan_idx, plan, data_sha, out: Path, args):
+    def __init__(self, model, tok, train, dev, plan_idx, plan, data_sha, out: Path, args,
+                 use_scaler: bool = False):
         import torch
         self.model, self.tok, self.train, self.dev = model, tok, train, dev
         self.plan_idx, self.plan, self.data_sha, self.out, self.args = plan_idx, plan, data_sha, out, args
@@ -425,6 +482,7 @@ class TorchTrainer:
         total = len(plan_idx)
         self.opt = torch.optim.AdamW(self.params, lr=args.lr, weight_decay=0.0)
         self.sched = torch.optim.lr_scheduler.LambdaLR(self.opt, lambda s: lr_factor(s, total))
+        self.scaler = torch.cuda.amp.GradScaler() if use_scaler else None  # fp16 only
         self.dev_curve: list[list] = []
 
     def checkpoint(self, step: int) -> bool:
@@ -437,10 +495,17 @@ class TorchTrainer:
         total = 0.0
         for j in idxs:
             s, _ = answer_loss_sum(self.model, self.train[j], self.args.device)
-            (s / n_tok).backward()  # each token weighs 1 / (tokens in this step)
+            loss = s / n_tok  # each token weighs 1 / (tokens in this step)
+            (self.scaler.scale(loss) if self.scaler else loss).backward()
             total += s.item()
+        if self.scaler:
+            self.scaler.unscale_(self.opt)  # clip the true gradients, not the scaled ones
         torch.nn.utils.clip_grad_norm_(self.params, self.args.max_grad_norm)
-        self.opt.step()
+        if self.scaler:
+            self.scaler.step(self.opt)  # skipped when the scaled gradients overflowed
+            self.scaler.update()
+        else:
+            self.opt.step()
         self.sched.step()
         self.opt.zero_grad(set_to_none=True)
         done = i + 1
@@ -456,6 +521,7 @@ class TorchTrainer:
         lora = {n: p.detach().cpu() for n, p in lora_params(self.model).items()}
         state = {"lora": lora, "optimizer": self.opt.state_dict(),
                  "scheduler": self.sched.state_dict(), "step": step,
+                 "scaler": self.scaler.state_dict() if self.scaler else None,
                  "rng": {"python": random.getstate(), "torch": torch.get_rng_state(),
                          "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None}}
         for name, obj in (("ckpt.pt", state), ("adapter.pt", lora)):
@@ -478,6 +544,8 @@ class TorchTrainer:
                 p.copy_(state["lora"][n].to(p.device))
         self.opt.load_state_dict(state["optimizer"])
         self.sched.load_state_dict(state["scheduler"])
+        if self.scaler and state.get("scaler"):
+            self.scaler.load_state_dict(state["scaler"])
         random.setstate(state["rng"]["python"])
         torch.set_rng_state(state["rng"]["torch"].cpu())
         if state["rng"]["cuda"] is not None and torch.cuda.is_available():
@@ -493,6 +561,18 @@ def save_merged(model, tok, model_dir: str, out_dir: Path) -> None:
     for name in BASE_SIDE_FILES:
         if (Path(model_dir) / name).exists():
             shutil.copy2(Path(model_dir) / name, out_dir / name)
+
+
+def merge_reloaded(args, tok, model_dir: str, out: Path, plan: dict) -> int:
+    """Merge --out/adapter.pt into a fresh copy of the base loaded on the CPU in plan's
+    base_dtype (float16), then save_merged. The copy in GPU memory (possibly 4-bit) is not
+    touched. Returns the number of merged modules."""
+    model = load_model(model_dir, "cpu", plan["base_dtype"])
+    apply_lora(model, args.lora_rank, args.lora_alpha, args.lora_dropout)
+    load_adapter(model, out / "adapter.pt")
+    merged = merge_lora(model)
+    save_merged(model, tok, model_dir, out / "merged")
+    return merged
 
 
 # ---------------------------------------------------------------------------
@@ -531,6 +611,12 @@ def parse_args(argv=None):
                     help="dev loss and refusal P/R of the untouched base model; no training")
     ap.add_argument("--merge-only", action="store_true",
                     help="merge --out/adapter.pt into --out/merged; no training")
+    ap.add_argument("--precision", choices=("bf16", "fp16"), default="bf16",
+                    help="bf16 (Ampere+) or fp16 with a loss scaler (T4, P100)")
+    ap.add_argument("--load-in-4bit", action="store_true",
+                    help="QLoRA: load the base in 4-bit (needs --device cuda); merges on the CPU")
+    ap.add_argument("--merge-device", choices=("same", "cpu"), default="same",
+                    help="cpu: merge into a float16 base reloaded on the CPU")
     return ap.parse_args(argv)
 
 
@@ -543,6 +629,8 @@ def main(argv=None) -> int:
     if args.eval_only and args.merge_only:
         print("--eval-only and --merge-only are exclusive", file=sys.stderr)
         return 2
+    validate_args(args)
+    mplan = merge_plan(args.load_in_4bit, args.merge_device)
     data_path = ROOT / args.data
     out = ROOT / args.out
     model_dir = str(ROOT / args.model_dir)
@@ -576,8 +664,15 @@ def main(argv=None) -> int:
                        "dropped_ids": data["dropped"][:50], "steps": plan["total_steps"]})
 
     import torch
-    model = load_model(model_dir, args.device)
     t_start = time.monotonic()
+    if args.merge_only and mplan["reload_base"]:
+        merged = merge_reloaded(args, tok, model_dir, out, mplan)
+        log.update(mode="merge-only", merged_modules=merged)
+        write_json(log_path, log)
+        print(f"merged {merged} modules on the CPU -> {out / 'merged'}", flush=True)
+        return 0
+    dt = pick_dtype(args.precision, bf16_supported(args.device))
+    model = load_model(model_dir, args.device, dt["dtype"], args.load_in_4bit)
 
     if args.eval_only:
         model.eval()
@@ -602,7 +697,8 @@ def main(argv=None) -> int:
 
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.train()
-    trainer = TorchTrainer(model, tok, train, dev, plan_idx, plan, data_sha, out, args)
+    trainer = TorchTrainer(model, tok, train, dev, plan_idx, plan, data_sha, out, args,
+                           use_scaler=dt["scaler"])
     print(f"{plan['total_steps']} steps x up to {args.grad_accum} examples; {n_wrapped} LoRA modules, "
           f"{sum(p.numel() for p in trainer.params):,} trainable parameters", flush=True)
 
@@ -638,8 +734,15 @@ def main(argv=None) -> int:
     trainer.save(result["step"])
     log["dev_after"] = evaluate(model, tok, dev, args)
     print("dev (after):", log["dev_after"], flush=True)
-    merged = merge_lora(model)
-    save_merged(model, tok, model_dir, out / "merged")
+    if mplan["reload_base"]:
+        import gc
+        del trainer, model  # free the GPU (and the 4-bit weights) before the CPU merge
+        gc.collect()
+        torch.cuda.empty_cache()
+        merged = merge_reloaded(args, tok, model_dir, out, mplan)
+    else:
+        merged = merge_lora(model)
+        save_merged(model, tok, model_dir, out / "merged")
     log.update(status="complete", merged_modules=merged)
     write_json(log_path, log)
     print(f"merged {merged} modules -> {out / 'merged'}", flush=True)
