@@ -141,7 +141,7 @@ from the reader.
 
 **Control.** `p15-ctl` (setting C, `SMM_GEN_ARGS="--parallel 1 --no-cache-prompt --cache-ram 0"`,
 `SMM_GEN_PORT=8090`). The control is not regenerated: phase 15 showed its generation holds across days
-[chk_025], and arms are generated on the same day under the same setting.
+(p13-ctl against p15-ctl), and arms are generated on the same day under the same setting.
 
 **Arms (one mechanism each, never combined here).**
 - **G1, fewer extracts:** `--read-k 3`. The reader sees the top 3 of the cached 5.
