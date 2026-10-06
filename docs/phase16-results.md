@@ -203,3 +203,41 @@ abstained [chk_057].
 | 4 extract repair | pre-registration pending its build |
 | 5 order and count | G1 closed, G2 closed |
 | 6-17 | not started |
+
+## msr_p16-disagree result (idea 9, offline half)
+
+`scripts/order_disagreement.py` compares `p15-ctl` (extracts in rank order) with `p16-g2` (the same
+extracts reversed) on the 750 rows `p15-ctl` answered. Refusing every row whose two answers differ
+(different identifiers, or, when neither names one, different text) would lose 280 of 564 correct
+answers to catch 124 of 163 wrong ones and 19 of 23 unanswerable questions [chk_066]. That is two
+correct answers lost per wrong one caught, so asking twice and refusing on disagreement is closed. A
+looser definition (identifiers only, ignoring wording) is an inline, unverified draft that gave 138
+correct lost against 58 wrong and 9 unanswerable caught, the same ratio; it is kept out of the
+decision. The rule was not written before this run; the ratio fails any bar I would have set, so
+the order of events does not change the verdict.
+
+## msr_p16-dom pre-registration (idea 11, written 2026-10-06, before any run)
+
+**Question.** Under an explicit domain (`--domain emacs`, the `asq.el` path), do the Emacs settings
+that gained answers in phase 15 - the neutral embedder instruction (R14a) and the fine-tuned embedder
+(R13) - gain them there too? With the domain given, the Emacs settings cannot cost man pages anything,
+so only Emacs rows are measured.
+
+**Rows.** The 432 Emacs rows of the pool (324 answerable, 108 unanswerable), listed in
+`data/eval/results/p16-emacs-qids.json`, retrieved with `--domain emacs`.
+
+**Arms, all the same shape (a 432-row subset run, since subset runs drift against full runs).**
+- **control:** index `phase11.db`, default embedder instruction, `--domain emacs`.
+- **A, instruction:** same, `--embed-task neutral`.
+- **B, fine-tuned embedder:** `data/index/phase15-ft.db` with the fine-tuned query model, `--domain
+  emacs`, default instruction.
+Generation under setting C on each arm's own retrieval, gate 0.65.
+
+**Decision rule per arm, on the 324 answerable Emacs rows:**
+1. net >= +8, sign test p < 0.05;
+2. clean group net >= -2;
+3. abstention net over the 108 unanswerable rows >= -1.
+An arm passing 1 and 2 but failing 3 is judged again at matched abstention (`screen_report.py
+--match-abstention`): it is a candidate with a recalibrated gate iff matched net >= +8.
+Anything else is closed. A passing arm becomes the `asq.el` setting only after a confirmation on the
+realistic Emacs screen (`data/eval/realistic_emacs.jsonl`), pre-registered separately.
