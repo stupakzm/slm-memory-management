@@ -241,3 +241,32 @@ An arm passing 1 and 2 but failing 3 is judged again at matched abstention (`scr
 --match-abstention`): it is a candidate with a recalibrated gate iff matched net >= +8.
 Anything else is closed. A passing arm becomes the `asq.el` setting only after a confirmation on the
 realistic Emacs screen (`data/eval/realistic_emacs.jsonl`), pre-registered separately.
+
+## Reader-side arms pre-registration (ideas 4, 6, 7, 10; written 2026-10-06, before any of these arms is generated)
+
+Same frame as the G1/G2 pre-registration above: every arm reads the control's cached retrieval
+(`p13-ctl`), is generated under setting C against the control `p15-ctl`, scored through
+`screen_report.py` on `gold_aliases_v2.json` with `--group variant_kind --group-default clean`. Rules, per
+arm, on all 883 answerable and 277 unanswerable rows:
+1. net >= +8 with sign-test p < 0.05;
+2. clean group net >= -2;
+3. abstention net >= -1.
+
+**Arms.**
+- **G3, extract repair** (`--read-view repaired`): the reader sees extracts whose window start is
+  completed from the previous window, with the option or heading line on top, and consecutive windows
+  merged. Evidence, the gate and the retrieved list are the original hits.
+- **G4, worked examples** (`--reader-prompt v3`): SYSTEM_V2 plus three worked examples built on manual
+  pages that are the gold page of no eval question (head, tee, nl, paste, basename, fold).
+- **G5, line mode** (`--answer-mode line`): the opening quotation must be an actual line of the cited
+  extract (a per-question grammar). Extra rule 4: mean generation seconds per question <= control + 0.5.
+  Judged on correctness, not support: a real line can be the wrong line.
+- **G6, second read** (idea 10): `--read-k 2` generated for all rows (`p16-g6`), then
+  `scripts/combine_answers.py` takes, for rows the control refused after the gate passed, with top score
+  >= 0.9, the `p16-g6` answer. Scored as the arm `p16-s6` against `p15-ctl`. Rule 3 is the limit on
+  new inventions: unanswerable rows above 0.9 that are answered count against it. The threshold 0.9 is
+  the only value tried.
+
+**Known limits.** G2 showed that reordering alone flips about 90 answers with net near zero, so rule 1
+needs a net gain, not churn. G4 adds about 500 prompt tokens: its abstention is watched. G5's grammar
+lists 75 to 150 literal lines per question; its sampling latency is measured, not assumed.
