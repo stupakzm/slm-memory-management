@@ -30,13 +30,16 @@ neither):
 
 ```bash
 .venv/bin/python scripts/build_raft_data.py plan     --work data/raft --questions data/index/qvec-emacs.json \
-    --questions data/index/qvec-linux.json --eval data/eval/questions.jsonl ... --n 2000
+    --questions data/index/qvec-linux.json --eval data/eval/questions.jsonl \
+    --eval data/eval/emacs_questions.jsonl --eval data/eval/variations_typo.jsonl \
+    --eval data/eval/variations_man.jsonl --eval data/eval/variations_emacs.jsonl --n 2000
 .venv/bin/python scripts/build_raft_data.py teach    --work data/raft --gen-url <the 30B llama-server URL>
 .venv/bin/python scripts/build_raft_data.py assemble --work data/raft
 ```
 
-Take the `--questions` and `--eval` lists from the docstring of `scripts/build_raft_data.py`; the
-`...` above stands for the remaining `--eval` files. The 30B teacher is local and takes about 8 s
+The two `--questions` files are the question caches the R13 embedder training used (`data/index/qvec-emacs.json`,
+`data/index/qvec-linux.json`); the five `--eval` files are the pool's eval sets, so no page that any of them
+treats as gold is trained on. The 30B teacher is local and takes about 8 s
 per example (an estimate from `todays-plan.md`, not a fresh measurement). Size the pilot at 1,500 to
 2,000 examples: that is about 3.5 to 4.5 hours of local GPU for `teach`. The output is
 `data/raft/train.jsonl`. Upload it (Google Drive for Colab, a private Kaggle dataset for Kaggle).
