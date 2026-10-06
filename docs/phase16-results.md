@@ -298,3 +298,31 @@ Rule 4 is speed: mean retrieval seconds per question <= control + 0.5.
 Each is one arm of one mechanism and none is combined with another here. Passing is a candidate, not a
 ship: the realistic Emacs screen (`data/eval/realistic_emacs.jsonl`) and a man-page cost check come
 before any default changes.
+
+## msr_p16-dom result (idea 11): the Emacs settings under an explicit domain
+
+432 Emacs rows (324 answerable, 108 unanswerable), `--domain emacs`, all three runs the same shape.
+The control answers 234 of 324 and abstains on 104 of 108. For reference, the same rows under the
+open-domain pool control answered 183, so knowing the domain is worth about +51 on these rows by
+itself.
+
+| arm | correct | lost | gained | net | p | abstention net | verdict |
+|---|---|---|---|---|---|---|---|
+| A, neutral embedder instruction | 242 | 5 | 13 | +8 | 0.096 | +0 | direction only [chk_089] |
+| B, fine-tuned embedder | 243 | 8 | 17 | +9 | 0.108 | +0 | direction only [chk_090] |
+
+Both clear the size of rule 1 (net >= +8) and fail its significance (p < 0.05). Both leave abstention
+and the clean group untouched, which is what the phase 15 arms could not do under the open-domain
+pool: knowing the domain removes the abstention cost. Matched-abstention replays equal the plain
+numbers, since abstention did not move. About a third of each arm's gains come from question families
+with five or six variants (`e25`, `e07`, `e43`), so the rows are not independent and the sign test is
+generous, not harsh. Neither arm becomes the `asq.el` setting on this evidence; both are candidates
+for a larger Emacs set, which does not exist yet (the realistic Emacs screen has 80 rows).
+
+## Reader-side arms, first result (G3)
+
+**G3, extract repair** (`--read-view repaired`): net -6, 32 lost and 26 gained, p 0.51, abstention net -2,
+clean group net -3 [chk_088]. It fails rules 1, 2 and 3; closed. On real data the repair did what it
+was built to do (a window opening mid-line now gets the line completed and the option line above it,
+and 939 of 5800 extracts merged away), but the reader reads no better for it. The cause is not
+established: merging cuts the number of extracts, and phase 7 and G1 show extracts matter.
