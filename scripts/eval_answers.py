@@ -116,6 +116,21 @@ def select_hits(hits: list, read_k: int, cap: int) -> list:
     return hits
 
 
+def order_hits(hits: list, order: str) -> list:
+    """--read-order: the order the reader sees its (already selected) extracts.
+    "rank" returns `hits` itself; "reverse" returns a new reversed list."""
+    if order == "rank":
+        return hits
+    if order == "reverse":
+        return list(reversed(hits))
+    raise ValueError(f"unknown read order: {order!r}")
+
+
+def read_order_config(order: str) -> dict:
+    """Config entry for --read-order, empty at the default so old configs are unchanged."""
+    return {"read_order": order} if order != "rank" else {}
+
+
 # routes that make a per-question decision worth recording
 ROUTED = ("dense-vote", "oracle")
 
@@ -244,8 +259,17 @@ def main() -> int:
                     help="phase 15 R14: the reader's system prompt (smm.generate.SYSTEM / "
                          "SYSTEM_V2). Acts at the generate stage; cite mode only. 'v1' "
                          "(default) reproduces every existing run exactly.")
+    ap.add_argument("--read-order", choices=("rank", "reverse"), default="rank",
+                    help="order of the extracts the reader sees, applied AFTER --read-k / "
+                         "--cap-per-doc selection. Changes only what the reader reads; the "
+                         "gate reads gate_hits before this and is unchanged. 'rank' (default) "
+                         "reproduces every existing run exactly.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
+
+    if args.read_order == "reverse" and args.cascade:
+        print("--read-order reverse does not compose with --cascade", file=sys.stderr)
+        return 2
 
     if args.reader_prompt == "v2" and args.answer_mode == "quote":
         print("--reader-prompt v2 does not compose with --answer-mode quote "
@@ -417,6 +441,7 @@ def main() -> int:
         score = gate_score(gate_hits)
         gated = bool(args.gate) and score < args.gate
         hits = select_hits(hits, args.read_k, args.cap_per_doc)
+        hits = order_hits(hits, args.read_order)
         # --llm-correct: reuse the SAME corrected text the retrieve stage cached
         # (correct_text), never re-ask the model here - see the cache-time
         # comment above. Falls back to query_text(row) (normalize, or the raw
@@ -594,6 +619,7 @@ def write_report(args, results: list, t0: float) -> int:
         config["embed_task"] = args.embed_task
     if args.reader_prompt != "v1":
         config["reader_prompt"] = args.reader_prompt
+    config.update(read_order_config(args.read_order))
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,

@@ -90,6 +90,48 @@ def test_rewrites_zero_keeps_legacy_format():
           "rewrites=0 cache_entry must be JSON-identical to the plain hits list")
 
 
+def test_order_hits_reverse_reverses_and_does_not_mutate():
+    hits = [{"chunk_id": "a"}, {"chunk_id": "b"}, {"chunk_id": "c"}]
+    orig = list(hits)
+    out = eval_answers.order_hits(hits, "reverse")
+    check([h["chunk_id"] for h in out] == ["c", "b", "a"], f"not reversed: {out}")
+    check(out is not hits and hits == orig, "reverse must return a new list, input untouched")
+    try:
+        eval_answers.order_hits(hits, "bogus")
+    except ValueError:
+        return
+    raise AssertionError("unknown order must raise ValueError")
+
+
+def test_order_hits_rank_returns_input_unchanged():
+    hits = [{"chunk_id": "a"}, {"chunk_id": "b"}]
+    check(eval_answers.order_hits(hits, "rank") is hits, "rank must return the same object")
+
+
+def test_order_hits_reverse_after_read_k():
+    hits = [{"chunk_id": c, "doc_id": c} for c in "abcde"]
+    sel = eval_answers.select_hits(hits, 3, 0)
+    out = eval_answers.order_hits(sel, "reverse")
+    check([h["chunk_id"] for h in out] == ["c", "b", "a"],
+          f"reverse must apply to the read-k selection, got {out}")
+
+
+def test_read_order_config_key_only_when_not_default():
+    check(eval_answers.read_order_config("rank") == {}, "rank must add no config key")
+    check(eval_answers.read_order_config("reverse") == {"read_order": "reverse"},
+          "reverse must record read_order")
+
+
+def test_read_order_reverse_rejects_cascade():
+    old = sys.argv
+    sys.argv = ["eval_answers.py", "--read-order", "reverse", "--cascade"]
+    try:
+        rc = eval_answers.main()
+    finally:
+        sys.argv = old
+    check(rc == 2, f"reverse + --cascade must return 2, got {rc}")
+
+
 if __name__ == "__main__":
     tests = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     failed = 0
