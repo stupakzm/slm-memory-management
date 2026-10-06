@@ -476,3 +476,14 @@ evidence 717 against 711; abstention net +1; clean group net +0 (registry entry 
   the mechanism. The typo-1 group gained 6 net (p 0.07), the group where one word is wrong.
 - **Verdict: closed.** Whatever the mechanism contributes is inside the noise of an arm that gains 20 and
   loses 17.
+
+## msr_p16-hd result (idea 14): the section heading in the embedded text
+
+All 75,613 chunks re-embedded with `Section: <heading>` after the document prefix
+(`scripts/reembed_headings.py`; the windows and ids are unchanged; every chunk matched its source
+document), then a full-pool arm against `p15-ctl`. Retrieval took 3547 s against 3761 s for the control, so
+rule 4 holds. Result (registry entry chk_112): 559 of 883 correct against 564, 35 lost and 30 gained,
+net -5, p 0.62; **evidence 711 against 711**, abstention net -1, clean net -1, Emacs net -2, man pages
+net -3. The heading changed which chunks rank where (the answers moved), but not how many rows have the
+gold passage in the top five. **Closed.** The phase 3 gain from the heading trail came with structure-aware
+chunking, which also moved window boundaries; with the boundaries held fixed the heading adds nothing here.
