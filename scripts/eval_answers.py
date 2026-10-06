@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sqlite3
 import sys
 import time
 from collections import defaultdict
@@ -36,6 +37,7 @@ sys.path.insert(0, str(ROOT / "src"))
 # Phase 13: the man pages' domain in the index; their eval rows carry `domain: null`.
 ORACLE_NULL_DOMAIN = "linux"
 
+from smm import extract_view  # noqa: E402
 from smm import gold, grammar, lexical, store  # noqa: E402
 from smm import normalize as qnorm  # noqa: E402
 from smm.cascade import ABSTAIN_RE, abstained, run_cascade  # noqa: E402
@@ -129,6 +131,38 @@ def order_hits(hits: list, order: str) -> list:
 def read_order_config(order: str) -> dict:
     """Config entry for --read-order, empty at the default so old configs are unchanged."""
     return {"read_order": order} if order != "rank" else {}
+
+
+def read_view_config(view: str) -> dict:
+    """Config entry for --read-view, empty at the default so old configs are unchanged."""
+    return {"read_view": view} if view != "raw" else {}
+
+
+def read_view_hits(hits: list, view: str, lookup) -> list:
+    """--read-view: the extracts the reader sees. "raw" returns `hits` itself;
+    "repaired" returns the window-start-repaired, merged view (smm.extract_view).
+    Only the reader reads this - evidence scoring and the gate read `hits`."""
+    if view == "raw":
+        return hits
+    if view == "repaired":
+        return extract_view.repair_hits(hits, lookup)
+    raise ValueError(f"unknown read view: {view!r}")
+
+
+def window_lookup(db_path):
+    """prev_lookup for extract_view: the stripped text of (doc_id, ord) read from
+    the index with plain sqlite3 (read-only, no sqlite_vec), cached per window."""
+    con = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    cache: dict = {}
+
+    def lookup(doc_id: str, ord_: int):
+        key = (doc_id, ord_)
+        if key not in cache:
+            row = con.execute("SELECT text FROM chunks WHERE doc_id=? AND ord=?",
+                              key).fetchone()
+            cache[key] = row[0].strip() if row else None
+        return cache[key]
+    return lookup
 
 
 # routes that make a per-question decision worth recording
@@ -265,11 +299,21 @@ def main() -> int:
                          "--cap-per-doc selection. Changes only what the reader reads; the "
                          "gate reads gate_hits before this and is unchanged. 'rank' (default) "
                          "reproduces every existing run exactly.")
+    ap.add_argument("--read-view", choices=("raw", "repaired"), default="raw",
+                    help="the extracts the reader sees: 'repaired' completes the line a window "
+                         "opens inside from the previous window, puts the option / section line "
+                         "above it and merges consecutive windows of a page (smm.extract_view). "
+                         "Changes only what the reader reads; evidence scoring, retrieved_docs "
+                         "and the gate keep the original hits. 'raw' (default) reproduces every "
+                         "existing run exactly.")
     args = ap.parse_args()
     args.cache = args.cache or args.name
 
     if args.read_order == "reverse" and args.cascade:
         print("--read-order reverse does not compose with --cascade", file=sys.stderr)
+        return 2
+    if args.read_view == "repaired" and args.cascade:
+        print("--read-view repaired does not compose with --cascade", file=sys.stderr)
         return 2
 
     if args.reader_prompt == "v2" and args.answer_mode in ("quote", "line"):
@@ -435,6 +479,7 @@ def main() -> int:
         return 2
     retrieved = json.loads(cache.read_text())
 
+    view_lookup = window_lookup(ROOT / args.db) if args.read_view == "repaired" else None
     results, t0 = [], time.time()
     for i, row in enumerate(rows, 1):
         entry = retrieved[row["qid"]]
@@ -447,6 +492,10 @@ def main() -> int:
         gated = bool(args.gate) and score < args.gate
         hits = select_hits(hits, args.read_k, args.cap_per_doc)
         hits = order_hits(hits, args.read_order)
+        # --read-view: from here `hits` is what the reader reads; `scored_hits` (the
+        # original selection) is what retrieved_docs and evidence scoring read.
+        scored_hits = hits
+        hits = read_view_hits(hits, args.read_view, view_lookup)
         # --llm-correct: reuse the SAME corrected text the retrieve stage cached
         # (correct_text), never re-ask the model here - see the cache-time
         # comment above. Falls back to query_text(row) (normalize, or the raw
@@ -490,7 +539,7 @@ def main() -> int:
             "question": row["question"], "answer": text,
             "abstained": gated or abstained(text),
             "gated": gated,
-            "retrieved_docs": [h["doc_id"] for h in hits],
+            "retrieved_docs": [h["doc_id"] for h in scored_hits],
             "top_score": score,
         }
         if answer_raw is not None:
@@ -516,11 +565,11 @@ def main() -> int:
                 qid_aliases, row["qid"], row.get("variant_of") or row.get("paraphrase_of"))
             rec["correct"] = gold.is_correct(text, toks, row_aliases)
             rec["correct_strict"] = all(t in text for t in toks)
-            aliased_ev, strict_ev = evidence_in(hits, toks, row_aliases)
+            aliased_ev, strict_ev = evidence_in(scored_hits, toks, row_aliases)
             rec["evidence_retrieved"] = aliased_ev
             rec["evidence_retrieved_strict"] = strict_ev
             if not gated:
-                rec.update(grammar.verify_citations(text, hits, toks))
+                rec.update(grammar.verify_citations(text, scored_hits, toks))
         results.append(rec)
         if sys.stdout.isatty():
             print(f"\r  {i}/{len(rows)}  {(time.time()-t0)/i:.1f}s/q", end="", flush=True)
@@ -627,6 +676,7 @@ def write_report(args, results: list, t0: float) -> int:
     if args.reader_prompt != "v1":
         config["reader_prompt"] = args.reader_prompt
     config.update(read_order_config(args.read_order))
+    config.update(read_view_config(args.read_view))
     out.write_text(json.dumps({
         "name": args.name, "k": args.k, "n": len(results),
         "config": config,
