@@ -165,3 +165,41 @@ default, not a ship: it still needs a confirmation arm on the realistic Emacs sc
 **Known limit, stated now.** Phase 8 found about half the changed outcomes flipped only because the
 extracts' order changed, so rule 1 needs a net gain, not churn. G1 removes information (extracts 4
 and 5); if the evidence is in extract 4 or 5 the arm loses that row, and its `lost` list says so.
+
+## Generation-only arms result (run 2026-10-06)
+
+Control `p15-ctl`; each arm generated under setting C on the control's cached retrieval; scored on
+`gold_aliases_v2.json` over all 883 answerable and 277 unanswerable rows.
+
+| arm | answerable correct | lost | gained | net | p | abstention net | verdict |
+|---|---|---|---|---|---|---|---|
+| G1 `--read-k 3` | 509 of 883 | 81 | 26 | -55 | 9.4e-8 | -4 | fail rules 1, 2, 3 |
+| G2 `--read-order reverse` | 567 of 883 | 44 | 47 | +3 | 0.83 | +0 | fail rule 1 |
+
+Registry entries: read-k arm [chk_056], reversed-order arm [chk_057]. The control is 564 of 883 correct, 711 with evidence, 254 of 277
+abstained [chk_057].
+
+- **G1 loses answers it cannot find.** Evidence the reader can see falls from 711 to 660 rows: the
+  answer sits in extract 4 or 5 for 51 rows. The clean group alone loses 14 (p 0.004) and the
+  synonym group 12. Phase 7's result runs the other way from the plan's hope: fewer extracts
+  does not help this reader, and the extra extracts are where recall lives. **G1 is closed.**
+- **G2 is churn.** Reversing the order flips 91 answers (44 lost, 47 gained), net +3, and
+  changes nothing about evidence or abstention. That matches phase 8's finding that order alone moves
+  answers about as much as a real change, and it puts a floor under every arm in this phase: a net
+  under about +10 on 883 rows is indistinguishable from reordering. **G2 is closed as a way to
+  gain answers.**
+- **G2's churn is itself a signal.** Rows that flip with the order are rows the reader answers
+  from luck. Idea 9 (ask twice in two orders, refuse when the named options differ) is the use of it, and
+  both orders now exist for all 1160 rows (`p15-ctl`, `p16-g2`). Counting how often the two answers
+  disagree and how well that separates right from wrong needs no GPU; it is the next offline check.
+
+## Phase 16 status
+
+| idea | verdict |
+|---|---|
+| 1 bracket grammar | built and merged; live check passed; full-pool run not yet done (c04 family) |
+| 2 identifier grounding | dropped (rule 3) |
+| 3 calibrated gate | closed (1 of 4 arms) |
+| 4 extract repair | pre-registration pending its build |
+| 5 order and count | G1 closed, G2 closed |
+| 6-17 | not started |
