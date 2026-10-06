@@ -390,3 +390,35 @@ evidence) are mixed in unmarked.
 sign test p < 0.05. Rules 2 and 3 stay on labels, since they are about abstention and clean rows, which
 the judge does not read. A judged pass changes "direction only" to "rule 1 met" and nothing else: it ships
 nothing and re-opens no closed arm. The judge's labels are not used to relabel the pool.
+
+## msr_p16-judge result (idea 16)
+
+Six `orch-judge` agents labelled 228 items (208 answers from 137 rows whose labels differed between
+control and arm in four pairs, plus 20 hidden controls) from the question, the answer, the reference
+tokens and the gold section text. The hook's canary was refused six times in
+`.work/_blind-denied.log`, once per judge, so the restriction was live. The hook also denied every judge
+the report-delivery call; the reports were recovered from the judges' final messages and every batch's
+ids matched its items file exactly. Blind files (sha256 prefixes): items 01 `bf9927de`, 02 `26decdea`, 03
+`6c87f663`, 04 `670ad2d2`, 05 `c3eca397`, 06 `1315e278`, rubric `a9ea8cf1`.
+
+**Reliability:** 17 of 20 hidden controls judged CORRECT. That is exactly the bar of 17, so the judged
+numbers stand, with no margin (registry entry chk_103).
+
+| pair | rows | labelled net | judged lost | judged gained | judged net | p | unclear |
+|---|---|---|---|---|---|---|---|
+| G4 worked examples vs `p15-ctl` | 82 | +24 | 8 | 36 | +28 | 2.5e-5 | 19 |
+| per-domain A vs `p16-dom-ctl` | 18 | +8 | 0 | 10 | +10 | 0.002 | 3 |
+| per-domain B vs `p16-dom-ctl` | 25 | +9 | 3 | 10 | +7 | 0.092 | 6 |
+| second read S6 vs `p15-ctl` | 12 | +12 | 0 | 11 | +11 | 0.001 | 0 |
+
+By the pre-registered rule (judged net >= +8 and p < 0.05): **per-domain arm A and the second read S6
+meet rule 1 on judged labels; G4 meets it with a wide margin; per-domain arm B does not (+7, p 0.092).**
+That changes nothing that was decided: rules 2 and 3 stay on labels, so G4 and S6 still fail on
+abstention, and arm A is still a candidate that needs a larger Emacs set. What the judge adds is that
+the labelled nets were not inflated: judging mostly removed losses (G4 29 to 8, arm A 5 to 0), which is
+what label noise predicts, since a correct answer the labels missed shows up as a "loss". It also leaves
+19 of G4's items UNCLEAR, a fifth of them.
+
+Limits. The judge saw only rows whose labels differ, so rows the labels score the same, both right or
+both wrong, are not adjusted; and a single judge pass has 17 of 20 on its own controls. The
+families inflate p: arm A's ten judged gains include several variants of one question.
