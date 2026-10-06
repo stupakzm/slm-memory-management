@@ -38,6 +38,62 @@ rules exactly:
 - Cite the extract number you used, like [2].
 - Be brief. No preamble."""
 
+# --reader-prompt v3: SYSTEM_V2 plus three worked examples (a misspelt question, an
+# answer in a later extract, a refusal over distractors). The example pages are the
+# gold page of no eval question.
+EXAMPLES_V3 = """
+Worked examples. They only show how to read; the extracts in them are not the extracts you will be given, and you must not use them to answer.
+
+Example 1 - a misspelt question.
+
+Extracts:
+
+[1] head.1
+head(1) - output the first part of files
+-n, --lines=[-]NUM  print the first NUM lines instead of the first 10
+
+[2] tee.1
+tee(1) - read from standard input and write to standard output and files
+-a, --append  append to the given FILEs, do not overwrite
+
+Question: how do i show only the firts 3 lines of a file
+Answer: Use head -n 3 FILE; -n, --lines=NUM prints the first NUM lines instead of the first 10. [1]
+
+Example 2 - the answer is not in the first extract.
+
+Extracts:
+
+[1] nl.1
+nl(1) - number lines of files
+-w, --number-width=NUMBER  use NUMBER columns for line numbers
+
+[2] paste.1
+paste(1) - merge lines of files
+-d, --delimiters=LIST  reuse characters from LIST instead of TABs
+
+[3] tee.1
+tee(1) - read from standard input and write to standard output and files
+-a, --append  append to the given FILEs, do not overwrite
+
+Question: How do I add output to a file instead of overwriting it, and still see it on screen?
+Answer: Use tee -a FILE; -a, --append appends to the given FILEs instead of overwriting them. [3]
+
+Example 3 - no extract answers the question.
+
+Extracts:
+
+[1] basename.1
+basename(1) - strip directory and suffix from filenames
+-s, --suffix=SUFFIX  remove a trailing SUFFIX; implies -a
+
+[2] fold.1
+fold(1) - wrap each input line to fit in specified width
+-w, --width=WIDTH  use WIDTH columns instead of 80
+
+Question: How do I change the owner of a file?
+Answer: I don't know."""
+SYSTEM_V3 = SYSTEM_V2 + EXAMPLES_V3
+
 # Phase 10: the 30B reader gains correctness by answering from parametric
 # knowledge, not by reading (blk_phase9_parametric_knowledge_failure) - the
 # reranker gate cannot catch this, because a parametric answer still scores
@@ -176,16 +232,20 @@ class Generator:
         `reader_prompt="v2"` (phase 15 R14) swaps SYSTEM for SYSTEM_V2 and the
         extracts header for "Documentation extracts"; "v1" (default) is
         byte-identical to before. Cite mode only: quote mode is v1 only."""
-        if reader_prompt not in ("v1", "v2"):
+        if reader_prompt not in ("v1", "v2", "v3"):
             raise ValueError(f"unknown reader_prompt {reader_prompt!r}")
         if reader_prompt == "v2" and mode == "quote":
             raise ValueError("reader_prompt v2 does not apply to quote mode")
+        if reader_prompt == "v3" and mode == "quote":
+            raise ValueError("reader_prompt v3 does not apply to quote mode")
         if mode == "quote":
             g = grammar.quoted_answer(len(chunks))
             return self.chat(build_prompt(question, chunks, system=QUOTE_SYSTEM), grammar=g, **kw)
         g = grammar.cited_answer(len(chunks)) if cite_grammar and chunks else None
         if reader_prompt == "v2":
             msgs = build_prompt(question, chunks, system=SYSTEM_V2, header="Documentation extracts")
+        elif reader_prompt == "v3":
+            msgs = build_prompt(question, chunks, system=SYSTEM_V3, header="Documentation extracts")
         else:
             msgs = build_prompt(question, chunks)
         return self.chat(msgs, grammar=g, **kw)
