@@ -151,7 +151,7 @@ def test_reader_v2_prompt_text():
     check(msgs[1]["content"] == "Documentation extracts:\n\n[1] d.1\np t\n\nQuestion: q?",
           msgs[1]["content"])
     check(grammar is not None, "cite grammar is still applied under v2")
-    for bad in (dict(reader_prompt="v2", mode="quote"), dict(reader_prompt="v3")):
+    for bad in (dict(reader_prompt="v2", mode="quote"), dict(reader_prompt="v4")):
         try:
             g.answer("q?", CHUNKS, **bad)
         except ValueError:
