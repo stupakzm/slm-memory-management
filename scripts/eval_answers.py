@@ -255,9 +255,9 @@ def main() -> int:
                          "Acts at the retrieve stage; pass it to the generate stage too so "
                          "the answers file's config records it. 'linux' (default) is "
                          "today's instruction and reproduces every existing run exactly.")
-    ap.add_argument("--reader-prompt", choices=("v1", "v2"), default="v1",
+    ap.add_argument("--reader-prompt", choices=("v1", "v2", "v3"), default="v1",
                     help="phase 15 R14: the reader's system prompt (smm.generate.SYSTEM / "
-                         "SYSTEM_V2). Acts at the generate stage; cite mode only. 'v1' "
+                         "SYSTEM_V2 / SYSTEM_V3). Acts at the generate stage; cite mode only. 'v1' "
                          "(default) reproduces every existing run exactly.")
     ap.add_argument("--read-order", choices=("rank", "reverse"), default="rank",
                     help="order of the extracts the reader sees, applied AFTER --read-k / "
@@ -271,8 +271,8 @@ def main() -> int:
         print("--read-order reverse does not compose with --cascade", file=sys.stderr)
         return 2
 
-    if args.reader_prompt == "v2" and args.answer_mode == "quote":
-        print("--reader-prompt v2 does not compose with --answer-mode quote "
+    if args.reader_prompt != "v1" and args.answer_mode == "quote":
+        print(f"--reader-prompt {args.reader_prompt} does not compose with --answer-mode quote "
               "(quote mode is v1 only)", file=sys.stderr)
         return 2
 
