@@ -270,3 +270,31 @@ arm, on all 883 answerable and 277 unanswerable rows:
 **Known limits.** G2 showed that reordering alone flips about 90 answers with net near zero, so rule 1
 needs a net gain, not churn. G4 adds about 500 prompt tokens: its abstention is watched. G5's grammar
 lists 75 to 150 literal lines per question; its sampling latency is measured, not assumed.
+
+## Retrieval-side arms pre-registration (ideas 12, 13, 14; written 2026-10-06, before any of these arms is run)
+
+Scoring as before: `screen_report.py`, `gold_aliases_v2.json`, `--group variant_kind --group-default clean`
+and `--group domain --group-default linux`, `--match-abstention` reported for anything that changes
+retrieval. Generation under setting C. Rules 1 to 3 are the R14 rules: (1) net >= +8 over the answerable
+rows of the comparison with sign test p < 0.05; (2) clean group net >= -2; (3) abstention net >= -1.
+Rule 4 is speed: mean retrieval seconds per question <= control + 0.5.
+
+- **IX, the Emacs manual's concept index (idea 12).** `data/index/phase16-ix.db` = `phase11.db` plus
+  one question vector per Concept Index entry, each pointing at the chunk its `(line N)` falls in
+  (`scripts/build_ixvec.py`; entry text alone is embedded; only the Concept Index, because the command,
+  key, variable and option indexes list names, not wordings). Retrieval with `--domain emacs
+  --question-vectors 10`, on the 432-row Emacs subset, against the control `p16-dom-ctl` (same shape).
+  Rule 4 is relaxed to control + 1.0 s, since R8's route cost +1.78 s on Emacs rows. If the share of
+  entries that map to a chunk is below 0.9, the build refuses and nothing runs.
+- **WSP, widen with the corrected question, rerank against the typed one (idea 13).** `--widen-spell`
+  over the full 1160-row pool against the full-pool control `p15-ctl` (a full run of the same shape;
+  subset runs drift). Extra rule 5, the name rule that failed R4a: among rows `p15-ctl` answered
+  correctly, rows lost by the arm are at most 5, and every lost row is listed with the changed words.
+- **HD, the section heading in the embedded text (idea 14).** `data/index/phase16-hd.db` =
+  `phase11.db` re-embedded by `scripts/reembed_headings.py` (75,613 of 75,613 chunks verified against
+  their source documents; windows and ids unchanged), full 1160-row pool against `p15-ctl`. The query
+  side is unchanged. Window starts are not aligned (that is the reader-side repair's job).
+
+Each is one arm of one mechanism and none is combined with another here. Passing is a candidate, not a
+ship: the realistic Emacs screen (`data/eval/realistic_emacs.jsonl`) and a man-page cost check come
+before any default changes.
