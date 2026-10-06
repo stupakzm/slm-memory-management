@@ -95,15 +95,35 @@ text    ::= [^\[\]\n]+
 '''
 
 
-def extract_lines(chunk: dict, max_lines: int = 40, max_len: int = 160) -> list[str]:
+_ID_PATTERNS = (
+    re.compile(r"(?<![\w-])--[A-Za-z][A-Za-z0-9-]*"),           # long flag
+    re.compile(r"(?<![\w-])-[A-Za-z0-9](?![\w-])"),            # short flag, standing alone
+    re.compile(r"(?<![\w-])(?:[CMs]-)+[^\s,;:)'\"`]+"),         # Emacs key chord
+    re.compile(r"(?<![\w-])M-x\s+[a-z][a-z0-9-]*"),            # M-x command
+)
+
+
+def is_identifier_line(line: str) -> bool:
+    """True iff the line names an option or key: a long or short flag, an Emacs
+    key chord, or M-x <command>. Plain hyphenated English is not one."""
+    line = line.strip()
+    return any(p.search(line) for p in _ID_PATTERNS)
+
+
+def extract_lines(chunk: dict, max_lines: int = 40, max_len: int = 160,
+                  identifier_only: bool = False) -> list[str]:
     """The usable lines of chunk["text"] (never chunk["prefix"]): stripped,
-    at least 4 characters, cut at max_len, first occurrence only, in order."""
+    at least 4 characters, cut at max_len, first occurrence only, in order.
+    identifier_only keeps just the lines for which is_identifier_line holds
+    (applied after the cut; dedupe and max_lines then apply to what remains)."""
     out: list[str] = []
     for raw in chunk["text"].split("\n"):
         line = raw.strip()
         if len(line) < 4:
             continue
         line = line[:max_len]
+        if identifier_only and not is_identifier_line(line):
+            continue
         if line in out:
             continue
         out.append(line)
@@ -119,13 +139,13 @@ def gbnf_literal(s: str) -> str:
     return '"' + s.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def line_answer(extracts: list[dict]) -> str:
+def line_answer(extracts: list[dict], identifier_only: bool = False) -> str:
     """Grammar admitting only the refusal, or one claim `"<line>" <text> [<n>]`
     whose <line> is one of extract n's own lines. Extracts without a line get
     no alternative; with none at all the grammar is the refusal alone."""
     ids, rules = [], []
     for n, chunk in enumerate(extracts[:9], 1):
-        lines = extract_lines(chunk)
+        lines = extract_lines(chunk, identifier_only=identifier_only)
         if not lines:
             continue
         ids.append(n)
