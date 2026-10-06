@@ -458,3 +458,21 @@ in 6 GB. Control `p15-ctl`.
 rows; (2) clean group net >= -2; (3) abstention net >= -1. Seconds per question is recorded as a cost. A
 passing arm still has to fit beside the embedder and reranker for everyday serving (Q6_K only with a
 quantised KV cache or a smaller context, see `todays-plan.md`), so a pass is a candidate, not a ship.
+
+## msr_p16-wsp result (idea 13): widen with the corrected question, rerank against the typed one
+
+`--widen-spell` over the full pool: 370 of 1160 questions were changed by the vocabulary corrector and got
+a widened candidate pool (the corrected question's candidates added, one rerank against the typed
+question). Retrieval took 4041 s against the control's 3761 s, +0.24 s per question (within the +0.5 s
+allowed). Against `p15-ctl`: 567 of 883 correct against 564, 17 lost and 20 gained, net +3, p 0.74;
+evidence 717 against 711; abstention net +1; clean group net +0 (registry entry chk_111).
+
+- **Rules:** rule 1 fails (+3 against +8 and p < 0.05). The clean group and abstention hold. Rule 5, at
+  most five lost rows, fails on the count (17 lost).
+- **The names did not break, and nothing was won.** Of the 17 lost rows only 5 had their question
+  changed (all typo variants: `thst`->`that`, `insttead`->`instead`, `lkst`->`list`, `wihtout`->`without`,
+  `orher`->`other`, `packagex`->`packages`); no tool name was rewritten in a lost row. The other 12 lost
+  rows were not widened at all, so they changed through retrieval order or generation churn, not through
+  the mechanism. The typo-1 group gained 6 net (p 0.07), the group where one word is wrong.
+- **Verdict: closed.** Whatever the mechanism contributes is inside the noise of an arm that gains 20 and
+  loses 17.
