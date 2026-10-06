@@ -326,3 +326,12 @@ clean group net -3 [chk_088]. It fails rules 1, 2 and 3; closed. On real data th
 was built to do (a window opening mid-line now gets the line completed and the option line above it,
 and 939 of 5800 extracts merged away), but the reader reads no better for it. The cause is not
 established: merging cuts the number of extracts, and phase 7 and G1 show extracts matter.
+
+## G5b pre-registration (written 2026-10-06 after G5, before the arm is generated)
+
+G5 (`--answer-mode line`) lost 272 answers and gained 17 [chk_092]. The answers show why: the 4B picks a
+description sentence from the extract ("Display only lines which do NOT match the pattern.") and leaves
+out the line that holds the option (`-v, --invert-match`). **G5b**, `--answer-mode line-id`, offers only
+lines that name a flag, an Emacs key chord or an M-x command, so the chosen line carries the identifier.
+It is a variation of the same idea, tried once. Same control, rules and scoring as G5 (rules 1 to 4);
+no further variation follows whatever it shows.
