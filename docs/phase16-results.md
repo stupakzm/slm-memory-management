@@ -322,14 +322,14 @@ for a larger Emacs set, which does not exist yet (the realistic Emacs screen has
 ## Reader-side arms, first result (G3)
 
 **G3, extract repair** (`--read-view repaired`): net -6, 32 lost and 26 gained, p 0.51, abstention net -2,
-clean group net -3 [chk_088]. It fails rules 1, 2 and 3; closed. On real data the repair did what it
+clean group net -3 (registry entry [chk_088]). It fails rules 1, 2 and 3; closed. On real data the repair did what it
 was built to do (a window opening mid-line now gets the line completed and the option line above it,
 and 939 of 5800 extracts merged away), but the reader reads no better for it. The cause is not
 established: merging cuts the number of extracts, and phase 7 and G1 show extracts matter.
 
 ## G5b pre-registration (written 2026-10-06 after G5, before the arm is generated)
 
-G5 (`--answer-mode line`) lost 272 answers and gained 17 [chk_092]. The answers show why: the 4B picks a
+G5 (`--answer-mode line`) lost 272 answers and gained 17 (registry entry [chk_092]). The answers show why: the 4B picks a
 description sentence from the extract ("Display only lines which do NOT match the pattern.") and leaves
 out the line that holds the option (`-v, --invert-match`). **G5b**, `--answer-mode line-id`, offers only
 lines that name a flag, an Emacs key chord or an M-x command, so the chosen line carries the identifier.
@@ -342,11 +342,11 @@ Control `p15-ctl`, same retrieval, setting C, 883 answerable and 277 unanswerabl
 
 | arm | correct | lost | gained | net | p | clean net | abstention net | verdict |
 |---|---|---|---|---|---|---|---|---|
-| G3 extract repair | 558 | 32 | 26 | -6 | 0.51 | -3 | -2 | fails 1, 2, 3 [chk_088] |
-| G4 worked examples (`--reader-prompt v3`) | 588 | 29 | 53 | +24 | 0.011 | +3 | -6 | fails rule 3 [chk_091] |
-| G5 line mode | 309 | 272 | 17 | -255 | 2.6e-60 | -46 | +5 | fails rule 1 and 2 [chk_092] |
-| G6 `--read-k 2`, alone | 482 | 117 | 35 | -82 | 1.6e-11 | -20 | -4 | closed alone [chk_096] |
-| S6 second read: G6 on rows refused above 0.9 | 576 | 0 | 12 | +12 | 0.0005 | +2 | -7 | fails rule 3 [chk_097] |
+| G3 extract repair | 558 | 32 | 26 | -6 | 0.51 | -3 | -2 | fails 1, 2, 3 (chk_088) |
+| G4 worked examples (`--reader-prompt v3`) | 588 | 29 | 53 | +24 | 0.011 | +3 | -6 | fails rule 3 (chk_091) |
+| G5 line mode | 309 | 272 | 17 | -255 | 2.6e-60 | -46 | +5 | fails rule 1 and 2 (chk_092) |
+| G6 `--read-k 2`, alone | 482 | 117 | 35 | -82 | 1.6e-11 | -20 | -4 | closed alone (chk_096) |
+| S6 second read: G6 on rows refused above 0.9 | 576 | 0 | 12 | +12 | 0.0005 | +2 | -7 | fails rule 3 (chk_097) |
 
 - **G4 is the strongest reader result of the phase and fails the same rule as the phase 15 reader
   arm.** It gains answers broadly (terse +9, p 0.023; Emacs +14, p 0.0066) and loses abstention: six
