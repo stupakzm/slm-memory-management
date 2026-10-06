@@ -422,3 +422,22 @@ what label noise predicts, since a correct answer the labels missed shows up as 
 Limits. The judge saw only rows whose labels differ, so rows the labels score the same, both right or
 both wrong, are not adjusted; and a single judge pass has 17 of 20 on its own controls. The
 families inflate p: arm A's ten judged gains include several variants of one question.
+
+## msr_p16-ix result (idea 12): the Emacs manual's own index
+
+2,097 Concept Index entries parsed from `/usr/share/info/emacs.info.gz` (the only line skipped is
+`* Menu:`), all 2,097 mapped to a chunk, embedded as question vectors into `phase16-ix.db`. A draft
+check (inline, unverified): 1,961 of 2,049 entries that have a word of four or more letters find that
+word in the chunk they map to. Retrieval with `--domain emacs --question-vectors 10` on the 432 Emacs rows
+against `p16-dom-ctl`:
+
+- **Nothing changes in outcomes:** 234 correct against 234, lost 0, gained 0, net +0, evidence 291
+  against 291, abstention identical (registry entry chk_104).
+- **The route is live:** the top five differ on 20 of the 432 rows, and retrieval takes 1581 s against
+  1360 s, +0.51 s per question (within the +1.0 s allowed). The 20 changed lists flipped no label.
+
+A null at the cost of half a second per question: **IX is closed.** Under an explicit Emacs domain the
+dense search plus reranker already finds what an index entry would point at; on 20 rows the entry
+vectors moved the list, and the reader answered the same. R8's 57,000 generated questions gained +23
+evidence on the open-domain pool; 2,097 human entries gain none here, and the likely reason is that this
+is the explicit-domain setting, where the control is already 51 answers above the open-domain one.
