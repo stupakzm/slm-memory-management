@@ -85,3 +85,49 @@ cache, which is not the cache of record, so the colon form is required). The L2 
 
 **Not decided here.** The final operating point of a shipped gate, and any gate looser than 0.65;
 a live arm must pre-register them.
+
+## msr_p16-grounding result
+
+The tool reproduces the draft's figures exactly under the `draft` pattern on `p15-ctl` (cache
+`p15-ctlr`): 44 of 564 correct, 27 of 163 wrong and 5 of 23 unanswerable-answered rows name an
+identifier absent from the extracts, and 4273 of 5800 extracts open with a lowercase fragment
+[chk_050]. So the draft numbers are now evidence, and they measure mostly English: `null-separated`,
+`read-only` and similar.
+
+Under the `tight` pattern, which decides, `p15-ctl` flags 5 of 564 correct, 8 of 163 wrong and 2 of 23
+unanswerable-answered rows [chk_050]. Against the pre-registered rule:
+
+| rule | needed | got | |
+|---|---|---|---|
+| 1. wrong rate >= 3 x correct rate | | 4.9% vs 0.9% (5.5x) | met |
+| 2. flagged correct rows | <= 5 of 564 | 5 | met |
+| 3. flagged wrong + unanswerable-answered rows | >= 20 | 10 | **not met** |
+| replication: wrong rate > correct rate on r13, r14a, r14b | all three | all three [chk_051] | met |
+
+Rule 3 fails: **the check is dropped.** It is precise but too rare to matter: it would refuse 15
+answers: 5 correct, 8 wrong and 2 to unanswerable questions. The "stronger version" (identifiers inside the grammar) is not
+pursued either, since the gap that motivated it came from hyphenated English. The mid-word extract
+rate is unchanged across arms and motivates idea 4 only as context.
+
+## msr_p16-gate result
+
+Fit rows 827, held rows 333 (68 unanswerable), control target 195 of 209 unanswerable fit rows
+refused. Held rows against the control under its plain gate, for each arm's `calibrated` and
+`top1-matched` gate [chk_053]:
+
+| arm | plain net | calibrated net / abstention_net | top1-matched net / abstention_net | rule |
+|---|---|---|---|---|
+| p15-r13 | +0 | -7 / +5 | -13 / +5 | pass |
+| p15-r14a | -2 | -3 / -1 | -8 / +6 | fail (abstention) |
+| p15-r14b | +7 | -1 / +4 | +1 / +4 | fail (net) |
+| p15-r14c | +6 | +6 / -2 | +6 / -2 | fail (no change) |
+
+One of four arms passes; two were required, so **the calibrated gate is closed.** The control's own
+calibrated and top-1 gates equal its plain gate, as expected, since its stored refusals already meet
+the target. What the table shows:
+- Refusing more to match abstention is expensive for every arm: even the best matched gate
+  (`p15-r13` calibrated) is 7 answers below the control, and no arm ends above it at matched
+  abstention. That agrees with the phase 15 matched-abstention diagnostic.
+- The model sorts rows better than the top-1 score alone for `p15-r13` (+6 over top-1 matched,
+  same abstention), and not elsewhere. One arm is a hint, not a result.
+- The replay can only add refusals. A gate looser than 0.65 needs a live run.
