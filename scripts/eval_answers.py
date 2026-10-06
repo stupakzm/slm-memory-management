@@ -83,6 +83,21 @@ def cache_entry(hits: list, gate_hits: list, rewrites: int, corrected: str | Non
     return entry
 
 
+def retrieve_one(r, question: str, k: int, vocab: dict | None) -> tuple:
+    """--widen-spell: `(hits, widened_info)` for one question. With no `vocab`
+    (flag off) or when the vocabulary corrector leaves the question alone this
+    is exactly `(r.retrieve(question, k=k), None)`. When it changes the question
+    the corrected text only ADDS candidates (`Retriever.retrieve_widened`); the
+    one rerank still scores every candidate against `question` as typed, so
+    `hits` is safe for the gate to read. `widened_info` is the audit record."""
+    if vocab is not None:
+        corrected, edits = qnorm.normalize(question, vocab)
+        if edits and corrected != question:
+            return (r.retrieve_widened(question, [corrected], k=k),
+                    {"typed": question, "corrected": corrected, "edits": edits})
+    return r.retrieve(question, k=k), None
+
+
 def unpack_entry(entry: object) -> tuple:
     """Inverse of `cache_entry`'s hits/gate_hits half. A plain list (legacy
     cache, or --rewrites 0 with --llm-correct off) gives `(entry, entry)`;
@@ -271,6 +286,15 @@ def main() -> int:
                          "(0/1/2), cascade_seconds (wall time beyond tier 0) and "
                          "cascade_rewrites ([] at tier 0). Default off reproduces "
                          "every existing run byte-for-byte.")
+    ap.add_argument("--widen-spell", action="store_true",
+                    help="retrieve stage: a question the vocabulary corrector (smm.normalize) "
+                         "changes gets its candidate pool widened with the corrected "
+                         "question's candidates and is reranked once against the question as "
+                         "typed (Retriever.retrieve_widened); unchanged questions retrieve as "
+                         "before. The reader and the gate keep the typed question. Writes "
+                         "NAME-widened.json (qid -> typed/corrected/edits) for audit. Does not "
+                         "compose with --normalize, --llm-correct, --rewrites, --route or "
+                         "--cascade. Default off reproduces every existing run byte-for-byte.")
     ap.add_argument("--route", choices=("dense-vote", "oracle", "quota", "floor"), default=None,
                     help="phase 13 R9: choose each question's domain. 'dense-vote' is the "
                          "retriever's own router (majority domain of the open search's top "
@@ -336,6 +360,15 @@ def main() -> int:
             ("--mode (must be dense)", args.mode != "dense")) if on]
         if clash:
             print(f"--route does not compose with {', '.join(clash)}", file=sys.stderr)
+            return 2
+
+    if args.widen_spell:
+        clash = [flag for flag, on in (
+            ("--normalize", args.normalize != "off"), ("--llm-correct", args.llm_correct),
+            ("--rewrites", args.rewrites > 0), ("--route", bool(args.route)),
+            ("--cascade", args.cascade)) if on]
+        if clash:
+            print(f"--widen-spell does not compose with {', '.join(clash)}", file=sys.stderr)
             return 2
 
     if args.normalize == "local":
@@ -426,7 +459,9 @@ def main() -> int:
         r = Retriever(db, embedder=emb, reranker=rr, mode=args.mode,
                       candidates=args.candidates, domain=args.domain,
                       **qv_kw)
-        retrieved, routes, t0 = {}, {}, time.time()
+        widen_vocab = (qnorm.build_vocab(ROOT / args.db, cache_path=args.vocab_cache)
+                       if args.widen_spell else None)
+        retrieved, routes, widened, t0 = {}, {}, {}, time.time()
         for i, row in enumerate(rows, 1):
             qtext = query_text(row)
             if args.route == "oracle":
@@ -444,8 +479,10 @@ def main() -> int:
                 hits, _winner, _variants, gate_hits = r.retrieve_fused(
                     qtext, rewrites=rewrites, k=args.k)
             else:
-                hits = r.retrieve(qtext, k=args.k)
+                hits, widen = retrieve_one(r, qtext, args.k, widen_vocab)
                 gate_hits = hits
+                if widen:
+                    widened[row["qid"]] = widen
             if args.route in ROUTED:
                 routes[row["qid"]] = r.domain if args.route == "oracle" else r.last_route
             # Expansion changes what the model reads, not how anything ranked, so it
@@ -459,6 +496,8 @@ def main() -> int:
                 print(f"\r  retrieve {i}/{len(rows)}  {(time.time()-t0)/i:.2f}s/q", end="", flush=True)
         cache.parent.mkdir(parents=True, exist_ok=True)
         cache.write_text(json.dumps(retrieved))
+        if args.widen_spell:
+            (cache.parent / f"{args.cache}-widened.json").write_text(json.dumps(widened))
         if args.route in ROUTED:
             (cache.parent / f"{args.cache}-routes.json").write_text(json.dumps(routes))
             print_route_summary(rows, routes)
@@ -665,6 +704,8 @@ def write_report(args, results: list, t0: float) -> int:
         config["llm_correct"] = True
     if args.cascade:
         config["cascade"] = True
+    if args.widen_spell:
+        config["widen_spell"] = True
     if args.question_vectors > 0:
         config["question_vectors"] = args.question_vectors
     if args.route:
