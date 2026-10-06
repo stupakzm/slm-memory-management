@@ -234,8 +234,10 @@ class Generator:
         byte-identical to before. Cite mode only: quote mode is v1 only."""
         if reader_prompt not in ("v1", "v2", "v3"):
             raise ValueError(f"unknown reader_prompt {reader_prompt!r}")
-        if reader_prompt != "v1" and mode == "quote":
-            raise ValueError(f"reader_prompt {reader_prompt} does not apply to quote mode")
+        if reader_prompt == "v2" and mode == "quote":
+            raise ValueError("reader_prompt v2 does not apply to quote mode")
+        if reader_prompt == "v3" and mode == "quote":
+            raise ValueError("reader_prompt v3 does not apply to quote mode")
         if mode == "quote":
             g = grammar.quoted_answer(len(chunks))
             return self.chat(build_prompt(question, chunks, system=QUOTE_SYSTEM), grammar=g, **kw)

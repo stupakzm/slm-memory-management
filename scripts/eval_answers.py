@@ -271,8 +271,12 @@ def main() -> int:
         print("--read-order reverse does not compose with --cascade", file=sys.stderr)
         return 2
 
-    if args.reader_prompt != "v1" and args.answer_mode == "quote":
-        print(f"--reader-prompt {args.reader_prompt} does not compose with --answer-mode quote "
+    if args.reader_prompt == "v2" and args.answer_mode == "quote":
+        print("--reader-prompt v2 does not compose with --answer-mode quote "
+              "(quote mode is v1 only)", file=sys.stderr)
+        return 2
+    if args.reader_prompt == "v3" and args.answer_mode == "quote":
+        print("--reader-prompt v3 does not compose with --answer-mode quote "
               "(quote mode is v1 only)", file=sys.stderr)
         return 2
 
