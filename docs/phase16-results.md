@@ -441,3 +441,20 @@ dense search plus reranker already finds what an index entry would point at; on 
 vectors moved the list, and the reader answered the same. R8's 57,000 generated questions gained +23
 evidence on the open-domain pool; 2,097 human entries gain none here, and the likely reason is that this
 is the explicit-domain setting, where the control is already 51 answers above the open-domain one.
+
+## Idea 8 pre-registration: a less compressed reader (written 2026-10-06, before any arm is generated)
+
+**Question.** The reader is `Qwen3-4B-Instruct-2507-Q4_K_M` (2.5 GB). The task is copying exact option
+spellings, which 4-bit compression plausibly costs a small model. Does the same model at Q5_K_M, Q6_K or
+Q8_0 read better?
+
+**Arms** (same weights family from the same repo, `unsloth/Qwen3-4B-Instruct-2507-GGUF`; one change each):
+**Q5** `Qwen3-4B-Instruct-2507-Q5_K_M.gguf`, **Q6** `...-Q6_K.gguf`, **Q8** `...-Q8_0.gguf`. Each is a
+generation-only run on the control's cached retrieval (`p13-ctl`), setting C, context 4096, with the
+embedder and reranker stopped while the generator runs, since Q8_0 plus both small models does not fit
+in 6 GB. Control `p15-ctl`.
+
+**Decision rule, per arm:** the R14 rules unchanged: (1) net >= +8 and p < 0.05 over the 883 answerable
+rows; (2) clean group net >= -2; (3) abstention net >= -1. Seconds per question is recorded as a cost. A
+passing arm still has to fit beside the embedder and reranker for everyday serving (Q6_K only with a
+quantised KV cache or a smaller context, see `todays-plan.md`), so a pass is a candidate, not a ship.
