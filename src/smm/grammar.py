@@ -113,9 +113,9 @@ def is_identifier_line(line: str) -> bool:
 def extract_lines(chunk: dict, max_lines: int = 40, max_len: int = 160,
                   identifier_only: bool = False) -> list[str]:
     """The usable lines of chunk["text"] (never chunk["prefix"]): stripped,
-    at least 4 characters, cut at max_len, first occurrence only, in order.
-    identifier_only keeps just the lines for which is_identifier_line holds
-    (applied after the cut; dedupe and max_lines then apply to what remains)."""
+    at least 4 characters, cut at max_len, first occurrence only, in order."""
+    # identifier_only keeps just the lines for which is_identifier_line holds,
+    # applied after the cut; dedupe and max_lines then apply to what remains.
     out: list[str] = []
     for raw in chunk["text"].split("\n"):
         line = raw.strip()

@@ -240,7 +240,7 @@ class Generator:
             raise ValueError("reader_prompt v3 does not apply to quote mode")
         if mode in ("line", "line-id"):
             if reader_prompt != "v1":
-                raise ValueError(f"reader_prompt {reader_prompt} does not apply to {mode} mode")
+                raise ValueError(f"reader_prompt {reader_prompt} does not apply to line mode")
             g = grammar.line_answer(chunks, identifier_only=(mode == "line-id"))
             return self.chat(build_prompt(question, chunks, system=QUOTE_SYSTEM), grammar=g, **kw)
         if mode == "quote":
