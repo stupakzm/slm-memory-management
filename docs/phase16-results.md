@@ -368,3 +368,25 @@ Control `p15-ctl`, same retrieval, setting C, 883 answerable and 277 unanswerabl
 extract answers (`"--column" I don't know. [1]`), and the 4B still often picks a line from the
 wrong extract. A real line is no better than a copied one when the choice is the weak step. **Idea 7
 is closed; no further variation.**
+
+## msr_p16-judge pre-registration (idea 16; written 2026-10-06, before any item is packaged or judged)
+
+**Question.** The label audit found about half of "wrong with evidence" answers were in fact right,
+so a net measured on labels can hide a real gain. Do the arms that came closest to rule 1 pass it when a
+blind judge reads the rows whose labels differ?
+
+**Pairs** (control:arm, the same comparisons already scored): `p15-ctl:p16-g4`, `p16-dom-ctl:p16-dom-a`,
+`p16-dom-ctl:p16-dom-b`, `p15-ctl:p16-s6`. **Rows:** answerable rows where the scorer's `correct` differs
+between control and arm (lost plus gained). Both answers of a row are judged, in separate items shuffled
+with seed 16; a refusal is not an item and counts WRONG. **Judge:** `orch-judge`, sees only the question, the
+answer, the reference tokens and the gold section text (`scripts/judge_pack.py`), labels CORRECT, WRONG or
+UNCLEAR by the audit's rubric. Twenty hidden controls (rows both runs of the first pair credited, with
+evidence) are mixed in unmarked.
+
+**Reliability first:** at least 17 of the 20 controls must be judged CORRECT, else every judged number is void.
+
+**Decision rule.** Judged net = rows where the arm is CORRECT and the control WRONG, minus the reverse
+(UNCLEAR rows excluded and counted). An arm **passes rule 1 on judged labels** iff judged net >= +8 and the
+sign test p < 0.05. Rules 2 and 3 stay on labels, since they are about abstention and clean rows, which
+the judge does not read. A judged pass changes "direction only" to "rule 1 met" and nothing else: it ships
+nothing and re-opens no closed arm. The judge's labels are not used to relabel the pool.
