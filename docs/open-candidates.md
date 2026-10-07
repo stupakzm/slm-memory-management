@@ -89,7 +89,7 @@ arms: abstention +0). So two directions remain: make the gain survive without th
 
 The blind judge met its reliability bar exactly (17 of 20 hidden controls). Before leaning on judged numbers
 again: 30 hidden controls, including known-wrong answers (not only known-correct), two passes with the
-item order shuffled differently, and report the agreement between passes. UNCLEAR was 19 of 82 items for
+item order shuffled differently, and report the agreement between passes. UNCLEAR was 19 of 82 rows for
 the worked-examples arm; decide beforehand how UNCLEAR rows count.
 
 ## 9. Older threads still open (from earlier phases, not touched in phase 16)
