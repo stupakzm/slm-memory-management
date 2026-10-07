@@ -487,3 +487,20 @@ net -5, p 0.62; **evidence 711 against 711**, abstention net -1, clean net -1, E
 net -3. The heading changed which chunks rank where (the answers moved), but not how many rows have the
 gold passage in the top five. **Closed.** The phase 3 gain from the heading trail came with structure-aware
 chunking, which also moved window boundaries; with the boundaries held fixed the heading adds nothing here.
+
+## Idea 8 result: the reader at less compression
+
+Same weights family, same retrieval, setting C, control `p15-ctl` (Q4_K_M, 1156 s for the pool). The embedder and
+reranker were stopped while each generator ran.
+
+| reader | correct | lost | gained | net | p | clean net | abstention net | at the control's abstention | seconds |
+|---|---|---|---|---|---|---|---|---|---|
+| Q5_K_M | 561 | 33 | 30 | -3 | 0.80 | +3 | -4 | net -8 | 1862 |
+| Q6_K | 566 | 28 | 30 | +2 | 0.90 | +3 | -5 | net -8 | 1994 |
+| Q8_0 | 573 | 22 | 31 | +9 | 0.27 | +2 | -3 | net +4 | 1652 |
+
+Registry entries chk_113 (Q5_K_M), chk_116 (Q6_K) and chk_117 (Q8_0). No arm meets rule 1 (the best, Q8_0,
+has net +9 but p 0.27) and none meets rule 3. At the control's abstention the gain is gone or shrinks to
++4. **Compression of the reader is not what limits it: closed.** Q8_0's lost count is the smallest (22), a
+hint that finer weights copy slightly better; it is a hint only, at a cost of 4.3 GB and (for Q5 and Q6)
+about 60% more time.
